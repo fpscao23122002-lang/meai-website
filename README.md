@@ -19,31 +19,37 @@ npm run typecheck  # kiểm tra TypeScript
 
 | Đường dẫn | Nội dung |
 | --- | --- |
-| `/` | Landing page: Hero, Bento tính năng, Quy trình, Demo tương tác, Bảng giá, FAQ, CTA |
-| `/docs` | Hướng dẫn sử dụng: cài đặt, thêm tài khoản, prompt hàng loạt, ảnh tham chiếu, hàng đợi, đăng FB Reels, LadiPage, khắc phục sự cố |
+| `/` | Landing page: Hero (ảnh Studio thật), Bento tính năng, Giao diện thật (8 màn hình app), Quy trình, Demo Studio tương tác, Bảng giá, FAQ, CTA |
+| `/docs` | Hướng dẫn sử dụng theo đúng menu app: cài đặt, thiết lập, tài khoản, Studio, Tư liệu, hàng đợi, Kịch bản, LadiPage, Đăng FB Reels, sự cố |
 | `/dashboard` | Khu vực khách hàng: đăng nhập, hạn dùng gói, License Key & thiết bị, tải bản mới, changelog |
 
 ```
-app/                 # Routes (App Router), metadata, sitemap, robots
+app/                 # Routes (App Router), metadata, icon, opengraph-image, sitemap, robots
 components/
-  landing/           # Các section của trang chủ (Hero, StudioMockup, InteractiveDemo, ...)
-  docs/              # Sidebar mục lục + block tài liệu (Steps, Callout, CodeBlock, DocTable)
+  landing/           # Hero, BentoFeatures, AppTour, Workflow, InteractiveDemo, Pricing, FAQ, FinalCTA
+  docs/              # Sidebar mục lục + block tài liệu (Steps, Callout, CodeBlock, DocTable, DocShot)
   dashboard/         # DashboardApp (đăng nhập, license) + Changelog
   layout/            # Navbar, Footer
   ui/                # Button, Logo, Reveal, SectionHeading
 lib/
   site.ts            # Thông tin chung: phiên bản, link tải, liên hệ
-  data.ts            # Engine, bảng giá, FAQ, changelog
+  data.ts            # Engine, màn hình app, bảng giá, FAQ, changelog
   docs.ts            # Mục lục tài liệu
+public/
+  brand/             # Logo MeAI (meai-logo.webp, meai-logo-full.webp)
+  screens/           # Ảnh chụp 12 màn hình app (đã tối ưu WebP 1920px)
+  samples/           # Ảnh thành phẩm mẫu dùng trong demo
+image/, app-preview.png.png  # Ảnh gốc bạn tải lên (nguồn để tạo các file trong public/)
 ```
 
 ## Tùy chỉnh nhanh
 
-- **Ảnh giao diện thật:** đặt ảnh chụp app tại `public/app-preview.png` (khuyến nghị 1920×1080). Hero sẽ tự dùng ảnh này thay cho mockup mô phỏng.
+- **Ảnh giao diện app:** thay file trong `public/screens/` (giữ nguyên tên, khuyến nghị WebP 1920px). Danh sách màn hình & mô tả nằm ở `appScreens` trong `lib/data.ts`.
+- **Logo:** `public/brand/meai-logo.webp` (header/footer), `app/icon.png` + `app/apple-icon.png` (favicon), `app/opengraph-image.png` (ảnh chia sẻ).
 - **Link tải bộ cài:** đặt `NEXT_PUBLIC_DOWNLOAD_URL` (xem `.env.example`) hoặc chép file vào `public/downloads/MeAI-Studio-Setup-x64.exe`.
 - **Phiên bản / ngày phát hành / dung lượng:** sửa trong `lib/site.ts`.
 - **Giá, quyền lợi, FAQ, changelog:** sửa trong `lib/data.ts`.
-- **Màu thương hiệu:** `tailwind.config.ts` (`ink` #0B0F19, `panel` #111827, `cyan.brand/glow`, `neon.pink/red`, `bg-brand-gradient`).
+- **Màu thương hiệu:** `tailwind.config.ts` (lấy đúng từ app: `ink` #0B0B14, `panel` #121224, `bg-brand-gradient` #00F0FF → #FC3199, màu engine Muse/Flow/Seedance/Dola).
 
 ## Lưu ý về `/dashboard`
 

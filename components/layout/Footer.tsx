@@ -8,6 +8,7 @@ const columns = [
     title: "Sản phẩm",
     links: [
       { href: "/#tinh-nang", label: "Tính năng" },
+      { href: "/#giao-dien", label: "Giao diện app" },
       { href: "/#demo", label: "Trải nghiệm thử" },
       { href: "/#bang-gia", label: "Bảng giá" },
       { href: "/dashboard#changelog", label: "Lịch sử cập nhật" },
@@ -18,7 +19,8 @@ const columns = [
     links: [
       { href: "/docs", label: "Hướng dẫn sử dụng" },
       { href: "/docs#cai-dat", label: "Cài đặt & kích hoạt" },
-      { href: "/docs#prompt-hang-loat", label: "Viết prompt hàng loạt" },
+      { href: "/docs#studio", label: "Tạo ảnh & video hàng loạt" },
+      { href: "/docs#kich-ban", label: "Kịch bản & LadiPage" },
       { href: "/docs#dang-reels", label: "Đăng Facebook Reels" },
     ],
   },
@@ -41,13 +43,13 @@ const socials = [
 
 export function Footer() {
   return (
-    <footer className="relative mt-24 border-t border-white/[0.06] bg-[#080B13]">
+    <footer className="relative mt-24 border-t border-white/[0.06] bg-[#08080F]">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-brand-gradient opacity-40" />
       <div className="container grid gap-12 py-16 lg:grid-cols-[1.4fr_repeat(3,1fr)]">
         <div>
           <Logo />
           <p className="mt-5 max-w-sm text-sm leading-6 text-slate-400">
-            {siteConfig.fullName}. Biến danh sách prompt thành hàng trăm video Reels mỗi ngày — một mình bạn vận hành cả một
+            {siteConfig.fullName}. Biến danh sách prompt, kịch bản hay một link LadiPage thành hàng trăm video Reels — một mình bạn vận hành cả một
             xưởng content.
           </p>
           <div className="mt-6 space-y-2 text-sm text-slate-400">

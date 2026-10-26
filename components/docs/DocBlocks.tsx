@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { Info, Lightbulb, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -43,7 +44,7 @@ export function Steps({ items }: { items: { title: string; body: React.ReactNode
 
 export function CodeBlock({ title, children }: { title?: string; children: string }) {
   return (
-    <div className="mt-6 overflow-hidden rounded-xl border border-white/[0.08] bg-[#080B13]">
+    <div className="mt-6 overflow-hidden rounded-xl border border-white/[0.08] bg-[#08080F]">
       {title ? (
         <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-2 text-xs text-slate-500">
           <span>{title}</span>
@@ -87,5 +88,33 @@ export function DocTable({ head, rows }: { head: string[]; rows: React.ReactNode
         </tbody>
       </table>
     </div>
+  );
+}
+
+export function DocShot({
+  src,
+  caption,
+  w = 1920,
+  h = 1040,
+  full,
+}: {
+  src: string;
+  caption: string;
+  w?: number;
+  h?: number;
+  full?: string;
+}) {
+  return (
+    <figure className="mt-6">
+      <a
+        href={full ?? src}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="glow-border block overflow-hidden rounded-xl bg-panel transition hover:shadow-glow-sm"
+      >
+        <Image src={src} alt={caption} width={w} height={h} sizes="(min-width: 1024px) 768px, 100vw" className="h-auto w-full" />
+      </a>
+      <figcaption className="mt-2 text-center text-xs text-slate-500">{caption} · bấm để xem ảnh lớn</figcaption>
+    </figure>
   );
 }
