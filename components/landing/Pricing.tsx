@@ -38,7 +38,7 @@ export function Pricing() {
                 className={cn(
                   "relative flex flex-col rounded-3xl p-7 sm:p-8",
                   plan.highlight
-                    ? "border-[1.5px] border-transparent shadow-glow [background:linear-gradient(180deg,#16203A,#111827)_padding-box,linear-gradient(135deg,#00F2FE,#06B6D4,#EC4899,#FF0844)_border-box] lg:-my-4 lg:py-12"
+                    ? "border-[1.5px] border-transparent shadow-glow [background:linear-gradient(180deg,#191936,#121224)_padding-box,linear-gradient(135deg,#00F0FF,#FC3199)_border-box] lg:-my-4 lg:py-12"
                     : "glow-border bg-panel shadow-panel",
                 )}
               >

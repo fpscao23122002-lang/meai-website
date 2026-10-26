@@ -1,29 +1,29 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ListOrdered, Send, Users, Wand2 } from "lucide-react";
+import { Combine, ListOrdered, UserRound, Users } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
 const steps = [
   {
     Icon: Users,
-    title: "Cắm tài khoản",
-    desc: "Đăng nhập các tài khoản Muse, Google Flow, Seedance vào MeAI. Phiên được lưu & mã hóa trên máy bạn.",
+    title: "Thêm tài khoản",
+    desc: "Tab Tài khoản → thêm Muse, Flow, Seedance hoặc Dola. Đặt số TK chạy đồng thời, tổng luồng, gán proxy nếu cần.",
+  },
+  {
+    Icon: UserRound,
+    title: "Nạp Tư liệu",
+    desc: "Lưu nhân vật (@tên), bật Người mẫu cố định hoặc Ảnh luân phiên để mọi video giữ đúng một gương mặt, một sản phẩm.",
   },
   {
     Icon: ListOrdered,
-    title: "Dán list prompt",
-    desc: "Mỗi dòng một kịch bản. Gắn ảnh người mẫu / sản phẩm, chọn tỉ lệ 9:16 cho Reels hoặc 16:9 cho YouTube.",
+    title: "Dán prompt & Tạo & chạy",
+    desc: "Mỗi prompt cách nhau 1 dòng trống — hoặc viết Kịch bản, hoặc dán link LadiPage. Hàng đợi tự chia việc, tự xử lý lỗi.",
   },
   {
-    Icon: Wand2,
-    title: "Bấm chạy & đi ngủ",
-    desc: "Hàng đợi tự chia việc cho tài khoản rảnh, tự retry task lỗi, tải thành phẩm về Thư viện và ghép video.",
-  },
-  {
-    Icon: Send,
-    title: "Lên sóng tự động",
-    desc: "Lên lịch đăng Facebook Reels đa fanpage, đẩy video sản phẩm sang LadiPage để chốt đơn.",
+    Icon: Combine,
+    title: "Ghép & đăng Reels",
+    desc: "Thành phẩm về Thư viện: Ghép video, Lưu vào Tư liệu, bấm Đăng FB Reels với caption chốt đơn.",
   },
 ];
 
@@ -38,7 +38,7 @@ export function Workflow() {
               Từ ý tưởng tới Reels <span className="text-gradient">trong 4 bước</span>
             </>
           }
-          description="Không cần biết code, không cần học edit. Workflow được thiết kế cho dân MMO, Affiliate và chủ shop muốn ra content đều đặn mỗi ngày."
+          description="Không cần biết code, không cần học edit. Workflow thiết kế cho dân MMO, Affiliate và chủ shop muốn ra content đều đặn mỗi ngày."
         />
         <div className="relative mt-16 grid gap-6 md:grid-cols-2 lg:grid-cols-4">
           <div className="pointer-events-none absolute left-0 right-0 top-7 hidden h-px bg-gradient-to-r from-transparent via-cyan-brand/40 to-transparent lg:block" />

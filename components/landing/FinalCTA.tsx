@@ -19,7 +19,7 @@ export function FinalCTA() {
               Đối thủ đang đăng 50 Reels/ngày. <span className="text-gradient">Còn bạn?</span>
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-slate-400">
-              Tải MeAI Studio, dùng thử 3 ngày đủ tính năng. Tối nay cắm tài khoản, sáng mai có cả trăm video chờ đăng.
+              Tải MeAI Studio, cắm tài khoản, dán prompt và bấm Tạo &amp; chạy. Tối nay xếp hàng đợi, sáng mai có cả trăm video chờ đăng Reels.
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <ButtonLink href={siteConfig.downloadUrl} download size="lg" className="w-full sm:w-auto">

@@ -4,22 +4,28 @@ import { ArrowRight, Download, MessageCircle } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
-import { Callout, CodeBlock, DocTable, Steps } from "@/components/docs/DocBlocks";
+import { Callout, CodeBlock, DocShot, DocTable, Steps } from "@/components/docs/DocBlocks";
 import { ButtonLink } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/site";
 
 export const metadata: Metadata = {
   title: "Hướng dẫn sử dụng",
   description:
-    "Tài liệu hướng dẫn MeAI Studio: cài đặt, kích hoạt License, thêm tài khoản AI, viết prompt hàng loạt, dùng ảnh tham chiếu và tự động đăng Facebook Reels.",
+    "Hướng dẫn MeAI Studio: cài đặt, thêm tài khoản Muse/Flow/Seedance/Dola, tạo ảnh & video hàng loạt, Tư liệu & ảnh tham chiếu, hàng đợi, Kịch bản, LadiPage và đăng Facebook Reels.",
 };
 
-const PROMPT_FORMULA = `[Chủ thể] + [Hành động] + [Bối cảnh] + [Ánh sáng] + [Góc máy / chuyển động] + [Phong cách]`;
+const PROMPT_EXAMPLE = `Chân dung cận cảnh cô gái Việt 25 tuổi, da trắng hồng,
+tóc layer uốn sóng nhẹ, ánh nắng sớm xuyên rèm, phong cách quảng cáo mỹ phẩm
 
-const PROMPT_EXAMPLE = `Cô gái 25 tuổi thoa serum lên má, phòng tắm tông trắng, nắng sớm xuyên rèm, cận mặt máy đẩy chậm, phong cách quảng cáo mỹ phẩm Hàn Quốc
-Cô gái 25 tuổi cầm lọ serum giơ lên camera, bàn trang điểm gỗ sáng, đèn ring light, trung cảnh, phong cách UGC TikTok
-Lọ serum đặt trên đá cẩm thạch, giọt nước lăn trên thân chai, ánh sáng studio dịu, macro xoay 180°, phong cách sản phẩm cao cấp
-Cô gái 25 tuổi soi gương mỉm cười, da căng bóng, ánh hoàng hôn, toàn cảnh máy lia ngang, phong cách điện ảnh`;
+Cô gái 25 tuổi cầm lọ serum giơ lên camera, bàn trang điểm gỗ sáng,
+đèn ring light, trung cảnh, phong cách UGC TikTok
+
+Lọ serum đặt trên đá cẩm thạch, giọt nước lăn trên thân chai,
+ánh sáng studio dịu, macro xoay chậm`;
+
+const SCRIPT_EXAMPLE = `0-10s: Cô gái Việt giơ hộp giữa kho hàng đầy ắp, cận cảnh lung linh đèn Noel
+10-20s: Cả gia đình quây quần mở quà hộp lịch Giáng Sinh
+20-30s: Cận cảnh sản phẩm trên bàn, chữ "Freeship toàn quốc" hiện lên`;
 
 export default function DocsPage() {
   return (
@@ -36,43 +42,52 @@ export default function DocsPage() {
             Hướng dẫn sử dụng <span className="text-gradient">MeAI Studio</span>
           </h1>
           <p className="mt-4 max-w-2xl text-slate-400">
-            Từ lúc tải bộ cài đến khi video đầu tiên lên sóng Reels — đọc theo thứ tự hoặc nhảy thẳng tới phần bạn cần.
-            Mất khoảng 15 phút để làm chủ toàn bộ workflow.
+            Từ lúc cài app đến khi video đầu tiên lên sóng Reels — đi theo đúng thứ tự menu trong app, kèm ảnh chụp màn hình
+            thật. Mất khoảng 15 phút để làm chủ toàn bộ workflow.
           </p>
         </header>
 
-        <div className="container grid gap-10 pb-10 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-14">
+        <div className="container grid gap-10 pb-10 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-14">
           <DocsSidebar />
 
           <article className="prose-doc min-w-0 max-w-3xl pb-10 lg:pt-4">
             {/* 1 */}
             <section id="tong-quan">
-              <h2>Tổng quan</h2>
+              <h2>Tổng quan giao diện</h2>
               <p>
-                MeAI Studio là phần mềm Desktop cho Windows, đóng vai trò <strong>“quản đốc xưởng”</strong> điều phối các
-                engine AI tạo ảnh & video (Muse, Google Flow, Seedance). Bạn cung cấp tài khoản AI, danh sách prompt và tư
-                liệu hình ảnh — MeAI lo phần chia việc, chạy song song, xử lý lỗi, tải thành phẩm, ghép video và đăng
-                Reels.
+                MeAI là phần mềm Desktop cho Windows, đóng vai trò <strong>“quản đốc xưởng”</strong> điều phối các nền tảng AI
+                tạo ảnh & video. Bạn cung cấp tài khoản, prompt và tư liệu — MeAI lo chia việc, chạy song song, xử lý lỗi,
+                lưu thành phẩm, ghép video và đăng Reels.
               </p>
-              <p>Các khu vực chính trong app:</p>
+              <DocShot src="/screens/studio-muse-anh.webp" caption="Màn hình Studio — cấu hình · hàng đợi · xem trước" />
+              <h3>Menu bên trái</h3>
+              <DocTable
+                head={["Mục", "Dùng để"]}
+                rows={[
+                  ["Studio", "Tạo ảnh & video hàng loạt bằng Muse, Google Flow, Seedance"],
+                  ["Tư liệu", "Nhân vật, mẫu prompt, người mẫu cố định, ảnh luân phiên"],
+                  ["Kịch bản", "Viết kịch bản phân cảnh → video có giọng đọc, nhạc nền"],
+                  ["Thư viện", "Xem, ghép, lưu và đăng mọi ảnh/video đã tạo"],
+                  ["Tài khoản", "Thêm tài khoản Muse, Flow, Seedance, Dola; luồng, proxy, hạn mức"],
+                  ["LadiPage", "Dán link landing page → sinh 3 kịch bản phân cảnh cho Muse"],
+                  ["Đăng FB Reels", "Đăng video lên Fanpage bằng Page Access Token"],
+                  ["Cài đặt", "Thư mục lưu, số lần thử khi lỗi, giới hạn thời gian, token Facebook"],
+                ]}
+              />
+              <h3>Thanh công cụ phía trên</h3>
               <ul>
                 <li>
-                  <strong>Studio</strong> — nơi chọn engine, chế độ (ảnh/video), tỉ lệ, ảnh tham chiếu và nhập prompt.
+                  <strong>Dự án</strong> (mặc định là <code>Mặc định</code>) — tách task & thành phẩm theo từng dự án/khách
+                  hàng.
                 </li>
                 <li>
-                  <strong>Tư liệu</strong> — kho ảnh người mẫu, ảnh sản phẩm, logo dùng làm tham chiếu.
+                  <strong>Tài khoản: x/y rảnh</strong> — số tài khoản đang rảnh trên tổng số tài khoản đang bật.
                 </li>
                 <li>
-                  <strong>Kịch bản</strong> — lưu các bộ prompt/hook đã “win” để tái sử dụng.
+                  <strong>Chạy tiếp</strong> / <strong>Dừng tất cả</strong> — tiếp tục hoặc dừng toàn bộ hàng đợi.
                 </li>
                 <li>
-                  <strong>Thư viện</strong> — toàn bộ ảnh/video đã tạo, lọc theo dự án, engine, ngày.
-                </li>
-                <li>
-                  <strong>Tài khoản</strong> & <strong>Hàng đợi</strong> — quản lý pool tài khoản và theo dõi tiến độ task.
-                </li>
-                <li>
-                  <strong>Ghép video</strong>, <strong>Đăng Reels</strong>, <strong>LadiPage</strong> — hậu kỳ và phân phối.
+                  <strong>Thư mục</strong> — mở nhanh thư mục chứa thành phẩm.
                 </li>
               </ul>
             </section>
@@ -80,25 +95,22 @@ export default function DocsPage() {
             {/* 2 */}
             <section id="cai-dat">
               <h2>Cài đặt & kích hoạt</h2>
-              <h3>Yêu cầu hệ thống</h3>
               <DocTable
                 head={["Thành phần", "Tối thiểu", "Khuyến nghị"]}
                 rows={[
                   ["Hệ điều hành", "Windows 10 64-bit", "Windows 11 64-bit"],
-                  ["RAM", "8 GB", "16 GB trở lên (chạy > 10 luồng)"],
-                  ["CPU", "4 nhân", "Intel i5 Gen 10 / Ryzen 5 trở lên"],
-                  ["Ổ cứng trống", "5 GB", "SSD, 50 GB+ để lưu thư viện video"],
-                  ["Mạng", "20 Mbps", "100 Mbps, ổn định"],
+                  ["RAM", "8 GB", "16 GB (chạy nhiều luồng)"],
+                  ["Ổ cứng trống", "5 GB", "SSD, 50 GB+ cho thư viện video"],
+                  ["Mạng", "Ổn định", "Cáp quang, có thể kèm proxy"],
                 ]}
               />
-              <h3>Các bước cài đặt</h3>
               <Steps
                 items={[
                   {
                     title: "Tải bộ cài",
                     body: (
                       <>
-                        Tải file <code>MeAI-Studio-Setup-x64.exe</code> ({siteConfig.installerSize}) tại trang chủ hoặc mục{" "}
+                        Tải file <code>MeAI-Studio-Setup-x64.exe</code> ở trang chủ hoặc trong{" "}
                         <Link href="/dashboard" className="text-cyan-glow hover:underline">
                           Quản lý License
                         </Link>
@@ -110,256 +122,394 @@ export default function DocsPage() {
                     title: "Chạy file cài đặt",
                     body: (
                       <>
-                        Nếu Windows SmartScreen hiện cảnh báo, bấm <strong>More info → Run anyway</strong>. Chọn thư mục cài
-                        đặt (khuyến nghị ổ SSD) rồi bấm <strong>Install</strong>.
+                        Nếu Windows SmartScreen cảnh báo, bấm <strong>More info → Run anyway</strong> rồi làm theo hướng dẫn.
                       </>
                     ),
                   },
                   {
-                    title: "Mở app & nhập License Key",
+                    title: "Kích hoạt License",
                     body: (
                       <>
-                        Lần đầu mở app, cửa sổ kích hoạt hiện ra. Dán License Key dạng <code>MEAI-XXXX-XXXX-XXXX</code> đã
-                        nhận qua email rồi bấm <strong>Kích hoạt</strong>. Chưa mua? Chọn <strong>Dùng thử 3 ngày</strong>.
+                        Mở app và nhập License Key dạng <code>MEAI-XXXX-XXXX-XXXX</code> đã nhận qua email. Máy đã kích hoạt
+                        sẽ hiện trong trang Quản lý License.
                       </>
                     ),
-                  },
-                  {
-                    title: "Cập nhật tự động",
-                    body: "MeAI tự kiểm tra phiên bản mới mỗi khi khởi động và hỏi bạn trước khi cập nhật. Dữ liệu, tài khoản và thư viện được giữ nguyên.",
                   },
                 ]}
               />
               <Callout type="warn">
-                Một số phần mềm diệt virus có thể chặn nhầm vì MeAI điều khiển trình duyệt tự động. Hãy thêm thư mục cài
-                đặt vào danh sách loại trừ (Exclusions) nếu app không khởi động được.
+                Một số phần mềm diệt virus có thể chặn nhầm vì MeAI điều khiển trình duyệt tự động. Hãy thêm thư mục cài đặt
+                vào danh sách loại trừ (Exclusions) nếu app không khởi động được.
               </Callout>
             </section>
 
             {/* 3 */}
-            <section id="them-tai-khoan">
-              <h2>Thêm tài khoản AI</h2>
+            <section id="thiet-lap">
+              <h2>Thiết lập ban đầu (Cài đặt)</h2>
               <p>
-                Mỗi tài khoản là một “công nhân” trong xưởng. Càng nhiều tài khoản, hàng đợi chạy càng nhanh vì MeAI phân
-                bổ task song song cho tất cả tài khoản đang rảnh.
+                Vào <strong>Cài đặt → Chạy task</strong>. Thiết lập áp dụng cho các task chạy sau khi bấm <strong>Lưu</strong>.
               </p>
+              <DocShot src="/screens/cai-dat-focus.webp" w={1209} h={681} full="/screens/cai-dat.webp" caption="Cài đặt: Chạy task & Facebook token" />
+              <DocTable
+                head={["Tuỳ chọn", "Ý nghĩa", "Gợi ý"]}
+                rows={[
+                  ["Thư mục lưu", "Nơi lưu mọi ảnh/video thành phẩm (VD: D:\\MeAI\\output)", "Chọn ổ SSD còn trống nhiều"],
+                  ["Số lần thử khi lỗi", "Task lỗi sẽ tự chạy lại bấy nhiêu lần", "1–2 lần (thử lại tốn thêm lượt Muse)"],
+                  ["Giới hạn tạo ảnh (phút)", "Quá thời gian này task ảnh bị tính là lỗi", "5 phút"],
+                  ["Giới hạn tạo video (phút)", "Quá thời gian này task video bị tính là lỗi", "30 phút"],
+                ]}
+              />
+              <p>
+                Phần <strong>Facebook token</strong> ở cùng trang dùng cho tính năng Đăng FB Reels — xem mục{" "}
+                <a href="#dang-reels" className="text-cyan-glow hover:underline">
+                  Đăng Facebook Reels
+                </a>
+                .
+              </p>
+            </section>
+
+            {/* 4 */}
+            <section id="tai-khoan">
+              <h2>Thêm & quản lý tài khoản</h2>
+              <p>
+                Tab <strong>Tài khoản</strong> gom 4 nền tảng: <strong>Muse</strong>, <strong>Flow</strong>,{" "}
+                <strong>Seedance</strong>, <strong>Dola</strong>. Mỗi tab hiện số tài khoản rảnh, ví dụ <code>1/1 rảnh</code>.
+              </p>
+              <DocShot src="/screens/tai-khoan-focus.webp" w={1209} h={514} full="/screens/tai-khoan.webp" caption="Tài khoản: cấu hình luồng, chia việc, proxy" />
               <Steps
                 items={[
                   {
-                    title: "Mở tab Tài khoản → Thêm tài khoản",
-                    body: "Chọn engine tương ứng: Muse, Google Flow hoặc Seedance. Đặt tên gợi nhớ (VD: flow_acc_01).",
+                    title: "Chọn nền tảng → bấm “+ Thêm tài khoản”",
+                    body: "Đăng nhập tài khoản trong cửa sổ Chrome do MeAI mở. Muốn xem lại trình duyệt của tài khoản nào, bấm Hiện Chrome.",
                   },
                   {
-                    title: "Đăng nhập trong cửa sổ trình duyệt riêng",
-                    body: "MeAI mở một profile trình duyệt cô lập cho từng tài khoản. Đăng nhập như bình thường, kể cả xác minh 2 bước. Đóng cửa sổ khi đã vào được trang chính.",
-                  },
-                  {
-                    title: "Kiểm tra trạng thái",
+                    title: "Kiểm tra tài khoản",
                     body: (
                       <>
-                        Tài khoản hợp lệ hiển thị chấm xanh <strong>Sẵn sàng</strong>. Bấm <strong>Kiểm tra</strong> để
-                        xem số credit/lượt còn lại (nếu engine hỗ trợ).
+                        Mỗi dòng hiện trạng thái (<strong>Rảnh</strong>), gói (VD: PRO) và <strong>tín dụng</strong> còn lại.
+                        Bấm <strong>Kiểm tra phiên</strong> / <strong>Kiểm tra hạn mức</strong> ở góc trên để cập nhật hàng loạt.
                       </>
                     ),
                   },
                   {
-                    title: "Gom nhóm (tùy chọn)",
-                    body: "Gắn tag theo dự án hoặc theo khách hàng để giới hạn hàng đợi chỉ dùng một nhóm tài khoản nhất định.",
+                    title: "Đặt luồng & cách chia việc",
+                    body: (
+                      <>
+                        <strong>TK chạy đồng thời</strong> và <strong>Tổng luồng</strong> quyết định tốc độ. Mỗi tài khoản có ô
+                        số luồng riêng (VD: <code>1 luồng</code>). <strong>Chia việc</strong>: <em>Luân phiên</em> chia đều task
+                        cho các tài khoản, <em>Lần lượt</em> dùng hết tài khoản này rồi mới sang tài khoản kế.
+                      </>
+                    ),
+                  },
+                  {
+                    title: "Gán proxy (tuỳ chọn)",
+                    body: (
+                      <>
+                        Nhập <code>ip:port</code> hoặc <code>ip:port:user:pass</code> cho từng tài khoản rồi bấm{" "}
+                        <strong>Kiểm tra</strong>. Để trống = không dùng proxy.
+                      </>
+                    ),
                   },
                 ]}
               />
-              <Callout type="info">
-                Phiên đăng nhập và cookie được mã hóa và lưu cục bộ trên máy bạn. MeAI không gửi thông tin tài khoản về
-                server. Khi chuyển máy, dùng chức năng <strong>Xuất / Nhập tài khoản</strong> để mang theo.
-              </Callout>
-              <Callout type="tip">
-                Với batch lớn, hãy trộn tài khoản của nhiều engine: Seedance cho cảnh chuyển động nhanh, Google Flow cho cảnh
-                cần chi tiết cao, Muse cho ảnh/video sản phẩm.
-              </Callout>
-            </section>
-
-            {/* 4 */}
-            <section id="prompt-hang-loat">
-              <h2>Viết prompt hàng loạt</h2>
-              <p>
-                Trong Studio, ô <strong>Danh sách prompt</strong> nhận <strong>mỗi dòng là một task</strong>. Bạn có thể dán
-                trực tiếp, nhập từ file <code>.txt</code> / <code>.csv</code>, hoặc kéo một bộ có sẵn từ tab{" "}
-                <strong>Kịch bản</strong>.
-              </p>
-              <h3>Công thức prompt ra video “ăn view”</h3>
-              <CodeBlock title="Công thức">{PROMPT_FORMULA}</CodeBlock>
-              <p>Ví dụ một bộ 4 prompt cho chiến dịch serum, giữ cùng nhân vật nhưng đổi bối cảnh để tránh trùng lặp:</p>
-              <CodeBlock title="serum-q4.txt">{PROMPT_EXAMPLE}</CodeBlock>
-              <h3>Nguyên tắc để batch chạy mượt</h3>
+              <h3>3 công tắc nên bật</h3>
               <ul>
-                <li>Mỗi prompt tối đa 1–2 câu, ưu tiên danh từ & động từ cụ thể thay vì tính từ chung chung.</li>
                 <li>
-                  Mô tả nhân vật <strong>giống hệt nhau</strong> giữa các dòng (tuổi, tóc, trang phục) — kết hợp ảnh tham
-                  chiếu để khóa khuôn mặt.
+                  <strong>Tự động chuyển tài khoản khi chạm hạn mức ngày (Daily Limit)</strong> — hết lượt là nhảy sang tài
+                  khoản khác, hàng đợi không bị đứng.
                 </li>
-                <li>Mô tả chuyển động máy rõ ràng cho video: “máy đẩy chậm”, “lia ngang”, “xoay 360°”.</li>
-                <li>Tránh tên thương hiệu, người nổi tiếng và nội dung nhạy cảm — đây là nguyên nhân số 1 khiến task bị từ chối.</li>
-                <li>Với Reels, chọn tỉ lệ <code>9:16</code>; YouTube/Facebook feed dùng <code>16:9</code> hoặc <code>1:1</code>.</li>
+                <li>
+                  <strong>Tự động tối ưu prompt khi dính bộ lọc an toàn Google (Safety Filter)</strong> — prompt bị chặn sẽ
+                  được viết lại và chạy tiếp.
+                </li>
+                <li>
+                  <strong>Kho proxy dự phòng (US/Global)</strong> — dùng khi tài khoản cần IP nước ngoài.
+                </li>
               </ul>
               <Callout type="tip">
-                Nhờ ChatGPT/Claude viết nhanh 50 biến thể theo công thức trên, rồi dán thẳng vào MeAI. Bộ nào ra số đẹp, lưu
-                vào <strong>Kịch bản</strong> để nhân bản cho sản phẩm khác.
+                Tắt công tắc đầu dòng để tạm ngưng một tài khoản mà không phải xoá. Nút <strong>Đăng xuất</strong> / <strong>Xoá</strong>{" "}
+                nằm cuối mỗi dòng.
               </Callout>
             </section>
 
             {/* 5 */}
-            <section id="anh-tham-chieu">
-              <h2>Ảnh tham chiếu & đồng nhất nhân vật</h2>
+            <section id="studio">
+              <h2>Studio: tạo ảnh & video hàng loạt</h2>
               <p>
-                Đây là “vũ khí” để làm series video cùng một KOC ảo hoặc cùng một sản phẩm mà không bị lệch mặt, lệch bao
-                bì. MeAI hỗ trợ ba chế độ:
+                Chọn engine (<strong>Muse</strong>, <strong>Google Flow</strong>, <strong>Seedance</strong>), chọn{" "}
+                <strong>Tạo ảnh</strong> hoặc <strong>Tạo video</strong>, rồi dán prompt. Quy tắc quan trọng nhất:
               </p>
+              <Callout type="info">
+                <strong>Mỗi prompt cách nhau 1 dòng trống.</strong> Nhờ vậy một prompt có thể viết nhiều dòng mô tả chi tiết
+                (da, tóc, trang phục, bối cảnh) mà vẫn chỉ tính là 1 task.
+              </Callout>
+              <CodeBlock title="3 prompt = 3 task">{PROMPT_EXAMPLE}</CodeBlock>
+              <ul>
+                <li>
+                  <strong>Chèn mẫu prompt…</strong> — chèn nhanh prompt đã lưu. <strong>Lưu làm mẫu</strong> — lưu prompt hiện
+                  tại vào Tư liệu → Mẫu prompt.
+                </li>
+                <li>
+                  <strong>Tạo &amp; chạy</strong> — tạo task và chạy ngay. <strong>Chỉ thêm vào hàng đợi</strong> — xếp task,
+                  chạy sau bằng nút <strong>Chạy</strong> / <strong>Chạy tiếp</strong>.
+                </li>
+              </ul>
+              <h3>Tuỳ chọn theo từng engine</h3>
               <DocTable
-                head={["Chế độ", "Cách hoạt động", "Dùng khi"]}
+                head={["Engine · chế độ", "Tuỳ chọn trong app"]}
                 rows={[
                   [
-                    "Người mẫu",
-                    "Chọn 1 người mẫu từ Tư liệu, MeAI đính kèm bộ ảnh khuôn mặt đó vào mọi prompt trong batch.",
-                    "Xây kênh KOC/KOL ảo, series review cùng một người.",
+                    "Muse · Tạo ảnh",
+                    "Người mẫu, Ảnh luân phiên, Ảnh tham chiếu (tối đa 6), Số ảnh mỗi prompt, Tỉ lệ 9:16 · 16:9 · 1:1 · 4:3 · 3:4, Nâng cao",
+                  ],
+                  ["Muse · Tạo video", "Người mẫu, Ảnh luân phiên, Ảnh tham chiếu (tối đa 6), Tỉ lệ 5 lựa chọn, Nâng cao"],
+                  [
+                    "Google Flow · Tạo ảnh",
+                    "Model (VD: Nano Banana 2 Lite), Tỷ lệ ảnh 5 lựa chọn, Độ phân giải 1K / 2K / 4K, Ảnh đầu / Ảnh cuối, Xóa logo / watermark",
                   ],
                   [
-                    "Ảnh luân phiên",
-                    "Chọn nhiều ảnh, mỗi prompt lần lượt dùng một ảnh theo vòng (1 → 2 → 3 → 1…).",
-                    "Cần đa dạng góc chụp/outfit nhưng vẫn cùng nhân vật, sản phẩm.",
+                    "Google Flow · Tạo video",
+                    "Model (VD: Omni 1.1 Flash), Tỷ lệ 16:9 / 9:16, Chất lượng 720p / 1080p / 4K, Thời lượng 4s / 6s / 8s, Ảnh đầu / Ảnh cuối, Xóa logo / watermark",
                   ],
                   [
-                    "Ảnh tham chiếu",
-                    "Đính kèm cố định tối đa 6 ảnh cho mỗi prompt (mặt, dáng, sản phẩm, logo…).",
-                    "Video sản phẩm cần đúng bao bì, màu sắc, chi tiết.",
+                    "Seedance",
+                    "Chế độ Text → Video / Ảnh → Video / Đầu–cuối, Model Seedance Pro, 480p / 720p / 1080p, 5s / 10s, Tỷ lệ 16:9 · 9:16 · 1:1 · 4:3 · 3:4 · 21:9, Tạo âm thanh, Cố định camera, Xóa watermark, Seed",
                   ],
                 ]}
               />
-              <h3>Chuẩn bị ảnh tham chiếu tốt</h3>
+              <DocShot src="/screens/studio-seedance.webp" caption="Studio với Seedance: Chế độ, độ phân giải, thời lượng, seed" />
+              <h3>Mẹo viết prompt ra video “ăn view”</h3>
               <ul>
-                <li>Ảnh rõ nét, đủ sáng, tối thiểu 1024px cạnh ngắn; nền đơn giản càng tốt.</li>
-                <li>Với người mẫu: 1 ảnh chính diện, 1 ảnh nghiêng 3/4, 1 ảnh toàn thân là đủ để giữ nhận diện.</li>
-                <li>Với sản phẩm: chụp mặt trước có logo, một ảnh cầm trên tay để AI hiểu kích thước thật.</li>
                 <li>
-                  Tỉ lệ đầu ra chọn tự do: <code>9:16</code>, <code>16:9</code>, <code>1:1</code>, <code>4:3</code>,{" "}
-                  <code>3:4</code> — không cần ảnh tham chiếu cùng tỉ lệ.
+                  Công thức: <code>Chủ thể + Hành động + Bối cảnh + Ánh sáng + Góc máy + Phong cách</code>.
+                </li>
+                <li>Mô tả nhân vật giống hệt nhau giữa các prompt và kết hợp Tư liệu để khoá gương mặt.</li>
+                <li>Video: ghi rõ chuyển động máy — “máy đẩy chậm”, “lia ngang”, “xoay 360°”.</li>
+                <li>Reels/TikTok chọn 9:16; Seedance có 21:9 cho cảnh điện ảnh.</li>
+                <li>
+                  Seedance: điền <strong>Seed</strong> cố định để ra kết quả tương tự giữa các lần chạy; để trống = ngẫu nhiên.
                 </li>
               </ul>
-              <Callout type="warn">
-                Chỉ sử dụng hình ảnh bạn có quyền sử dụng. Không dùng ảnh người thật khi chưa có sự đồng ý của họ.
-              </Callout>
             </section>
 
             {/* 6 */}
-            <section id="hang-doi">
-              <h2>Hàng đợi & ghép video</h2>
+            <section id="dong-nhat">
+              <h2>Tư liệu & ảnh tham chiếu</h2>
               <p>
-                Khi bấm <strong>Chạy</strong>, toàn bộ prompt được đẩy vào Hàng đợi. Hệ thống làm việc theo nguyên tắc:
+                Tab <strong>Tư liệu</strong> là nơi giữ “bản gốc” để mọi video đồng nhất. Người mẫu và ảnh luân phiên quản lý
+                ở đây và bật/tắt nhanh ngay trong Studio.
               </p>
-              <ol>
+              <DocShot src="/screens/tu-lieu-focus.webp" w={1215} h={482} full="/screens/tu-lieu.webp" caption="Tư liệu: Nhân vật, Mẫu prompt, Người mẫu cố định, Ảnh luân phiên" />
+              <DocTable
+                head={["Khối", "Cách hoạt động", "Dùng khi"]}
+                rows={[
+                  [
+                    "Nhân vật",
+                    "Prompt có tên nhân vật (viết hoa đúng như tên, hoặc @tên) sẽ tự gắn ảnh của nhân vật đó. Ảnh đẹp ở Thư viện lưu thẳng vào đây được.",
+                    "Xây series KOC/KOL ảo, nhiều nhân vật trong một batch",
+                  ],
+                  ["Mẫu prompt", "Lưu từ ô prompt ở Studio, chèn lại bằng “Chèn mẫu prompt…”.", "Nhân bản kịch bản đã ra số"],
+                  ["Người mẫu cố định", "Khi bật, gắn vào mọi task (tối đa 3 ảnh).", "Cả batch dùng chung một gương mặt"],
+                  [
+                    "Ảnh luân phiên",
+                    "Mỗi task lấy 1 ảnh kế tiếp (không giới hạn số ảnh), thêm bằng + Ảnh hoặc + Folder. App hiện “Ảnh tiếp theo: #n”.",
+                    "Đa dạng góc chụp/outfit/sản phẩm",
+                  ],
+                ]}
+              />
+              <h3>Ảnh tham chiếu & Ảnh đầu / Ảnh cuối</h3>
+              <ul>
                 <li>
-                  <strong>Tự phân bổ:</strong> task tiếp theo luôn được giao cho tài khoản đang rảnh — không tài khoản nào
-                  phải ngồi chơi.
+                  <strong>Muse</strong>: ô <em>Ảnh tham chiếu (tối đa 6)</em> — đính kèm cố định cho mọi prompt trong lượt.
                 </li>
                 <li>
-                  <strong>Tự lọc lỗi:</strong> task bị từ chối, timeout hoặc tài khoản hết lượt được đánh dấu và đưa lại vào
-                  cuối hàng đợi, chuyển sang tài khoản khác.
+                  <strong>Google Flow</strong>: <em>Ảnh đầu / Ảnh cuối</em> (tuỳ chọn) — khung hình mở đầu và kết thúc.
                 </li>
                 <li>
-                  <strong>Giới hạn retry:</strong> mặc định chạy lại tối đa 3 lần. Task vẫn lỗi được gom vào bộ lọc{" "}
-                  <strong>Lỗi</strong> để bạn sửa prompt và chạy lại một chạm.
+                  <strong>Seedance</strong>: chế độ <em>Ảnh → Video</em> hoặc <em>Đầu–cuối</em>.
                 </li>
-                <li>
-                  <strong>Tự tải về:</strong> thành phẩm được lưu vào Thư viện theo cấu trúc <code>Dự án / Ngày / Engine</code>.
-                </li>
-              </ol>
-              <h3>Ghép video trực tiếp</h3>
-              <p>
-                Chọn nhiều clip trong Thư viện → <strong>Ghép video</strong>. Sắp xếp thứ tự bằng kéo-thả, thêm hiệu ứng
-                chuyển cảnh, chèn nhạc nền và xuất ra một video hoàn chỉnh đúng tỉ lệ đã chọn — không cần CapCut hay
-                Premiere.
-              </p>
-              <Callout type="tip">
-                Muốn ưu tiên một dự án gấp? Kéo dự án đó lên đầu Hàng đợi, các task khác sẽ tạm lùi lại mà không bị hủy.
+              </ul>
+              <Callout type="warn">
+                Chỉ dùng hình ảnh bạn có quyền sử dụng. Không dùng ảnh người thật khi chưa có sự đồng ý của họ.
               </Callout>
             </section>
 
             {/* 7 */}
+            <section id="hang-doi">
+              <h2>Hàng đợi, xử lý lỗi & ghép video</h2>
+              <p>Cột giữa Studio là hàng đợi. Mỗi task hiện engine, loại, tỉ lệ, tài khoản đã chạy, thời gian và trạng thái.</p>
+              <ul>
+                <li>
+                  <strong>Tìm prompt…</strong>, lọc <strong>Mọi trạng thái</strong>, sắp xếp <strong>Mới nhất</strong>.
+                </li>
+                <li>
+                  <strong>Chọn lỗi</strong> / <strong>Chọn chưa chạy</strong> — chọn nhanh nhóm task cần xử lý.
+                </li>
+                <li>
+                  Thanh dưới: <strong>Chạy</strong>, <strong>Dừng</strong>, <strong>Xoá</strong>, <strong>Chạy lại lỗi</strong>,{" "}
+                  <strong>Ghép video</strong>.
+                </li>
+                <li>
+                  Bấm một task để xem trước ở cột phải: <strong>Mở file</strong>, <strong>Tạo lại</strong>,{" "}
+                  <strong>Chỉnh sửa</strong> prompt.
+                </li>
+              </ul>
+              <h3>Cơ chế xử lý lỗi</h3>
+              <ol>
+                <li>Task lỗi tự chạy lại theo “Số lần thử khi lỗi” trong Cài đặt.</li>
+                <li>Hết hạn mức ngày → tự chuyển sang tài khoản khác (nếu bật).</li>
+                <li>Dính bộ lọc an toàn → tự tối ưu prompt rồi chạy lại (nếu bật).</li>
+                <li>
+                  Vẫn lỗi → task nằm ở trạng thái <strong>Lỗi</strong>: bấm <strong>Chọn lỗi</strong> →{" "}
+                  <strong>Chạy lại lỗi</strong>, hoặc <strong>Chỉnh sửa</strong> prompt rồi tạo lại.
+                </li>
+              </ol>
+              <h3>Thư viện & ghép video</h3>
+              <DocShot src="/screens/thu-vien-focus.webp" w={1209} h={983} full="/screens/thu-vien.webp" caption="Thư viện: lọc dự án, ảnh/video, Ghép video, Đăng FB Reels" />
+              <p>
+                Thành phẩm nằm ở <strong>Thư viện</strong> (đường dẫn hiện ngay dưới tiêu đề). Chọn nhiều video →{" "}
+                <strong>Ghép video</strong>; chọn ảnh đẹp → <strong>Lưu vào Tư liệu…</strong>; mỗi video có nút{" "}
+                <strong>Mở</strong> và <strong>Đăng FB Reels</strong>.
+              </p>
+            </section>
+
+            {/* 8 */}
+            <section id="kich-ban">
+              <h2>Kịch bản video</h2>
+              <p>
+                Tab <strong>Kịch bản</strong> biến một kịch bản phân cảnh thành video hoàn chỉnh có giọng đọc, nhạc nền và
+                render trên Muse. Có 2 cách nhập: <strong>Kịch bản</strong> (viết theo mốc thời gian) hoặc{" "}
+                <strong>Từ ảnh</strong>.
+              </p>
+              <CodeBlock title="Kịch bản theo mốc thời gian">{SCRIPT_EXAMPLE}</CodeBlock>
+              <DocShot src="/screens/kich-ban-focus.webp" w={1462} h={737} full="/screens/kich-ban.webp" caption="Kịch bản: cách làm, tỉ lệ, giọng đọc, người dẫn, nhạc nền" />
+              <DocTable
+                head={["Tuỳ chọn", "Ý nghĩa"]}
+                rows={[
+                  ["Cách làm", "VD: Làm video thẳng · nhanh ~3 phút"],
+                  ["Tỉ lệ", "VD: 9:16 · Dọc (TikTok, Reels)"],
+                  ["Thời lượng", "VD: 30 giây · gộp các cảnh thành 1 lệnh"],
+                  ["Tiền tố câu lệnh", "Thêm vào đầu mọi cảnh, VD: “Tạo video chân thực”"],
+                  ["Giọng đọc / Người dẫn", "Chọn giọng AI (VD: Husky Campfire — Nam · khàn), người dẫn theo giọng đọc"],
+                  ["Nhân vật dẫn", "Lấy từ Tư liệu → Nhân vật để giữ đúng gương mặt"],
+                  ["Từng cảnh · Tự ghép khi xong", "Render từng cảnh rồi tự ghép thành 1 video"],
+                  ["Nhạc nền · Ghép nhạc", "Chọn thư mục nhạc, app tự ghép vào video"],
+                  ["Số bản / video", "Số phiên bản khác nhau cho cùng kịch bản"],
+                  ["Ảnh sản phẩm (tuỳ chọn)", "Kéo thả nhiều ảnh: mỗi ảnh làm ra 1 bộ video riêng"],
+                ]}
+              />
+              <p>
+                Bấm <strong>Đưa vào hàng đợi</strong>, theo dõi theo bộ lọc <em>Tất cả · Chờ · Đang làm · Xong · Lỗi</em>, rồi
+                bấm <strong>Bắt đầu render trên Muse</strong>. <strong>Thư mục video</strong> mở nơi lưu kết quả.
+              </p>
+            </section>
+
+            {/* 9 */}
+            <section id="ladipage">
+              <h2>LadiPage → kịch bản video</h2>
+              <p>
+                Có sẵn landing page bán hàng? Dán link, MeAI lấy <strong>ảnh gốc, giá, chính sách</strong> và sinh{" "}
+                <strong>3 kịch bản phân cảnh cho Muse</strong>.
+              </p>
+              <DocShot src="/screens/ladipage-focus.webp" w={1209} h={246} full="/screens/ladipage.webp" caption="LadiPage: 4 bước từ link đến hàng đợi" />
+              <Steps
+                items={[
+                  { title: "Dán link", body: "Dán link LadiPage của sản phẩm, bấm Quét và sinh kịch bản." },
+                  { title: "Chọn ảnh sản phẩm", body: "Chọn những ảnh gốc từ landing page muốn đưa vào video." },
+                  { title: "Sửa kịch bản, chọn cách làm", body: "Chỉnh lại câu chữ, giá, ưu đãi trong 3 kịch bản AI sinh ra." },
+                  { title: "Đưa vào hàng đợi", body: "Video được render trên Muse và lưu vào Thư viện như mọi task khác." },
+                ]}
+              />
+            </section>
+
+            {/* 10 */}
             <section id="dang-reels">
-              <h2>Đăng Facebook Reels tự động</h2>
+              <h2>Đăng Facebook Reels</h2>
+              <p>
+                MeAI đăng video lên Fanpage bằng <strong>Page Access Token</strong> (Graph API v20). Cần lấy token một lần
+                trong Cài đặt.
+              </p>
+              <h3>Lấy token & quét Fanpage</h3>
               <Steps
                 items={[
                   {
-                    title: "Kết nối Fanpage",
-                    body: "Vào tab Đăng Reels → Thêm Fanpage. Đăng nhập Facebook trong cửa sổ riêng của MeAI, chọn các Page bạn quản trị.",
-                  },
-                  {
-                    title: "Chọn video từ Thư viện",
-                    body: "Lọc video tỉ lệ 9:16, thời lượng phù hợp Reels. Có thể chọn hàng loạt cả trăm video một lúc.",
-                  },
-                  {
-                    title: "Viết caption & hashtag",
+                    title: "Mở Graph API Explorer",
                     body: (
                       <>
-                        Nhập caption chung hoặc riêng cho từng video. Dùng nhiều dòng caption để MeAI xoay vòng, tránh trùng
-                        lặp nội dung. Gắn link sản phẩm/LadiPage ở bình luận đầu nếu cần.
+                        Truy cập <code>developers.facebook.com/tools/explorer</code>.
+                      </>
+                    ),
+                  },
+                  { title: "Chọn User Token", body: "Ở mục User or Page, chọn User Token." },
+                  {
+                    title: "Tích quyền",
+                    body: (
+                      <>
+                        <code>pages_show_list</code>, <code>pages_read_engagement</code>, <code>pages_manage_posts</code>,{" "}
+                        <code>publish_video</code>.
                       </>
                     ),
                   },
                   {
-                    title: "Lên lịch",
-                    body: "Chọn khung giờ vàng (VD: 11:30, 18:30, 21:00), số video mỗi Page mỗi ngày và khoảng nghỉ ngẫu nhiên giữa các lần đăng.",
-                  },
-                  {
-                    title: "Theo dõi",
-                    body: "Tab Lịch đăng hiển thị trạng thái từng video: Chờ đăng, Đã đăng (kèm link), Lỗi (kèm lý do). Video lỗi có thể đăng lại một chạm.",
+                    title: "Generate Access Token → Quét Fanpage",
+                    body: (
+                      <>
+                        Dán token (bắt đầu bằng <code>EAA…</code>) vào <strong>Cài đặt → Facebook token</strong>, bấm{" "}
+                        <strong>Quét Fanpage</strong>. App tự lấy danh sách Fanpage bạn quản lý.
+                      </>
+                    ),
                   },
                 ]}
               />
+              <h3>Đăng video</h3>
+              <DocShot src="/screens/dang-reels-focus.webp" w={1209} h={665} full="/screens/dang-reels.webp" caption="Đăng FB Reels: chọn video, caption, Đăng lên Reels" />
+              <ol>
+                <li>
+                  Vào <strong>Đăng FB Reels</strong> (hoặc bấm nút <em>Đăng FB Reels</em> trên video trong Thư viện).
+                </li>
+                <li>
+                  <strong>Video cần đăng</strong>: chọn trong kho hoặc <strong>Chọn file khác</strong>.
+                </li>
+                <li>
+                  <strong>Caption</strong>: tiêu đề, caption chốt đơn kèm hashtag (VD: <code>#reels #xuhuong #freeship</code>).
+                </li>
+                <li>
+                  Bấm <strong>Đăng lên Reels</strong>. Kết quả hiện ở <strong>Lịch sử đăng</strong>.
+                </li>
+              </ol>
               <Callout type="warn">
-                Đừng đăng quá dày trên Page mới. Khuyến nghị bắt đầu 3–5 Reels/ngày/Page, tăng dần sau 1–2 tuần. Luôn tuân
-                thủ Tiêu chuẩn cộng đồng của Meta và không reup nội dung có bản quyền.
+                Định dạng Reels là video dọc 9:16. Hãy tuân thủ Tiêu chuẩn cộng đồng của Meta, không đăng nội dung vi phạm bản
+                quyền và không đăng quá dày trên Page mới.
               </Callout>
             </section>
 
-            {/* 8 */}
-            <section id="ladipage">
-              <h2>Tích hợp LadiPage</h2>
-              <p>
-                Đẩy ảnh/video sản phẩm vừa tạo thẳng lên landing page để chạy ads hoặc gắn link Reels, không cần tải về rồi
-                upload thủ công.
-              </p>
-              <ol>
-                <li>
-                  Vào <strong>Cài đặt → Tích hợp → LadiPage</strong>, dán API Key lấy từ tài khoản LadiPage của bạn.
-                </li>
-                <li>Chọn landing page đích và khu vực (section) muốn cập nhật media.</li>
-                <li>
-                  Trong Thư viện, chọn ảnh/video → <strong>Gửi sang LadiPage</strong>. Media được tải lên thư viện của
-                  LadiPage và sẵn sàng sử dụng.
-                </li>
-              </ol>
-            </section>
-
-            {/* 9 */}
+            {/* 11 */}
             <section id="khac-phuc-su-co">
               <h2>Khắc phục sự cố</h2>
               <DocTable
                 head={["Hiện tượng", "Nguyên nhân thường gặp", "Cách xử lý"]}
                 rows={[
                   [
-                    "Tài khoản báo “Hết phiên”",
-                    "Cookie hết hạn hoặc engine yêu cầu đăng nhập lại",
-                    "Bấm Đăng nhập lại trong tab Tài khoản. Bật “Tự làm mới phiên” trong Cài đặt.",
+                    "Tài khoản báo lỗi phiên",
+                    "Phiên đăng nhập hết hạn",
+                    "Tài khoản → Kiểm tra phiên, bấm Hiện Chrome để đăng nhập lại.",
+                  ],
+                  [
+                    "Hàng đợi đứng, task chờ mãi",
+                    "Tài khoản hết tín dụng / chạm Daily Limit",
+                    "Kiểm tra hạn mức, bật tự chuyển tài khoản, thêm tài khoản.",
                   ],
                   [
                     "Task lỗi liên tục",
-                    "Prompt vi phạm chính sách nội dung của engine",
-                    "Mở bộ lọc Lỗi, đọc lý do, bỏ tên thương hiệu/người nổi tiếng rồi chạy lại.",
+                    "Prompt dính bộ lọc an toàn",
+                    "Bật tự tối ưu prompt; bỏ tên thương hiệu/người nổi tiếng rồi Chạy lại lỗi.",
                   ],
+                  ["Task video bị huỷ giữa chừng", "Vượt Giới hạn tạo video (phút)", "Tăng giới hạn trong Cài đặt."],
+                  ["Proxy không chạy", "Sai định dạng hoặc proxy chết", "Nhập ip:port:user:pass, bấm Kiểm tra."],
                   [
-                    "Hàng đợi chạy chậm",
-                    "Ít tài khoản rảnh hoặc tài khoản hết credit",
-                    "Thêm tài khoản, kiểm tra credit, giảm số luồng nếu mạng yếu.",
+                    "“Chưa kết nối Fanpage”",
+                    "Chưa có token hoặc token thiếu quyền",
+                    "Lấy lại token đủ 4 quyền, bấm Quét Fanpage.",
                   ],
                   [
                     "“License đã đạt giới hạn thiết bị”",
@@ -369,13 +519,8 @@ export default function DocsPage() {
                       <Link href="/dashboard" className="text-cyan-glow hover:underline">
                         Quản lý License
                       </Link>{" "}
-                      → gỡ máy cũ, sau đó kích hoạt lại.
+                      → gỡ máy cũ.
                     </>,
-                  ],
-                  [
-                    "Đăng Reels thất bại",
-                    "Page bị hạn chế hoặc video sai định dạng",
-                    "Kiểm tra Page Quality, đảm bảo video 9:16, dưới 90 giây.",
                   ],
                 ]}
               />
