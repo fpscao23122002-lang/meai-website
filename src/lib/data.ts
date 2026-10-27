@@ -248,38 +248,93 @@ export const plans: Plan[] = [
   },
 ];
 
-export const faqs = [
+export const faqCategories = [
+  { id: "mua", label: "Trước khi mua" },
+  { id: "goi", label: "Gói & thiết bị" },
+  { id: "dung", label: "Trong lúc dùng" },
+  { id: "tien", label: "Thanh toán" },
+] as const;
+
+export const faqs: { cat: (typeof faqCategories)[number]["id"]; q: string; a: string }[] = [
   {
+    cat: "mua",
     q: "MeAI chạy trên hệ điều hành nào? Máy cần cấu hình bao nhiêu?",
     a: "MeAI là phần mềm Desktop cho Windows 10/11 64-bit. Việc tạo ảnh/video chạy trên server của các nền tảng AI, máy bạn chủ yếu điều phối trình duyệt và tải thành phẩm — 8GB RAM, CPU 4 nhân là chạy ổn; nhiều luồng thì nên 16GB RAM.",
   },
   {
+    cat: "mua",
     q: "Tôi có cần tự có tài khoản Muse / Google Flow / Seedance không?",
     a: "Có. MeAI là “xưởng điều phối”: bạn thêm tài khoản Muse, Flow, Seedance hoặc Dola trong tab Tài khoản, app hiển thị trạng thái rảnh, gói, tín dụng còn lại và tự chia task. Càng nhiều tài khoản, hàng đợi chạy càng nhanh.",
   },
   {
+    cat: "dung",
     q: "Prompt hàng loạt nhập thế nào?",
     a: "Trong Studio, dán toàn bộ prompt vào ô Prompt, mỗi prompt cách nhau 1 dòng trống — nhờ vậy một prompt có thể dài nhiều dòng (mô tả da, tóc, trang phục…). Prompt hay có thể Lưu làm mẫu và Chèn mẫu prompt ở lần sau.",
   },
   {
+    cat: "dung",
     q: "Làm sao giữ đồng nhất nhân vật/sản phẩm qua hàng trăm video?",
     a: "Kết hợp 4 cách: Nhân vật trong Tư liệu (prompt có tên nhân vật hoặc @tên tự gắn ảnh), Người mẫu cố định (tối đa 3 ảnh gắn vào mọi task), Ảnh luân phiên (mỗi task lấy 1 ảnh kế tiếp) và Ảnh tham chiếu tối đa 6 ảnh. Với Google Flow và Seedance có thêm Ảnh đầu / Ảnh cuối.",
   },
   {
+    cat: "dung",
     q: "Tài khoản bị hết hạn mức hoặc dính bộ lọc an toàn thì sao?",
     a: "Bật “Tự động chuyển tài khoản khi chạm hạn mức ngày” để MeAI nhảy sang tài khoản khác, và “Tự động tối ưu prompt khi dính bộ lọc an toàn Google” để prompt được viết lại và chạy tiếp. Task vẫn lỗi được gom lại — bấm Chọn lỗi → Chạy lại lỗi.",
   },
   {
+    cat: "dung",
     q: "Đăng Facebook Reels hoạt động thế nào?",
     a: "Vào Cài đặt, dán 1 Facebook token (User hoặc Page) có quyền pages_show_list, pages_read_engagement, pages_manage_posts, publish_video rồi bấm Quét Fanpage. Sau đó ở tab Đăng FB Reels chọn video trong kho, viết caption và bấm Đăng lên Reels. Video nên ở dạng dọc 9:16.",
   },
   {
+    cat: "goi",
     q: "Đăng nhập thế nào? Một gói dùng được trên mấy máy?",
     a: "MeAI chỉ dùng tài khoản Google: đăng nhập cùng một Gmail trên website và trong app, gói bạn mua gắn vào tài khoản đó nên app tự nhận đúng gói và hạn dùng — không cần nhập mã kích hoạt. Gói Tháng: 1 máy, Gói Năm: 2 máy, Gói Vĩnh Viễn/Agency: 5 máy; tự gỡ máy cũ trong Khu vực khách hàng. Nhắn Telegram @meai_support để được dùng thử trước khi mua.",
   },
   {
+    cat: "tien",
     q: "Thanh toán bằng cách nào? Có xuất hóa đơn VAT không?",
     a: "Chọn gói trên website hoặc ngay trong app, quét VietQR / chuyển khoản đúng nội dung của đơn. Khi thanh toán được xác nhận, gói tự kích hoạt vào tài khoản Google của bạn — app nhận ngay ở lần mở kế tiếp. Gói Năm và Agency hỗ trợ xuất hóa đơn VAT cho doanh nghiệp.",
+  },
+  {
+    cat: "mua",
+    q: "MeAI có thu thêm tiền cho mỗi video không?",
+    a: "Không. Phí gói là phí sử dụng phần mềm. Lượt tạo ảnh/video được tính trên tài khoản Muse, Flow, Seedance của chính bạn theo gói của từng nền tảng — MeAI không thu thêm đồng nào trên mỗi video và không bán credit.",
+  },
+  {
+    cat: "mua",
+    q: "MeAI có bán tài khoản AI hay credit không?",
+    a: "Không. MeAI chỉ là phần mềm điều phối chạy trên tài khoản bạn tự sở hữu. Bạn tự chuẩn bị tài khoản và chịu trách nhiệm tuân thủ điều khoản của từng nền tảng.",
+  },
+  {
+    cat: "mua",
+    q: "Có dùng thử trước khi mua không?",
+    a: "Có 2 cách: bấm thử Studio mô phỏng ngay trên website (mục Trải nghiệm), hoặc nhắn Telegram @meai_support để được cấp bản dùng thử trên máy của bạn.",
+  },
+  {
+    cat: "goi",
+    q: "Đổi máy hoặc cài lại Windows thì có mất gói không?",
+    a: "Không. Gói gắn với tài khoản Google chứ không gắn với máy. Cài lại xong chỉ cần đăng nhập đúng Gmail; nếu app báo đã đủ số máy, vào Khu vực khách hàng gỡ máy cũ là dùng được ngay.",
+  },
+  {
+    cat: "goi",
+    q: "Mua gói trên web hay trong app có khác nhau không?",
+    a: "Như nhau. Dù mua ở đâu, gói đều cộng vào cùng một tài khoản Google; app kiểm tra lại gói mỗi lần khởi động nên nhận ngay gói mới.",
+  },
+  {
+    cat: "dung",
+    q: "Video và dữ liệu của tôi lưu ở đâu?",
+    a: "Thành phẩm được tải về thư mục bạn chọn trong Cài đặt của app. Website và hệ thống tài khoản MeAI không nhận prompt, ảnh hay video của bạn — chỉ lưu thông tin gói, thiết bị và đơn hàng.",
+  },
+  {
+    cat: "tien",
+    q: "Hết hạn có tự trừ tiền không?",
+    a: "Không. Thanh toán bằng chuyển khoản nên không có gia hạn tự động. Gói sắp hết hạn sẽ hiện cảnh báo trong Khu vực khách hàng; gia hạn sớm được cộng nối tiếp vào hạn còn lại.",
+  },
+  {
+    cat: "tien",
+    q: "Đã chuyển khoản nhưng chưa thấy gói được kích hoạt?",
+    a: "Kiểm tra nội dung chuyển khoản đã đúng mã đơn (dạng MEAIxxxxxx) chưa — trang thanh toán tự cập nhật khi nhận tiền. Nếu vẫn chưa thấy, nhắn Telegram @meai_support kèm mã đơn và ảnh chuyển khoản để được kích hoạt ngay.",
   },
 ];
 

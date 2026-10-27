@@ -6,7 +6,7 @@ import { Menu, UserRound, X } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { ButtonLink } from "@/components/ui/Button";
 import { WindowsIcon } from "@/components/ui/WindowsIcon";
-import { navLinks, siteConfig } from "@/lib/site";
+import { navLinks } from "@/lib/site";
 import { cn } from "@/lib/cn";
 import { usePageScroll } from "@/hooks/usePageScroll";
 import { useIndicator } from "@/hooks/useIndicator";
@@ -125,7 +125,7 @@ export function Navbar() {
             <UserRound className="h-4 w-4" />
             Khách hàng
           </ButtonLink>
-          <ButtonLink href={siteConfig.downloadUrl} download size="sm">
+          <ButtonLink href="/tai-ve" size="sm">
             <WindowsIcon className="h-4 w-4" />
             Tải MeAI
           </ButtonLink>
@@ -187,7 +187,7 @@ export function Navbar() {
                   <UserRound className="h-4 w-4" />
                   Khách hàng
                 </ButtonLink>
-                <ButtonLink href={siteConfig.downloadUrl} download>
+                <ButtonLink href="/tai-ve">
                   <WindowsIcon className="h-4 w-4" />
                   Tải MeAI
                 </ButtonLink>

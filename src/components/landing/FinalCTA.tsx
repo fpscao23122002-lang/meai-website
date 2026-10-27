@@ -5,7 +5,6 @@ import { WindowsIcon } from "@/components/ui/WindowsIcon";
 import { SplitText } from "@/components/fx/SplitText";
 import { trackSpotlight } from "@/components/fx/spotlight";
 import { engines } from "@/lib/data";
-import { siteConfig } from "@/lib/site";
 
 /** Logo nổi giữa các vòng quỹ đạo, mỗi engine là một "vệ tinh" */
 function OrbitLogo() {
@@ -57,13 +56,21 @@ export function FinalCTA() {
                 video chờ đăng Reels.
               </p>
               <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                <ButtonLink href={siteConfig.downloadUrl} download size="lg" className="w-full sm:w-auto">
+                <ButtonLink href="/tai-ve" size="lg" className="w-full sm:w-auto">
                   <WindowsIcon className="h-5 w-5" /> Tải MeAI cho Windows
                 </ButtonLink>
                 <ButtonLink href="/docs" variant="outline" size="lg" className="w-full sm:w-auto">
                   <BookOpen className="h-5 w-5 text-cyan-glow" /> Xem hướng dẫn
                 </ButtonLink>
               </div>
+              <ul className="mt-9 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-slate-400">
+                {["Chạy trên máy của bạn", "Bằng tài khoản AI của bạn", "Thành phẩm nằm trong thư mục của bạn"].map((t) => (
+                  <li key={t} className="flex items-center gap-2">
+                    <span className="h-1.5 w-1.5 rounded-full bg-brand-gradient" />
+                    {t}
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
         </Reveal>

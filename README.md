@@ -57,9 +57,12 @@ npm run deploy              # build + wrangler pages deploy dist
 
 | Đường dẫn | Nội dung |
 | --- | --- |
-| `/` | Landing page: Hero (ảnh Studio thật), Bento tính năng, Giao diện thật (8 màn hình app), Quy trình, Demo Studio tương tác, Bảng giá, FAQ, CTA |
+| `/` | Landing page: Hero (ảnh Studio thật), Bento tính năng, Giao diện thật (8 màn hình app), Ứng dụng thực tế (UGC · phim AI · affiliate), Quy trình, Demo Studio tương tác, Bảng giá + bảng so sánh gói, FAQ theo nhóm, CTA |
 | `/docs` | Hướng dẫn sử dụng theo đúng menu app |
 | `/dashboard` | Khu vực khách hàng — **chỉ đăng nhập bằng Google**: gói & hạn dùng, chọn gói + thanh toán VietQR, máy tính đang dùng, lịch sử đơn, tải bản mới, changelog |
+| `/tai-ve` | Trang tải bộ cài: phiên bản, yêu cầu máy, 4 bước chạy lô đầu tiên, ghi chú bản mới |
+| `/prompt-mau` | Thư viện prompt mẫu theo nhóm (chép từng prompt hoặc cả nhóm để chạy hàng loạt) |
+| `/dieu-khoan`, `/bao-mat` | Điều khoản sử dụng & Chính sách bảo mật (thông tin pháp nhân điền ở `siteConfig.legal` trong `src/lib/site.ts`) |
 | `/app/connect` | Trang app desktop mở để đăng nhập Google qua trình duyệt |
 | `/api/*` | API tài khoản (Cloudflare Pages Functions + D1) — xem [docs/TAI-KHOAN.md](docs/TAI-KHOAN.md) |
 
@@ -81,7 +84,7 @@ public/
   samples/             # Ảnh thành phẩm mẫu dùng trong demo
 src/
   main.tsx, App.tsx    # Khởi tạo React + định tuyến (trang phụ tải lazy)
-  pages/               # HomePage, DocsPage, DashboardPage, AppConnectPage, NotFoundPage
+  pages/               # HomePage, DocsPage, DashboardPage, DownloadPage, PromptLibraryPage, LegalPage, AppConnectPage, NotFoundPage
   components/
     landing/           # Hero, BentoFeatures, AppTour, Workflow, InteractiveDemo, Pricing, FAQ, FinalCTA
     docs/              # Sidebar mục lục + block tài liệu
@@ -89,7 +92,7 @@ src/
     layout/            # Navbar, Footer, ScrollManager (cuộn tới #section)
     ui/                # Button, Link, Image, Logo, Reveal, SectionHeading
   hooks/usePageMeta.ts # Title/description/canonical theo trang
-  lib/                 # site.ts (thông tin chung), data.ts (nội dung), docs.ts (mục lục)
+  lib/                 # site.ts (thông tin chung, pháp lý), data.ts (nội dung, FAQ), prompts.ts (prompt mẫu), docs.ts (mục lục)
 image/, app-preview.png.png  # Ảnh gốc bạn tải lên (nguồn để tạo các file trong public/)
 ```
 

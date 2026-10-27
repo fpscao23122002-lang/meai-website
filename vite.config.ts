@@ -4,7 +4,7 @@ import react from "@vitejs/plugin-react";
 
 /** Chèn URL website vào index.html và sinh robots.txt + sitemap.xml lúc build */
 function seoFiles(siteUrl: string): Plugin {
-  const routes = ["/", "/docs"];
+  const routes = ["/", "/docs", "/tai-ve", "/prompt-mau", "/dieu-khoan", "/bao-mat"];
   return {
     name: "meai-seo-files",
     transformIndexHtml: (html) => html.replaceAll("__SITE_URL__", siteUrl),
@@ -12,7 +12,7 @@ function seoFiles(siteUrl: string): Plugin {
       this.emitFile({
         type: "asset",
         fileName: "robots.txt",
-        source: `User-agent: *\nAllow: /\nDisallow: /dashboard\n\nSitemap: ${siteUrl}/sitemap.xml\n`,
+        source: `User-agent: *\nAllow: /\nDisallow: /dashboard\nDisallow: /app/\nDisallow: /api/\n\nSitemap: ${siteUrl}/sitemap.xml\n`,
       });
       const urls = routes
         .map(

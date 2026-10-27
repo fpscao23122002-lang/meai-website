@@ -34,6 +34,7 @@ sang **chế độ xem thử**: dữ liệu mô phỏng, lưu trên trình duy�
 2. Mở **OAuth consent screen**:
    - User type: **External**.
    - Điền tên app "MeAI Studio", email hỗ trợ và logo.
+   - **Privacy policy**: `https://meai.vn/bao-mat`; **Terms of service**: `https://meai.vn/dieu-khoan` (website đã có sẵn hai trang này).
    - Bấm **Publish app**.
 3. Mở **Credentials**, chọn **Create credentials → OAuth client ID**:
    - Application type: **Web application**.
