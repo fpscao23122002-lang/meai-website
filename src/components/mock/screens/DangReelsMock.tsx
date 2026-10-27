@@ -168,24 +168,24 @@ export function DangReelsMock({ play }: { play: boolean }) {
                   key={video}
                   src={VIDEOS[video]}
                   alt=""
-                  initial={{ opacity: 0, scale: 1.2 }}
-                  animate={{ opacity: 1, scale: [1, 1.08, 1] }}
-                  transition={{ opacity: { duration: 0.5 }, scale: { duration: 6, repeat: Infinity } }}
-                  className="absolute inset-0 h-full w-full object-cover object-top"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="absolute inset-0 h-full w-full animate-[fx-kenburns_6s_ease-in-out_infinite] object-cover object-top"
                 />
               ) : null}
             </AnimatePresence>
             <div className="absolute inset-x-0 top-0 h-1 bg-white/20">
-              <motion.div className="h-full bg-white" animate={posted ? { width: ["0%", "100%"] } : { width: "0%" }} transition={{ duration: 4, repeat: Infinity, ease: "linear" }} />
+              <div className={cn("h-full origin-left scale-x-0 bg-white", posted && "animate-[fx-fill_4s_linear_infinite]")} />
             </div>
             {!posted ? (
               <Play className="absolute inset-0 m-auto h-6 w-6 fill-white/80 text-white/80" />
             ) : null}
             <div className="absolute bottom-10 right-1.5 flex flex-col items-center gap-2 text-white">
-              <motion.span animate={posted ? { scale: [1, 1.35, 1] } : {}} transition={{ duration: 0.5, repeat: Infinity, repeatDelay: 0.8 }} className="flex flex-col items-center text-[8px]">
+              <span className={cn("flex flex-col items-center text-[8px]", posted && "animate-[fx-heart_1.3s_ease-in-out_infinite]")}>
                 <Heart className={cn("h-4 w-4", posted && "fill-neon-pink text-neon-pink")} />
                 {likes}
-              </motion.span>
+              </span>
               <span className="flex flex-col items-center text-[8px]">
                 <MessageCircle className="h-4 w-4" />
                 {Math.round(likes / 9)}

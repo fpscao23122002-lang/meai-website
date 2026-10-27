@@ -1,30 +1,41 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { Link } from "@/components/ui/Link";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useMotionValueEvent } from "framer-motion";
 import { Menu, UserRound, X } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
 import { ButtonLink } from "@/components/ui/Button";
 import { WindowsIcon } from "@/components/ui/WindowsIcon";
 import { navLinks, siteConfig } from "@/lib/site";
 import { cn } from "@/lib/cn";
+import { usePageScroll } from "@/hooks/usePageScroll";
+import { useIndicator } from "@/hooks/useIndicator";
+import { getScrollTarget, onScrollTarget } from "@/lib/scrollState";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [section, setSection] = useState<string | null>(null);
+  const [scrollTarget, setScrollTarget] = useState<string | null>(getScrollTarget());
   const { pathname } = useLocation();
+  const targetRef = useRef<string | null>(null);
+  targetRef.current = scrollTarget;
 
-  // Scroll-spy: tô sáng mục menu ứng với section đang xem
+  useEffect(() => onScrollTarget(setScrollTarget), []);
+
+  // Scroll-spy: tô sáng mục menu ứng với section đang xem (tạm nghỉ khi trang đang tự cuộn tới mục vừa bấm)
   useEffect(() => {
     if (pathname !== "/") return;
     const ids = navLinks.map((l) => l.href.split("#")[1]).filter(Boolean) as string[];
     const els = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+    const visible = new Map<string, number>();
     const io = new IntersectionObserver(
       (entries) => {
-        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (hit) setSection(hit.target.id);
+        entries.forEach((e) => (e.isIntersecting ? visible.set(e.target.id, e.intersectionRatio) : visible.delete(e.target.id)));
+        if (targetRef.current) return;
+        const best = [...visible.entries()].sort((a, b) => b[1] - a[1])[0];
+        setSection(best ? best[0] : null);
       },
       { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.25, 0.5] },
     );
@@ -32,22 +43,37 @@ export function Navbar() {
     return () => io.disconnect();
   }, [pathname]);
 
-  const isActive = (href: string) =>
-    href.startsWith("/#") ? pathname === "/" && section === href.slice(2) : pathname === href;
-
+  // Cuộn có chủ đích kết thúc → đồng bộ lại mục đang xem
   useEffect(() => {
-    let last = window.scrollY;
-    const onScroll = () => {
-      const y = window.scrollY;
-      setScrolled(y > 12);
-      setHidden(y > 400 && y > last + 4);
-      if (y < last - 4) setHidden(false);
-      last = y;
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+    if (scrollTarget) {
+      setSection(scrollTarget);
+      setHidden(false);
+    }
+  }, [scrollTarget]);
+
+  const activeSection = scrollTarget ?? section;
+  const isActive = (href: string) =>
+    href.startsWith("/#") ? pathname === "/" && activeSection === href.slice(2) : pathname === href;
+  const activeHref = navLinks.find((l) => isActive(l.href))?.href ?? null;
+  const { containerRef: navRef, style: pillStyle } = useIndicator<HTMLUListElement>(activeHref);
+
+  // Ẩn menu khi cuộn xuống, hiện khi cuộn lên. Đọc vị trí cuộn trong vòng lặp khung hình của framer
+  // (không ép trình duyệt tính lại bố cục mỗi sự kiện cuộn) và chỉ cập nhật state khi thật sự đổi.
+  const { scrollY } = usePageScroll();
+  const last = useRef(0);
+  const flags = useRef({ scrolled: false, hidden: false });
+  useMotionValueEvent(scrollY, "change", (y) => {
+    const prev = last.current;
+    last.current = y;
+    const sc = y > 12;
+    let hd = flags.current.hidden;
+    if (targetRef.current) hd = false;
+    else if (y > 400 && y > prev + 4) hd = true;
+    else if (y < prev - 4 || y <= 400) hd = false;
+    if (sc !== flags.current.scrolled) setScrolled(sc);
+    if (hd !== flags.current.hidden) setHidden(hd);
+    flags.current = { scrolled: sc, hidden: hd };
+  });
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -62,32 +88,32 @@ export function Navbar() {
       animate={{ y: hidden && !open ? -80 : 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
-        "fixed inset-x-0 top-0 z-50 transition-all duration-300",
+        "fixed inset-x-0 top-0 z-50 transition-[background-color,border-color] duration-300",
         scrolled || open ? "border-b border-white/[0.06] bg-ink/80 backdrop-blur-xl" : "bg-transparent",
       )}
     >
       <nav className="container flex h-16 items-center justify-between gap-6">
         <Logo />
 
-        <ul className="hidden items-center gap-1 lg:flex">
+        <ul ref={navRef} className="relative hidden items-center gap-1 lg:flex">
+          <span
+            aria-hidden
+            style={pillStyle}
+            className="pointer-events-none absolute left-0 top-0 rounded-lg bg-white/[0.06] ring-1 ring-cyan-glow/30 will-change-transform"
+          >
+            <span className="absolute inset-x-3 -bottom-px h-px bg-brand-gradient" />
+          </span>
           {navLinks.map((l) => (
             <li key={l.href}>
               <Link
                 href={l.href}
+                data-ind={l.href}
+                data-no-ripple
                 className={cn(
-                  "relative isolate block rounded-lg px-3.5 py-2 text-sm font-medium transition-colors hover:text-white",
+                  "relative block rounded-lg px-3.5 py-2 text-sm font-medium transition-colors duration-300 hover:text-white active:scale-95",
                   isActive(l.href) ? "text-white" : "text-slate-400",
                 )}
               >
-                {isActive(l.href) ? (
-                  <motion.span
-                    layoutId="nav-active"
-                    className="absolute inset-0 -z-10 rounded-lg bg-white/[0.06] ring-1 ring-cyan-glow/30"
-                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                  >
-                    <span className="absolute inset-x-3 -bottom-px h-px bg-brand-gradient" />
-                  </motion.span>
-                ) : null}
                 {l.label}
               </Link>
             </li>

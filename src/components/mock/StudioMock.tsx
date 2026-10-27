@@ -6,6 +6,7 @@ import { CONFIGS, DEFAULT_OPTS, type Kind, type OptValue } from "@/lib/studioCon
 import { useDemoControl, useScript, useTask } from "@/hooks/useScript";
 import { AppFrame, Btn, Caret, FakeCursor, Field, Interactive, Label, Panel, ProgressBar, Seg, StatusPill, Toast, Toggle } from "./atoms";
 import { pointTo } from "./mockUtils";
+import { useIndicator } from "@/hooks/useIndicator";
 import { cn } from "@/lib/cn";
 
 type Task = {
@@ -94,6 +95,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
 
   const busy = tasks.filter((t) => t.status === "run").length;
   const ctl = useDemoControl(Boolean(inView && !reduce));
+  const engInd = useIndicator(mode.engine);
   const task = useTask();
 
   // Người dùng tự thao tác
@@ -223,25 +225,23 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
         <div className="grid gap-2.5 md:grid-cols-[232px_minmax(0,1fr)] xl:grid-cols-[232px_minmax(0,1fr)_190px]">
           {/* Panel cấu hình */}
           <Panel className="space-y-2.5 p-2.5">
-            <div className="flex gap-0.5 rounded-md border border-white/[0.06] bg-ink/50 p-0.5">
+            <div ref={engInd.containerRef} className="relative flex gap-0.5 rounded-md border border-white/[0.06] bg-ink/50 p-0.5">
+              <span
+                aria-hidden
+                style={{ ...engInd.style, boxShadow: `inset 0 0 0 1px ${engineOf(mode.engine).hex}` }}
+                className="pointer-events-none absolute left-0 top-0 rounded bg-white/[0.06] will-change-transform"
+              />
               {engines.map((en) => (
                 <button
                   type="button"
                   key={en.id}
+                  data-ind={en.id}
                   onClick={() => pickEngine(en.id)}
                   className={cn(
                     "relative flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded px-1 py-1 text-[10.5px] font-semibold",
                     en.id === mode.engine ? "text-white" : "text-slate-500 hover:text-white",
                   )}
                 >
-                  {en.id === mode.engine ? (
-                    <motion.span
-                      layoutId={`${uid}-eng`}
-                      className="absolute inset-0 rounded bg-white/[0.06]"
-                      style={{ boxShadow: `inset 0 0 0 1px ${en.hex}` }}
-                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                    />
-                  ) : null}
                   <span className={cn("relative h-1.5 w-1.5 rounded-full", en.dot)} />
                   <span className="relative">{en.name}</span>
                 </button>
@@ -386,15 +386,19 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                   return (
                     <motion.div
                       key={t.id}
-                      layout
-                      initial={{ opacity: 0, x: -24, backgroundColor: "rgba(0,240,255,0.18)" }}
-                      animate={{ opacity: 1, x: 0, backgroundColor: active ? "rgba(0,240,255,0.06)" : "rgba(0,0,0,0)" }}
+                      initial={{ opacity: 0, x: -24, height: 0, backgroundColor: "rgba(0,240,255,0.18)" }}
+                      animate={{ opacity: 1, x: 0, height: "auto", backgroundColor: active ? "rgba(0,240,255,0.06)" : "rgba(0,0,0,0)" }}
                       exit={{ opacity: 0, height: 0 }}
-                      transition={{ duration: 0.4 }}
+                      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
                       onClick={() => t.status === "done" && setPreview(t)}
-                      className="relative flex cursor-pointer items-center gap-2 border-b border-white/[0.04] px-2.5 py-1.5"
+                      className="relative flex cursor-pointer items-center gap-2 overflow-hidden border-b border-white/[0.04] px-2.5 py-1.5"
                     >
-                      {active ? <motion.span layoutId={`${uid}-row`} className="absolute inset-y-0 left-0 w-0.5 bg-cyan-glow" /> : null}
+                      <span
+                        className={cn(
+                          "absolute inset-y-0 left-0 w-0.5 origin-top bg-cyan-glow transition-transform duration-300",
+                          active ? "scale-y-100" : "scale-y-0",
+                        )}
+                      />
                       <span className="h-3 w-3 shrink-0 rounded-[3px] border border-white/20" />
                       <span className="relative h-8 w-8 shrink-0 overflow-hidden rounded-md bg-white/5">
                         <AnimatePresence>

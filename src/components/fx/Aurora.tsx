@@ -1,7 +1,27 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 /** Nền động toàn trang: các quầng sáng trôi chậm + hạt sáng lấp lánh (chỉ dùng transform/opacity để mượt) */
 export function Aurora() {
+  const ref = useRef<HTMLDivElement>(null);
+
+  // Khi đang cuộn: tạm dừng các quầng sáng (trôi rất chậm nên mắt không nhận ra), giúp trình duyệt
+  // dồn toàn bộ sức xử lý cho việc cuộn → mượt hơn trên mọi thiết bị. Tiếp tục ngay khi ngừng cuộn.
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    let timer = 0;
+    const onScroll = () => {
+      if (!el.classList.contains("aurora-paused")) el.classList.add("aurora-paused");
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => el.classList.remove("aurora-paused"), 160);
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      window.clearTimeout(timer);
+    };
+  }, []);
+
   const particles = useMemo(() => {
     // Sinh vị trí cố định (giả ngẫu nhiên) để không đổi giữa các lần render
     let seed = 7;
@@ -18,7 +38,7 @@ export function Aurora() {
   }, []);
 
   return (
-    <div aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden">
+    <div ref={ref} aria-hidden className="pointer-events-none fixed inset-0 -z-10 overflow-hidden [contain:strict]">
       <div className="absolute -left-[15%] -top-[20%] h-[60vmax] w-[60vmax] animate-aurora-1 rounded-full bg-[radial-gradient(circle,rgba(0,240,255,0.13),transparent_60%)]" />
       <div className="absolute -right-[20%] top-[10%] h-[55vmax] w-[55vmax] animate-aurora-2 rounded-full bg-[radial-gradient(circle,rgba(252,49,153,0.11),transparent_60%)]" />
       <div className="absolute -bottom-[25%] left-[20%] h-[50vmax] w-[50vmax] animate-aurora-3 rounded-full bg-[radial-gradient(circle,rgba(168,85,247,0.09),transparent_60%)]" />

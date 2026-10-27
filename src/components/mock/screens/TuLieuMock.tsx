@@ -4,6 +4,7 @@ import { AtSign, FolderPlus, Plus } from "lucide-react";
 import { useDemoControl, useScript } from "@/hooks/useScript";
 import { AppFrame, Btn, Interactive, Label, Panel, PTitle, Toggle } from "../atoms";
 import { cn } from "@/lib/cn";
+import { useIndicator } from "@/hooks/useIndicator";
 
 const FACES = ["/samples/video-1.webp", "/samples/video-3.webp", "/samples/video-4.webp", "/samples/video-5.webp", "/samples/video-2.webp", "/samples/anh-1.webp"];
 const CHARACTERS = [
@@ -24,6 +25,7 @@ export function TuLieuMock({ play }: { play: boolean }) {
   const [next, setNext] = useState(0);
   const [inserted, setInserted] = useState<string | null>(null);
   const ctl = useDemoControl(play);
+  const nextInd = useIndicator(String(next));
 
   const toggleModel = (v: boolean) => {
     setModelOn(v);
@@ -170,11 +172,13 @@ export function TuLieuMock({ play }: { play: boolean }) {
           <p className="mt-1 text-[10px] text-slate-500">
             Mỗi task lấy 1 ảnh kế tiếp · <span className="text-cyan-glow">Ảnh tiếp theo: #{next + 1}</span>
           </p>
-          <div className="mt-2 grid grid-cols-6 gap-1">
+          <div ref={nextInd.containerRef} className="relative mt-2 grid grid-cols-6 gap-1">
+            <span aria-hidden style={nextInd.style} className="pointer-events-none absolute left-0 top-0 z-10 rounded-md bg-cyan-glow/20 will-change-transform" />
             {FACES.slice(0, rotateImgs).map((src, i) => (
               <motion.button
                 type="button"
                 key={src}
+                data-ind={String(i)}
                 onClick={() => setNext(i)}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -185,7 +189,6 @@ export function TuLieuMock({ play }: { play: boolean }) {
                 )}
               >
                 <img src={src} alt="" className="h-full w-full object-cover object-top" />
-                {i === next ? <motion.span layoutId="tl-next" className="absolute inset-0 bg-cyan-glow/20" /> : null}
               </motion.button>
             ))}
           </div>

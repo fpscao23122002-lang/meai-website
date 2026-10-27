@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
+import { AnimatePresence, motion, useSpring } from "framer-motion";
 import { BookOpen, ChevronDown } from "lucide-react";
 import { docSections } from "@/lib/docs";
 import { cn } from "@/lib/cn";
+import { usePageScroll } from "@/hooks/usePageScroll";
+import { useIndicator } from "@/hooks/useIndicator";
 
 export function DocsSidebar() {
   const [active, setActive] = useState<string>(docSections[0].id);
@@ -25,30 +27,33 @@ export function DocsSidebar() {
 
   const current = docSections.find((s) => s.id === active) ?? docSections[0];
   const activeIdx = docSections.findIndex((s) => s.id === active);
-  const { scrollYProgress } = useScroll();
+  const tocInd = useIndicator<HTMLUListElement>(active);
+  const tocIndMobile = useIndicator<HTMLUListElement>(open ? active : null);
+  const { scrollYProgress } = usePageScroll();
   const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
 
-  const list = (
-    <ul className="space-y-0.5">
+  // Danh sách dùng cho cả bản mobile (thả xuống) và desktop, mỗi bản có viên sáng riêng
+  const renderList = (ind: typeof tocInd) => (
+    <ul ref={ind.containerRef} className="relative space-y-0.5">
+      <span
+        aria-hidden
+        style={ind.style}
+        className="pointer-events-none absolute left-0 top-0 rounded-lg border-l-2 border-cyan-glow bg-cyan-brand/10 will-change-transform"
+      />
       {docSections.map((s, i) => (
         <li key={s.id}>
           <a
             href={`#${s.id}`}
+            data-ind={s.id}
             onClick={() => setOpen(false)}
             className={cn(
               "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
               active === s.id ? "font-semibold text-white" : "text-slate-400 hover:text-white",
             )}
           >
-            {active === s.id ? (
-              <motion.span
-                layoutId="docs-active"
-                transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                className="absolute inset-0 rounded-lg border-l-2 border-cyan-glow bg-cyan-brand/10"
-              />
-            ) : (
+            {active !== s.id ? (
               <span className="absolute inset-0 rounded-lg bg-white/[0.03] opacity-0 transition-opacity group-hover:opacity-100" />
-            )}
+            ) : null}
             <span className={cn("relative font-mono text-[10px] transition-colors", i <= activeIdx ? "text-cyan-glow" : "text-slate-600")}>
               {i < activeIdx ? "✓" : String(i + 1).padStart(2, "0")}
             </span>
@@ -82,7 +87,7 @@ export function DocsSidebar() {
               exit={{ opacity: 0, height: 0 }}
               className="overflow-hidden"
             >
-              <div className="mt-2 rounded-xl border border-white/10 bg-panel p-2">{list}</div>
+              <div className="mt-2 rounded-xl border border-white/10 bg-panel p-2">{renderList(tocIndMobile)}</div>
             </motion.div>
           ) : null}
         </AnimatePresence>
@@ -103,7 +108,7 @@ export function DocsSidebar() {
           <div className="mx-3 mb-3 h-1 overflow-hidden rounded-full bg-white/[0.06]">
             <motion.div style={{ scaleX: progress }} className="h-full origin-left bg-brand-gradient" />
           </div>
-          {list}
+          {renderList(tocInd)}
         </div>
       </aside>
     </>

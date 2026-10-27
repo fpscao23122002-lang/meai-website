@@ -1,8 +1,9 @@
-import { motion, useScroll, useSpring } from "framer-motion";
+import { usePageScroll } from "@/hooks/usePageScroll";
+import { motion, useSpring } from "framer-motion";
 
 /** Thanh gradient mảnh ở đỉnh trang, chạy theo tiến độ cuộn */
 export function ScrollProgress() {
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = usePageScroll();
   const scaleX = useSpring(scrollYProgress, { stiffness: 140, damping: 30, mass: 0.3 });
   return (
     <motion.div

@@ -2,6 +2,7 @@ import { useContext, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
 import { BareFrame, SIDEBAR } from "./mockUtils";
+import { useIndicator } from "@/hooks/useIndicator";
 import { cn } from "@/lib/cn";
 
 /* Bộ "linh kiện" dựng lại giao diện app MeAI bằng HTML/CSS: luôn sắc nét, tự co giãn theo màn hình */
@@ -56,9 +57,7 @@ export function AppFrame({
                 id === active ? "text-cyan-glow" : "text-slate-500",
               )}
             >
-              {id === active ? (
-                <motion.span layoutId={`sb-${title}`} className="absolute inset-0 rounded-lg bg-cyan-glow/10 ring-1 ring-cyan-glow/40" />
-              ) : null}
+              {id === active ? <span className="absolute inset-0 rounded-lg bg-cyan-glow/10 ring-1 ring-cyan-glow/40" /> : null}
               <Icon className="relative h-3.5 w-3.5" />
               <span className="relative">{label}</span>
             </span>
@@ -171,12 +170,16 @@ export function Seg({
   dataKey?: string;
   onPick?: (o: string) => void;
 }) {
+  const { containerRef, style } = useIndicator(value);
+  void layoutKey; // giữ API cũ; chỉ báo trượt nay dùng CSS (nhẹ hơn layoutId)
   return (
-    <div className={cn("flex gap-0.5 rounded-md border border-white/[0.06] p-0.5", className)}>
+    <div ref={containerRef} className={cn("relative flex gap-0.5 rounded-md border border-white/[0.06] p-0.5", className)}>
+      <span aria-hidden style={style} className="pointer-events-none absolute left-0 top-0 rounded bg-cyan-glow/10 ring-1 ring-cyan-glow/60 will-change-transform" />
       {options.map((o) => (
         <span
           key={o}
           data-opt={dataKey ? `${dataKey}:${o}` : undefined}
+          data-ind={o}
           role={onPick ? "button" : undefined}
           tabIndex={onPick ? 0 : undefined}
           onClick={onPick ? () => onPick(o) : undefined}
@@ -187,13 +190,6 @@ export function Seg({
             onPick && value !== o && "cursor-pointer hover:bg-white/5 hover:text-white",
           )}
         >
-          {value === o ? (
-            <motion.span
-              layoutId={layoutKey}
-              transition={{ type: "spring", stiffness: 420, damping: 32 }}
-              className="absolute inset-0 rounded bg-cyan-glow/10 ring-1 ring-cyan-glow/60"
-            />
-          ) : null}
           <span className="relative">{o}</span>
         </span>
       ))}
@@ -225,7 +221,7 @@ export function StatusPill({ status, progress }: { status: "wait" | "run" | "don
 export function ProgressBar({ value, className }: { value: number; className?: string }) {
   return (
     <div className={cn("h-1 overflow-hidden rounded-full bg-white/[0.06]", className)}>
-      <motion.div className="h-full bg-brand-gradient" animate={{ width: `${value}%` }} transition={{ duration: 0.25 }} />
+      <motion.div className="h-full w-full origin-left bg-brand-gradient" initial={false} animate={{ scaleX: value / 100 }} transition={{ duration: 0.25 }} />
     </div>
   );
 }

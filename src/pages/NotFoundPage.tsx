@@ -24,8 +24,8 @@ function RenderBar() {
       </div>
       <div className="mt-1.5 h-1.5 overflow-hidden rounded-full bg-white/[0.07]">
         <motion.div
-          className={failed ? "h-full bg-neon-pink" : "h-full bg-brand-gradient"}
-          animate={{ width: `${p}%` }}
+          className={failed ? "h-full w-full origin-left bg-neon-pink" : "h-full w-full origin-left bg-brand-gradient"}
+          animate={{ scaleX: p / 100 }}
           transition={{ duration: 0.12 }}
         />
       </div>
@@ -62,12 +62,16 @@ export default function NotFoundPage() {
         {/* Mảnh vỡ trôi */}
         <div aria-hidden className="pointer-events-none absolute inset-0">
           {SHARDS.map((s, i) => (
-            <motion.span
+            <span
               key={i}
-              className={`absolute rounded-sm border ${s.cyan ? "border-cyan-glow/40 bg-cyan-glow/10" : "border-neon-pink/40 bg-neon-pink/10"}`}
-              style={{ left: s.left, top: s.top, width: s.size, height: s.size }}
-              animate={{ y: [0, -30, 0], rotate: [0, 180, 360], opacity: [0.2, 0.8, 0.2] }}
-              transition={{ duration: s.dur, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
+              className={`absolute rounded-sm border opacity-20 ${s.cyan ? "border-cyan-glow/40 bg-cyan-glow/10" : "border-neon-pink/40 bg-neon-pink/10"}`}
+              style={{
+                left: s.left,
+                top: s.top,
+                width: s.size,
+                height: s.size,
+                animation: `fx-shard ${s.dur}s ease-in-out ${i * 0.3}s infinite`,
+              }}
             />
           ))}
         </div>

@@ -18,8 +18,8 @@ export default function DashboardPage() {
       <Navbar />
       <main className="relative pt-28">
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] overflow-hidden">
-          <div className="absolute left-[10%] top-[-150px] h-[400px] w-[600px] rounded-full bg-cyan-brand/15 blur-[120px]" />
-          <div className="absolute right-[5%] top-[-100px] h-[360px] w-[500px] rounded-full bg-neon-pink/10 blur-[120px]" />
+          <div className="absolute left-[10%] top-[-150px] h-[400px] w-[600px] rounded-full bg-[radial-gradient(closest-side,rgba(14,230,250,0.15),rgba(14,230,250,0.083)_45%,transparent)] scale-[1.5]" />
+          <div className="absolute right-[5%] top-[-100px] h-[360px] w-[500px] rounded-full bg-[radial-gradient(closest-side,rgba(252,49,153,0.10),rgba(252,49,153,0.055)_45%,transparent)] scale-[1.5]" />
         </div>
         <div className="container space-y-20">
           <DashboardApp />

@@ -5,6 +5,7 @@ import { useDemoControl, useScript, useTask } from "@/hooks/useScript";
 import { platforms } from "@/lib/data";
 import { AppFrame, Btn, Field, Interactive, Label, Panel, PTitle, Seg, Toggle } from "../atoms";
 import { cn } from "@/lib/cn";
+import { useIndicator } from "@/hooks/useIndicator";
 
 type Acc = { email: string; state: "Rảnh" | "Đang chạy" | "Hết lượt"; credit: number; threads: number };
 
@@ -22,6 +23,7 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
   const [checking, setChecking] = useState(false);
   const [opened, setOpened] = useState<string | null>(null);
   const ctl = useDemoControl(play);
+  const tabInd = useIndicator(tab);
   const task = useTask();
 
   const check = async (wait: (ms: number) => Promise<void>) => {
@@ -89,18 +91,19 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
         </span>
       </div>
 
-      <div className="mt-2.5 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+      <div ref={tabInd.containerRef} className="relative mt-2.5 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+        <span aria-hidden style={tabInd.style} className="pointer-events-none absolute left-0 top-0 rounded-lg shadow-glow-sm ring-1 ring-cyan-glow/60 will-change-transform" />
         {platforms.map((p) => (
           <button
             type="button"
             key={p.name}
+            data-ind={p.name}
             onClick={() => setTab(p.name)}
             className={cn(
               "relative flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-colors",
               tab === p.name ? "border-transparent text-white" : "border-white/[0.07] text-slate-400 hover:text-white",
             )}
           >
-            {tab === p.name ? <motion.span layoutId="tk-tab" className="absolute inset-0 rounded-lg ring-1 ring-cyan-glow/60 shadow-glow-sm" /> : null}
             <span className={cn("relative h-2 w-2 rounded-full", p.dot)} />
             <span className="relative">{p.name}</span>
             <span className="relative ml-auto rounded bg-white/[0.06] px-1 text-[9.5px] text-slate-400">

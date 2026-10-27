@@ -18,6 +18,7 @@ import { ShotButton } from "@/components/mock/ShotButton";
 import { ScreenMock } from "@/components/mock/ScreenMock";
 import { appScreens } from "@/lib/data";
 import { cn } from "@/lib/cn";
+import { useIndicator } from "@/hooks/useIndicator";
 
 // Icon theo đúng menu bên trái của app
 const icons: Record<string, typeof Sparkles> = {
@@ -43,6 +44,7 @@ export function AppTour() {
   const [hovering, setHovering] = useState(false);
 
   const screen = appScreens[active];
+  const tourInd = useIndicator<HTMLUListElement>(screen.id);
   const shot = screen.shots[Math.min(shotIdx, screen.shots.length - 1)];
   const playing = auto && inView && !hovering;
 
@@ -80,7 +82,12 @@ export function AppTour() {
         <div className="mt-14 grid gap-6 lg:grid-cols-[230px_minmax(0,1fr)]">
           {/* Menu giống sidebar của app */}
           <div className="-mx-4 overflow-x-auto px-4 pb-1 lg:mx-0 lg:overflow-visible lg:px-0">
-            <ul className="flex gap-2 lg:flex-col lg:gap-1.5">
+            <ul ref={tourInd.containerRef} className="relative flex gap-2 lg:flex-col lg:gap-1.5">
+              <span
+                aria-hidden
+                style={tourInd.style}
+                className="pointer-events-none absolute left-0 top-0 rounded-xl bg-gradient-to-r from-cyan-glow/15 to-neon-pink/10 shadow-glow-sm will-change-transform"
+              />
               {appScreens.map((s, i) => {
                 const Icon = icons[s.id] ?? Sparkles;
                 const on = i === active;
@@ -88,27 +95,21 @@ export function AppTour() {
                   <li key={s.id} className="shrink-0">
                     <button
                       type="button"
+                      data-ind={s.id}
                       onClick={() => select(i)}
                       className={cn(
                         "relative flex w-full items-center gap-3 overflow-hidden rounded-xl border px-3.5 py-2.5 text-left text-sm font-medium transition-colors",
                         on ? "border-cyan-glow/40 text-white" : "border-white/[0.06] bg-panel/60 text-slate-400 hover:border-white/15 hover:text-white",
                       )}
                     >
-                      {on ? (
-                        <motion.span
-                          layoutId="tour-active"
-                          className="absolute inset-0 -z-10 bg-gradient-to-r from-cyan-glow/15 to-neon-pink/10 shadow-glow-sm"
-                          transition={{ type: "spring", stiffness: 380, damping: 32 }}
-                        />
-                      ) : null}
                       <Icon className={cn("h-4 w-4 shrink-0 transition-colors", on ? "text-cyan-glow" : "text-slate-500")} />
                       <span className="whitespace-nowrap">{s.label}</span>
                       {on && playing ? (
                         <motion.span
                           key={`p-${active}`}
-                          className="absolute bottom-0 left-0 h-0.5 bg-brand-gradient"
-                          initial={{ width: "0%" }}
-                          animate={{ width: "100%" }}
+                          className="absolute bottom-0 left-0 h-0.5 w-full origin-left bg-brand-gradient"
+                          initial={{ scaleX: 0 }}
+                          animate={{ scaleX: 1 }}
                           transition={{ duration: AUTO_MS / 1000, ease: "linear" }}
                         />
                       ) : null}
@@ -167,7 +168,7 @@ export function AppTour() {
                 ) : null}
 
                 <div className="relative">
-                  <div className="absolute -inset-4 -z-10 rounded-[28px] bg-brand-gradient opacity-[0.12] blur-2xl" />
+                  <div className="absolute -inset-12 -z-10 bg-[radial-gradient(50%_55%_at_30%_50%,rgba(0,240,255,0.13),transparent_75%),radial-gradient(50%_55%_at_70%_50%,rgba(252,49,153,0.12),transparent_75%)]" />
                   <ScreenMock id={screen.id} shotIdx={shotIdx} play={inView} />
                 </div>
                 <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">

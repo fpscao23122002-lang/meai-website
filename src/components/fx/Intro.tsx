@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
 import { Check } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -30,6 +30,7 @@ const ENGINES = [
 ];
 
 const BRAND = "MeAI Studio";
+const MILESTONES = [...new Set([...STEPS.map((s) => s.at), ...ENGINES.map((e) => e.at)])].sort((a, b) => a - b);
 
 // Tải trước tài nguyên trang chính trong lúc chạy màn mở đầu
 function preload() {
@@ -49,6 +50,12 @@ function easeProgress(t: number) {
 
 export function Intro({ onReveal }: { onReveal: () => void }) {
   const reduce = useMemo(() => window.matchMedia("(prefers-reduced-motion: reduce)").matches, []);
+  // Tiến độ chạy bằng motion value (cập nhật thẳng vào DOM, không dựng lại giao diện mỗi khung hình);
+  // `pct` (state) chỉ đổi khi vượt qua các mốc trạng thái → rất ít lần render lại.
+  const progress = useMotionValue(0);
+  const pctText = useTransform(progress, (v) => Math.round(v));
+  const barScale = useTransform(progress, (v) => v / 100);
+  const headX = useTransform(progress, (v) => `${v - 100}%`);
   const [pct, setPct] = useState(0);
   const [phase, setPhase] = useState<"load" | "open" | "gone">("load");
   const revealed = useRef(false);
@@ -57,6 +64,7 @@ export function Intro({ onReveal }: { onReveal: () => void }) {
   const finish = () => {
     if (revealed.current) return;
     revealed.current = true;
+    progress.set(100);
     setPct(100);
     setPhase("open");
     onReveal();
@@ -70,9 +78,16 @@ export function Intro({ onReveal }: { onReveal: () => void }) {
     const start = performance.now();
     let raf = 0;
     let doneTimer = 0;
+    let stage = 0;
     const tick = (now: number) => {
       const t = Math.min(1, (now - start) / total);
-      setPct(easeProgress(t));
+      const v = easeProgress(t);
+      progress.set(v);
+      const reached = MILESTONES.filter((m) => v >= m).pop() ?? 0;
+      if (reached !== stage) {
+        stage = reached;
+        setPct(reached);
+      }
       if (t < 1) raf = requestAnimationFrame(tick);
       else doneTimer = window.setTimeout(finish, 380);
     };
@@ -144,13 +159,21 @@ export function Intro({ onReveal }: { onReveal: () => void }) {
         <div className="pointer-events-none absolute left-1/2 top-[42%]">
           {!reduce &&
             particles.map((p, i) => (
-              <motion.span
+              <span
                 key={i}
-                className="absolute rounded-full"
-                style={{ width: p.s, height: p.s, background: p.c, boxShadow: `0 0 ${p.s * 4}px ${p.c}` }}
-                initial={{ x: p.x, y: p.y, opacity: 0 }}
-                animate={{ x: [p.x, 0], y: [p.y, 0], opacity: [0, 1, 0] }}
-                transition={{ duration: 1.8, delay: p.d, repeat: Infinity, ease: "easeIn" }}
+                className="absolute rounded-full opacity-0"
+                style={
+                  {
+                    width: p.s,
+                    height: p.s,
+                    background: p.c,
+                    boxShadow: `0 0 ${p.s * 4}px ${p.c}`,
+                    "--px": `${p.x}px`,
+                    "--py": `${p.y}px`,
+                    transform: `translate3d(${p.x}px, ${p.y}px, 0)`,
+                    animation: `fx-converge 1.8s ease-in ${p.d}s infinite backwards, fx-blink 1.8s ease-in ${p.d}s infinite backwards`,
+                  } as CSSProperties
+                }
               />
             ))}
         </div>
@@ -189,7 +212,7 @@ export function Intro({ onReveal }: { onReveal: () => void }) {
             transition={{ type: "spring", stiffness: 160, damping: 14, delay: 0.35 }}
             className="relative"
           >
-            <div className="absolute -inset-6 animate-pulse-soft rounded-[30%] bg-brand-gradient opacity-40 blur-2xl" />
+            <div className="absolute -inset-14 animate-pulse-soft bg-[radial-gradient(closest-side,rgba(0,240,255,0.45),rgba(252,49,153,0.3)_55%,transparent)]" />
             <div className="relative h-28 w-28 overflow-hidden rounded-[26%] ring-1 ring-white/20 sm:h-32 sm:w-32">
               <img src="/brand/meai-logo.webp" alt="MeAI" className="h-full w-full" />
               {/* vệt sáng quét qua logo */}
@@ -238,14 +261,16 @@ export function Intro({ onReveal }: { onReveal: () => void }) {
               </motion.span>
             </AnimatePresence>
             <span className="font-mono text-lg font-bold tabular-nums text-white">
-              {pct}
+              <motion.span>{pctText}</motion.span>
               <span className="text-xs text-slate-500">%</span>
             </span>
           </div>
           <div className="relative mt-2 h-1.5 rounded-full bg-white/[0.07]">
-            <div className="absolute inset-y-0 left-0 rounded-full bg-brand-gradient" style={{ width: `${pct}%` }}>
+            <motion.div style={{ scaleX: barScale }} className="absolute inset-0 origin-left rounded-full bg-brand-gradient" />
+            {/* đầu sáng: lớp phủ toàn chiều rộng dịch theo % → mép phải luôn ở đúng vị trí tiến độ */}
+            <motion.div style={{ x: headX }} className="pointer-events-none absolute inset-0">
               <span className="absolute -right-1.5 top-1/2 h-3 w-3 -translate-y-1/2 rounded-full bg-white shadow-[0_0_12px_4px_rgba(0,240,255,0.8)]" />
-            </div>
+            </motion.div>
             <div className="absolute inset-0 overflow-hidden rounded-full">
               <div className="h-full w-1/3 animate-shimmer bg-gradient-to-r from-transparent via-white/25 to-transparent" />
             </div>
