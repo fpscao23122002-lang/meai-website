@@ -6,9 +6,9 @@ import { Changelog } from "@/components/dashboard/Changelog";
 
 export default function DashboardPage() {
   usePageMeta({
-    title: "Khách hàng & Quản lý License",
+    title: "Khu vực khách hàng",
     description:
-      "Đăng nhập khu vực khách hàng MeAI: kiểm tra hạn sử dụng gói cước, quản lý License Key và thiết bị, xem changelog và tải bản cập nhật mới nhất.",
+      "Đăng nhập khu vực khách hàng MeAI: đăng nhập bằng Google để xem gói cước & hạn dùng, quản lý thiết bị, xem changelog và tải bản cập nhật mới nhất.",
     path: "/dashboard",
     noindex: true,
   });
@@ -16,7 +16,7 @@ export default function DashboardPage() {
   return (
     <>
       <Navbar />
-      <main className="relative pt-28">
+      <main className="relative overflow-x-clip pt-28">
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[500px] overflow-hidden">
           <div className="absolute left-[10%] top-[-150px] h-[400px] w-[600px] rounded-full bg-[radial-gradient(closest-side,rgba(14,230,250,0.15),rgba(14,230,250,0.083)_45%,transparent)] scale-[1.5]" />
           <div className="absolute right-[5%] top-[-100px] h-[360px] w-[500px] rounded-full bg-[radial-gradient(closest-side,rgba(252,49,153,0.10),rgba(252,49,153,0.055)_45%,transparent)] scale-[1.5]" />

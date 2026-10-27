@@ -1,4 +1,5 @@
 // Dữ liệu sản phẩm — bám sát giao diện & tính năng thật của app MeAI.
+import { PLAN_RULES, formatVnd } from "../../shared/plans";
 
 export type EngineId = "muse" | "flow" | "seedance";
 
@@ -198,7 +199,7 @@ export const plans: Plan[] = [
   {
     id: "month",
     name: "Gói Tháng",
-    price: "399.000",
+    price: formatVnd(PLAN_RULES.month.amount),
     unit: "/ tháng",
     note: "Test thị trường, chạy thử một ngách trước khi scale",
     cta: "Bắt đầu Gói Tháng",
@@ -207,14 +208,14 @@ export const plans: Plan[] = [
       "Muse, Google Flow, Seedance — tạo ảnh & video hàng loạt",
       "Không giới hạn tài khoản & luồng chạy",
       "LadiPage → kịch bản, Đăng FB Reels",
-      "Kích hoạt trên 1 máy tính",
+      "Dùng trên 1 máy tính",
       "Hỗ trợ qua nhóm cộng đồng",
     ],
   },
   {
     id: "year",
     name: "Gói Năm",
-    price: "2.990.000",
+    price: formatVnd(PLAN_RULES.year.amount),
     unit: "/ năm",
     note: "Tiết kiệm ~38% — lựa chọn của dân làm content chuyên nghiệp",
     highlight: true,
@@ -222,8 +223,8 @@ export const plans: Plan[] = [
     cta: "Chọn Gói Năm",
     features: [
       "Toàn bộ tính năng như Gói Tháng",
-      "Kích hoạt trên 2 máy tính",
-      "Hỗ trợ 1-1 qua Zalo trong giờ hành chính",
+      "Dùng trên 2 máy tính",
+      "Hỗ trợ 1-1 qua Telegram trong giờ hành chính",
       "Hướng dẫn setup tài khoản, proxy, token Fanpage",
       "Cập nhật engine & model mới miễn phí 12 tháng",
     ],
@@ -231,18 +232,18 @@ export const plans: Plan[] = [
   {
     id: "lifetime",
     name: "Vĩnh Viễn / Agency",
-    price: "6.990.000",
+    price: formatVnd(PLAN_RULES.lifetime.amount),
     unit: "/ trọn đời",
     note: "Dành cho team, agency và studio chạy nhiều dự án song song",
     badge: "Best value",
-    cta: "Liên hệ Agency",
+    cta: "Chọn gói Vĩnh Viễn",
     features: [
       "Toàn bộ tính năng, cập nhật trọn đời",
-      "Kích hoạt trên 5 máy tính, chuyển máy linh hoạt",
+      "Dùng trên 5 máy tính, chuyển máy linh hoạt",
       "Ưu tiên trải nghiệm tính năng mới (Early Access)",
       "Setup & training 1-1 cho team qua UltraView",
       "Hỗ trợ ưu tiên 7 ngày/tuần",
-      "Giá riêng khi mua thêm license",
+      "Giá riêng khi mua thêm tài khoản cho team",
     ],
   },
 ];
@@ -273,12 +274,12 @@ export const faqs = [
     a: "Vào Cài đặt, dán 1 Facebook token (User hoặc Page) có quyền pages_show_list, pages_read_engagement, pages_manage_posts, publish_video rồi bấm Quét Fanpage. Sau đó ở tab Đăng FB Reels chọn video trong kho, viết caption và bấm Đăng lên Reels. Video nên ở dạng dọc 9:16.",
   },
   {
-    q: "Một License dùng được trên mấy máy? Có dùng thử không?",
-    a: "Gói Tháng: 1 máy, Gói Năm: 2 máy, Gói Vĩnh Viễn/Agency: 5 máy. Bạn tự gỡ máy cũ và kích hoạt máy mới trong trang Quản lý License. Liên hệ Zalo để được cấp bản dùng thử trước khi mua.",
+    q: "Đăng nhập thế nào? Một gói dùng được trên mấy máy?",
+    a: "MeAI chỉ dùng tài khoản Google: đăng nhập cùng một Gmail trên website và trong app, gói bạn mua gắn vào tài khoản đó nên app tự nhận đúng gói và hạn dùng — không cần nhập mã kích hoạt. Gói Tháng: 1 máy, Gói Năm: 2 máy, Gói Vĩnh Viễn/Agency: 5 máy; tự gỡ máy cũ trong Khu vực khách hàng. Nhắn Telegram @meai_support để được dùng thử trước khi mua.",
   },
   {
     q: "Thanh toán bằng cách nào? Có xuất hóa đơn VAT không?",
-    a: "Hỗ trợ chuyển khoản ngân hàng/VietQR, ví MoMo. License được gửi qua email ngay sau khi xác nhận thanh toán. Gói Năm và Agency hỗ trợ xuất hóa đơn VAT cho doanh nghiệp.",
+    a: "Chọn gói trên website hoặc ngay trong app, quét VietQR / chuyển khoản đúng nội dung của đơn. Khi thanh toán được xác nhận, gói tự kích hoạt vào tài khoản Google của bạn — app nhận ngay ở lần mở kế tiếp. Gói Năm và Agency hỗ trợ xuất hóa đơn VAT cho doanh nghiệp.",
   },
 ];
 

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { MessageCircle, Plus, Search, X } from "lucide-react";
+import { Plus, Search, X } from "lucide-react";
+import { TelegramIcon } from "@/components/ui/TelegramIcon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { trackSpotlight } from "@/components/fx/spotlight";
 import { faqs } from "@/lib/data";
@@ -38,7 +39,7 @@ export function FAQ() {
         <SectionHeading
           eyebrow="FAQ"
           title={["Câu hỏi ", { text: "thường gặp", className: "text-gradient" }]}
-          description="Chưa thấy câu trả lời bạn cần? Nhắn Zalo cho team MeAI — phản hồi trung bình dưới 15 phút trong giờ hành chính."
+          description="Chưa thấy câu trả lời bạn cần? Nhắn Telegram cho team MeAI — phản hồi trung bình dưới 15 phút trong giờ hành chính."
         />
 
         {/* Tìm nhanh */}
@@ -56,7 +57,7 @@ export function FAQ() {
               setQ(e.target.value);
               setOpen(null);
             }}
-            placeholder="Tìm câu hỏi: tài khoản, Reels, License…"
+            placeholder="Tìm câu hỏi: tài khoản, Reels, gói cước…"
             className="min-w-0 flex-1 bg-transparent text-sm text-white outline-none placeholder:text-slate-500"
           />
           <AnimatePresence>
@@ -167,12 +168,12 @@ export function FAQ() {
               >
                 <p className="text-sm text-slate-400">Chưa có câu hỏi nào khớp “{q}”.</p>
                 <a
-                  href={siteConfig.contact.zalo}
+                  href={siteConfig.contact.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-cyan-glow hover:underline"
                 >
-                  <MessageCircle className="h-4 w-4" /> Hỏi trực tiếp team MeAI qua Zalo
+                  <TelegramIcon className="h-4 w-4" /> Hỏi trực tiếp team MeAI qua Telegram
                 </a>
               </motion.div>
             ) : null}

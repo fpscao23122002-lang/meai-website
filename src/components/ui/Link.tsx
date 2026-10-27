@@ -22,8 +22,10 @@ export function Link({ href, children, onClick, ...rest }: LinkProps) {
   const navigate = useNavigate();
 
   if (/^(https?:|mailto:|tel:)/.test(href)) {
+    // Link web bên ngoài (VD: Telegram hỗ trợ) mở tab mới để không rời khỏi site
+    const external = /^https?:/.test(href) ? { target: "_blank", rel: "noopener noreferrer" } : {};
     return (
-      <a href={href} onClick={onClick} {...rest}>
+      <a href={href} onClick={onClick} {...external} {...rest}>
         {children}
       </a>
     );

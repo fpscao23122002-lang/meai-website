@@ -1,7 +1,8 @@
 import { Link } from "@/components/ui/Link";
 import { useEffect } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, BookOpen, Download, MessageCircle } from "lucide-react";
+import { ArrowRight, BookOpen, Download } from "lucide-react";
+import { TelegramIcon } from "@/components/ui/TelegramIcon";
 import { SplitText } from "@/components/fx/SplitText";
 import { docSections } from "@/lib/docs";
 import { Navbar } from "@/components/layout/Navbar";
@@ -148,7 +149,7 @@ export default function DocsPage() {
 
             {/* 2 */}
             <section id="cai-dat">
-              <h2>Cài đặt & kích hoạt</h2>
+              <h2>Cài đặt & đăng nhập</h2>
               <DocTable
                 head={["Thành phần", "Tối thiểu", "Khuyến nghị"]}
                 rows={[
@@ -166,7 +167,7 @@ export default function DocsPage() {
                       <>
                         Tải file <code>MeAI-Studio-Setup-x64.exe</code> ở trang chủ hoặc trong{" "}
                         <Link href="/dashboard" className="text-cyan-glow hover:underline">
-                          Quản lý License
+                          Khu vực khách hàng
                         </Link>
                         .
                       </>
@@ -181,11 +182,16 @@ export default function DocsPage() {
                     ),
                   },
                   {
-                    title: "Kích hoạt License",
+                    title: "Đăng nhập bằng Google",
                     body: (
                       <>
-                        Mở app và nhập License Key dạng <code>MEAI-XXXX-XXXX-XXXX</code> đã nhận qua email. Máy đã kích hoạt
-                        sẽ hiện trong trang Quản lý License.
+                        Mở app, bấm <strong>Đăng nhập với Google</strong> và chọn đúng Gmail đã dùng trên website. Gói cước gắn
+                        với tài khoản Google nên app tự nhận gói & hạn dùng — không cần nhập mã. Chưa có gói? Chọn gói ngay
+                        trong app hoặc ở{" "}
+                        <Link href="/#bang-gia" className="text-cyan-glow hover:underline">
+                          Bảng giá
+                        </Link>
+                        .
                       </>
                     ),
                   },
@@ -566,12 +572,12 @@ export default function DocsPage() {
                     "Lấy lại token đủ 4 quyền, bấm Quét Fanpage.",
                   ],
                   [
-                    "“License đã đạt giới hạn thiết bị”",
-                    "Đã kích hoạt đủ số máy của gói",
+                    "“Tài khoản đã đạt giới hạn thiết bị”",
+                    "Đã đăng nhập đủ số máy của gói",
                     <>
                       Vào{" "}
                       <Link href="/dashboard" className="text-cyan-glow hover:underline">
-                        Quản lý License
+                        Khu vực khách hàng
                       </Link>{" "}
                       → gỡ máy cũ.
                     </>,
@@ -581,16 +587,16 @@ export default function DocsPage() {
 
               <div className="mt-10 grid gap-4 sm:grid-cols-2">
                 <div className="glow-border rounded-2xl bg-panel p-5">
-                  <MessageCircle className="h-5 w-5 text-cyan-glow" />
+                  <TelegramIcon className="h-5 w-5 text-cyan-glow" />
                   <p className="mt-3 font-semibold text-white">Vẫn bí? Hỏi team MeAI</p>
-                  <p className="mt-1 text-sm text-slate-400">Nhắn Zalo kèm ảnh chụp lỗi, team kỹ thuật phản hồi nhanh.</p>
+                  <p className="mt-1 text-sm text-slate-400">Nhắn Telegram {siteConfig.contact.telegramHandle} kèm ảnh chụp lỗi, team kỹ thuật phản hồi nhanh.</p>
                   <a
-                    href={siteConfig.contact.zalo}
+                    href={siteConfig.contact.telegram}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="mt-3 inline-flex items-center gap-1 text-sm font-semibold text-cyan-glow hover:underline"
                   >
-                    Mở Zalo hỗ trợ <ArrowRight className="h-4 w-4" />
+                    Mở Telegram hỗ trợ <ArrowRight className="h-4 w-4" />
                   </a>
                 </div>
                 <div className="glow-border rounded-2xl bg-panel p-5">

@@ -20,3 +20,10 @@
 
 /dashboard
   X-Robots-Tag: noindex
+
+/app/*
+  X-Robots-Tag: noindex
+
+/api/*
+  X-Robots-Tag: noindex
+  Cache-Control: no-store
