@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { Link } from "@/components/ui/Link";
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, UserRound, X } from "lucide-react";
@@ -11,6 +12,27 @@ import { cn } from "@/lib/cn";
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const [section, setSection] = useState<string | null>(null);
+  const { pathname } = useLocation();
+
+  // Scroll-spy: tô sáng mục menu ứng với section đang xem
+  useEffect(() => {
+    if (pathname !== "/") return;
+    const ids = navLinks.map((l) => l.href.split("#")[1]).filter(Boolean) as string[];
+    const els = ids.map((id) => document.getElementById(id)).filter((el): el is HTMLElement => !!el);
+    const io = new IntersectionObserver(
+      (entries) => {
+        const hit = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
+        if (hit) setSection(hit.target.id);
+      },
+      { rootMargin: "-45% 0px -50% 0px", threshold: [0, 0.25, 0.5] },
+    );
+    els.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, [pathname]);
+
+  const isActive = (href: string) =>
+    href.startsWith("/#") ? pathname === "/" && section === href.slice(2) : pathname === href;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 12);
@@ -27,7 +49,10 @@ export function Navbar() {
   }, [open]);
 
   return (
-    <header
+    <motion.header
+      initial={{ y: -80, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
         scrolled || open ? "border-b border-white/[0.06] bg-ink/80 backdrop-blur-xl" : "bg-transparent",
@@ -41,8 +66,20 @@ export function Navbar() {
             <li key={l.href}>
               <Link
                 href={l.href}
-                className="rounded-lg px-3.5 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-white/5 hover:text-white"
+                className={cn(
+                  "relative isolate block rounded-lg px-3.5 py-2 text-sm font-medium transition-colors hover:text-white",
+                  isActive(l.href) ? "text-white" : "text-slate-400",
+                )}
               >
+                {isActive(l.href) ? (
+                  <motion.span
+                    layoutId="nav-active"
+                    className="absolute inset-0 -z-10 rounded-lg bg-white/[0.06] ring-1 ring-cyan-glow/30"
+                    transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                  >
+                    <span className="absolute inset-x-3 -bottom-px h-px bg-brand-gradient" />
+                  </motion.span>
+                ) : null}
                 {l.label}
               </Link>
             </li>
@@ -105,6 +142,6 @@ export function Navbar() {
           </motion.div>
         ) : null}
       </AnimatePresence>
-    </header>
+    </motion.header>
   );
 }

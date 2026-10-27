@@ -64,9 +64,40 @@ export type AppScreen = {
   title: string;
   desc: string;
   points: string[];
-  /** src: ảnh hiển thị (studio = toàn màn hình, các mục khác = cận cảnh vùng nội dung); full: ảnh toàn màn hình khi phóng to */
-  shots: { label: string; src: string; w: number; h: number; full?: string }[];
+  shots: Shot[];
 };
+
+/**
+ * Ảnh màn hình app.
+ * - src/w/h: ảnh hiển thị chính (Studio = toàn màn hình độ phân giải gốc; mục khác = cận cảnh vùng nội dung)
+ * - srcSet: bản 1280px cho màn hình nhỏ, bản gốc cho màn hình lớn/Retina
+ * - full: ảnh toàn màn hình độ phân giải gốc để phóng to
+ * - panel: cận cảnh panel cấu hình (chỉ Studio) — đọc rõ từng tuỳ chọn
+ */
+export type Shot = {
+  label: string;
+  src: string;
+  srcSet?: string;
+  w: number;
+  h: number;
+  full?: string;
+  panel?: { src: string; w: number; h: number };
+};
+
+/** Ảnh toàn màn hình: bản gốc + bản 1280px */
+export function screenSet(name: string, w: number) {
+  return `/screens/${name}-1280.webp 1280w, /screens/${name}.webp ${w}w`;
+}
+
+const studioShot = (label: string, name: string, w: number, h: number, panelH: number): Shot => ({
+  label,
+  src: `/screens/${name}.webp`,
+  srcSet: screenSet(name, w),
+  w,
+  h,
+  full: `/screens/${name}.webp`,
+  panel: { src: `/screens/${name}-panel.webp`, w: 318, h: panelH },
+});
 
 /** Các màn hình thật của app, theo đúng thứ tự menu bên trái */
 export const appScreens: AppScreen[] = [
@@ -82,11 +113,11 @@ export const appScreens: AppScreen[] = [
       "Xem trước kết quả, Mở file, Tạo lại hoặc Chỉnh sửa prompt",
     ],
     shots: [
-      { label: "Muse · Ảnh", src: "/screens/studio-muse-anh.webp", w: 1920, h: 1039 },
-      { label: "Muse · Video", src: "/screens/studio-muse-video.webp", w: 1920, h: 1042 },
-      { label: "Flow · Ảnh", src: "/screens/studio-flow-anh.webp", w: 1920, h: 1035 },
-      { label: "Flow · Video", src: "/screens/studio-flow-video.webp", w: 1920, h: 1038 },
-      { label: "Seedance", src: "/screens/studio-seedance.webp", w: 1920, h: 1044 },
+      studioShot("Muse · Ảnh", "studio-muse-anh", 2558, 1384, 695),
+      studioShot("Muse · Video", "studio-muse-video", 2559, 1389, 695),
+      studioShot("Flow · Ảnh", "studio-flow-anh", 2548, 1374, 804),
+      studioShot("Flow · Video", "studio-flow-video", 2559, 1384, 874),
+      studioShot("Seedance", "studio-seedance", 2558, 1391, 890),
     ],
   },
   {

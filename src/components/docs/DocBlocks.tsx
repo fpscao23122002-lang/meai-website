@@ -1,4 +1,4 @@
-import { Image } from "@/components/ui/Image";
+import { ZoomImage } from "@/components/fx/ZoomImage";
 import { Info, Lightbulb, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -94,27 +94,32 @@ export function DocTable({ head, rows }: { head: string[]; rows: React.ReactNode
 export function DocShot({
   src,
   caption,
-  w = 1920,
-  h = 1040,
+  w = 2558,
+  h = 1384,
   full,
+  srcSet,
 }: {
   src: string;
   caption: string;
   w?: number;
   h?: number;
   full?: string;
+  srcSet?: string;
 }) {
   return (
     <figure className="mt-6">
-      <a
-        href={full ?? src}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="glow-border block overflow-hidden rounded-xl bg-panel transition hover:shadow-glow-sm"
-      >
-        <Image src={src} alt={caption} width={w} height={h} sizes="(min-width: 1024px) 768px, 100vw" className="h-auto w-full" />
-      </a>
-      <figcaption className="mt-2 text-center text-xs text-slate-500">{caption} · bấm để xem ảnh lớn</figcaption>
+      <ZoomImage
+        src={src}
+        srcSet={srcSet}
+        sizes="(min-width: 1024px) 768px, 100vw"
+        alt={caption}
+        w={w}
+        h={h}
+        full={full}
+        fullW={2559}
+        className="glow-border rounded-xl bg-panel transition-shadow hover:shadow-glow-sm"
+      />
+      <figcaption className="mt-2 text-center text-xs text-slate-500">{caption}</figcaption>
     </figure>
   );
 }

@@ -22,21 +22,25 @@ import {
   Volume2,
 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { TiltCard } from "@/components/fx/TiltCard";
 import { engines, platforms } from "@/lib/data";
 import { cn } from "@/lib/cn";
 
 function Card({ className, delay = 0, children }: { className?: string; delay?: number; children: React.ReactNode }) {
   return (
-    <motion.article
-      initial={{ opacity: 0, y: 28 }}
-      whileInView={{ opacity: 1, y: 0 }}
+    <TiltCard
+      wrapperClassName={className}
+      max={4}
+      initial={{ opacity: 0, y: 36, scale: 0.97 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
       viewport={{ once: true, margin: "-60px" }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
-      className={cn("glow-border group relative overflow-hidden rounded-3xl bg-panel p-6 shadow-panel sm:p-8", className)}
+      transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
+      className="glow-border group relative h-full overflow-hidden rounded-3xl bg-panel p-6 shadow-panel transition-shadow duration-500 hover:shadow-[0_0_0_1px_rgba(0,240,255,0.25),0_30px_80px_-30px_rgba(0,240,255,0.45)] sm:p-8"
     >
-      <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-brand/10 blur-3xl" />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-brand/10 blur-3xl transition-transform duration-700 group-hover:scale-150" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-neon-pink/0 blur-3xl transition-colors duration-700 group-hover:bg-neon-pink/10" />
       {children}
-    </motion.article>
+    </TiltCard>
   );
 }
 
@@ -44,7 +48,7 @@ function CardHead({ icon: Icon, index, title, desc }: { icon: typeof Cpu; index:
   return (
     <div className="relative">
       <div className="flex items-center gap-3">
-        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-gradient-soft ring-1 ring-cyan-brand/30">
+        <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-gradient-soft ring-1 ring-cyan-brand/30 transition-transform duration-500 group-hover:rotate-[-8deg] group-hover:scale-110">
           <Icon className="h-5 w-5 text-cyan-glow" />
         </span>
         <span className="font-mono text-xs text-slate-500">{index}</span>
@@ -65,11 +69,7 @@ export function BentoFeatures() {
       <div className="container">
         <SectionHeading
           eyebrow="Tính năng cốt lõi"
-          title={
-            <>
-              Một app thay cả <span className="text-gradient">team sản xuất content</span>
-            </>
-          }
+          title={["Một app thay cả ", { text: "team sản xuất content", className: "text-gradient" }]}
           description="Từ prompt, kịch bản hay một link LadiPage đến video thành phẩm và lên sóng Reels — mọi khâu gom về một Studio duy nhất."
         />
 
@@ -133,7 +133,7 @@ export function BentoFeatures() {
             <div className="relative mt-5 grid grid-cols-5 gap-1.5">
               {[1, 2, 3, 4, 5].map((n) => (
                 <div key={n} className="relative aspect-[3/4] overflow-hidden rounded-md ring-1 ring-white/10">
-                  <Image src={`/samples/video-${n}.webp`} alt="" fill sizes="80px" className="object-cover" />
+                  <Image src={`/samples/video-${n}.webp`} alt="" fill sizes="80px" className="object-cover transition-transform duration-700 group-hover:scale-110" />
                 </div>
               ))}
             </div>

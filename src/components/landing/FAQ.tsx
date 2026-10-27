@@ -13,11 +13,7 @@ export function FAQ() {
       <div className="container max-w-4xl">
         <SectionHeading
           eyebrow="FAQ"
-          title={
-            <>
-              Câu hỏi <span className="text-gradient">thường gặp</span>
-            </>
-          }
+          title={["Câu hỏi ", { text: "thường gặp", className: "text-gradient" }]}
           description="Chưa thấy câu trả lời bạn cần? Nhắn Zalo cho team MeAI — phản hồi trung bình dưới 15 phút trong giờ hành chính."
         />
 
