@@ -1,5 +1,4 @@
 import { BookOpen } from "lucide-react";
-import { motion } from "framer-motion";
 import { ButtonLink } from "@/components/ui/Button";
 import { Reveal } from "@/components/ui/Reveal";
 import { WindowsIcon } from "@/components/ui/WindowsIcon";
@@ -26,14 +25,10 @@ function OrbitLogo() {
           />
         </div>
       ))}
-      <motion.div
-        animate={{ y: [0, -8, 0] }}
-        transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-        className="absolute inset-9"
-      >
-        <div className="absolute -inset-3 animate-pulse-soft rounded-[30%] bg-brand-gradient opacity-40 blur-2xl" />
+      <div className="fx-bob absolute inset-9">
+        <div className="absolute -inset-10 animate-pulse-soft bg-[radial-gradient(closest-side,rgba(0,240,255,0.45),rgba(252,49,153,0.3)_55%,transparent)]" />
         <img src="/brand/meai-logo.webp" alt="MeAI" width={256} height={256} loading="lazy" className="relative h-full w-full rounded-[24%] ring-1 ring-white/15" />
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -48,8 +43,8 @@ export function FinalCTA() {
             className="spotlight glow-border relative overflow-hidden rounded-[32px] bg-panel px-6 py-16 text-center sm:px-12"
           >
             <div className="pointer-events-none absolute inset-0">
-              <div className="absolute -left-20 -top-20 h-72 w-72 animate-aurora-1 rounded-full bg-cyan-brand/25 blur-[100px]" />
-              <div className="absolute -bottom-24 -right-10 h-72 w-72 animate-aurora-2 rounded-full bg-neon-pink/25 blur-[100px]" />
+              <div className="absolute -left-20 -top-20 h-72 w-72 animate-aurora-1 rounded-full bg-[radial-gradient(closest-side,rgba(14,230,250,0.25),rgba(14,230,250,0.138)_45%,transparent)]" />
+              <div className="absolute -bottom-24 -right-10 h-72 w-72 animate-aurora-2 rounded-full bg-[radial-gradient(closest-side,rgba(252,49,153,0.25),rgba(252,49,153,0.138)_45%,transparent)]" />
               <div className="bg-grid absolute inset-0 opacity-50 [mask-image:radial-gradient(ellipse_at_center,black_20%,transparent_70%)]" />
             </div>
             <div className="relative">

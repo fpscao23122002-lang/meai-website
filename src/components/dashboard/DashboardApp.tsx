@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { Link } from "@/components/ui/Link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -438,7 +438,7 @@ function PlanCard({ license, onRenew }: { license: License; onRenew: () => void 
 
   return (
     <div onMouseMove={trackSpotlight} className="spotlight glow-border relative h-full overflow-hidden rounded-3xl bg-panel p-7 shadow-panel">
-      <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 animate-aurora-2 rounded-full bg-neon-pink/15 blur-3xl" />
+      <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 animate-aurora-2 rounded-full bg-[radial-gradient(closest-side,rgba(252,49,153,0.15),rgba(252,49,153,0.083)_45%,transparent)]" />
       <div className="relative flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
           <motion.span
@@ -521,9 +521,9 @@ function DownloadCard() {
   return (
     <div onMouseMove={trackSpotlight} className="spotlight glow-border group flex h-full flex-col rounded-3xl bg-panel p-7 shadow-panel">
       <span className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-cyan-brand/15 ring-1 ring-cyan-brand/30">
-        <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>
+        <span className="fx-bob" style={{ "--bob": "4px", "--bob-d": "1.6s" } as CSSProperties}>
           <MonitorDown className="h-6 w-6 text-cyan-glow" />
-        </motion.span>
+        </span>
       </span>
       <p className="mt-5 text-xs uppercase tracking-wider text-slate-500">Bản cập nhật mới nhất</p>
       <p className="mt-1 text-2xl font-bold text-white">v{siteConfig.latestVersion}</p>

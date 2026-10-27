@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Music } from "lucide-react";
 import { useDemoControl, useScript, useTask } from "@/hooks/useScript";
 import { AppFrame, Btn, Field, Interactive, Label, Panel, ProgressBar, Seg, StatusPill } from "../atoms";
 import { cn } from "@/lib/cn";
+import { useIndicator } from "@/hooks/useIndicator";
 
 const SCRIPT = `0-10s: Cô gái Việt giơ hộp quà giữa kho hàng, đèn Noel lung linh
 10-20s: Cả gia đình quây quần mở quà lịch Giáng Sinh
@@ -32,6 +33,7 @@ export function KichBanMock({ play }: { play: boolean }) {
   const [filter, setFilter] = useState("Tất cả");
   const [tab, setTab] = useState("Kịch bản");
   const ctl = useDemoControl(play);
+  const filterInd = useIndicator(filter);
   const task = useTask();
 
   /** Render từng cảnh của kịch bản (dùng chung cho demo tự chạy và khi người dùng bấm) */
@@ -166,11 +168,21 @@ export function KichBanMock({ play }: { play: boolean }) {
             {/* sóng âm giọng đọc */}
             <span className="flex h-5 items-end gap-0.5">
               {Array.from({ length: 14 }).map((_, i) => (
-                <motion.span
+                <span
                   key={i}
-                  className="w-0.5 rounded-full bg-gradient-to-t from-cyan-glow to-neon-pink"
-                  animate={music ? { height: [4, 6 + ((i * 7) % 14), 4] } : { height: 3 }}
-                  transition={{ duration: 0.6 + (i % 4) * 0.12, repeat: music ? Infinity : 0, ease: "easeInOut" }}
+                  className={cn(
+                    "w-0.5 rounded-full bg-gradient-to-t from-cyan-glow to-neon-pink transition-transform duration-300",
+                    music && "fx-eq",
+                  )}
+                  style={
+                    {
+                      height: 6 + ((i * 7) % 14),
+                      transformOrigin: "bottom",
+                      transform: music ? undefined : `scaleY(${3 / (6 + ((i * 7) % 14))})`,
+                      "--eq-lo": 4 / (6 + ((i * 7) % 14)),
+                      "--eq-d": `${0.6 + (i % 4) * 0.12}s`,
+                    } as CSSProperties
+                  }
                 />
               ))}
             </span>
@@ -181,20 +193,21 @@ export function KichBanMock({ play }: { play: boolean }) {
         </div>
       </Panel>
 
-      <div className="mt-2.5 flex flex-wrap gap-1">
+      <div ref={filterInd.containerRef} className="relative mt-2.5 flex flex-wrap gap-1">
+        <span aria-hidden style={filterInd.style} className="pointer-events-none absolute left-0 top-0 rounded-full bg-cyan-glow/10 will-change-transform" />
         {(["Tất cả", "Chờ", "Đang làm", "Xong", "Lỗi"] as const).map((f) => {
           const n = { "Tất cả": rows.length, Chờ: count("wait"), "Đang làm": count("run"), Xong: count("done"), Lỗi: 0 }[f];
           return (
             <button
               type="button"
               key={f}
+              data-ind={f}
               onClick={() => setFilter(f)}
               className={cn(
                 "relative rounded-full border px-2 py-0.5 text-[10.5px] font-semibold",
                 f === filter ? "border-cyan-glow/60 text-cyan-glow" : "border-white/10 text-slate-400",
               )}
             >
-              {f === filter ? <motion.span layoutId="kb-filter" className="absolute inset-0 rounded-full bg-cyan-glow/10" /> : null}
               <span className="relative">
                 {f} {n}
               </span>

@@ -53,7 +53,7 @@ export default function DocsPage() {
       <Navbar />
       <main className="relative pt-16">
         <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[420px] overflow-hidden">
-          <div className="absolute left-1/2 top-[-200px] h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-cyan-brand/15 blur-[120px]" />
+          <div className="absolute left-1/2 top-[-200px] h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(14,230,250,0.15),rgba(14,230,250,0.083)_45%,transparent)] scale-[1.5]" />
         </div>
 
         <header className="container relative border-b border-white/[0.06] py-14">

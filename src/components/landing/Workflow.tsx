@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useSpring } from "framer-motion";
+import { useElementProgress } from "@/hooks/usePageScroll";
 import { Combine, ListOrdered, UserRound, Users } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 
@@ -28,7 +29,7 @@ const steps = [
 
 export function Workflow() {
   const gridRef = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: gridRef, offset: ["start 85%", "end 55%"] });
+  const scrollYProgress = useElementProgress(gridRef, 0.85, 0.55);
   const line = useSpring(scrollYProgress, { stiffness: 90, damping: 24 });
 
   return (
@@ -60,7 +61,7 @@ export function Workflow() {
                 transition={{ type: "spring", stiffness: 260, damping: 16, delay: 0.2 + i * 0.15 }}
                 className="relative z-10 flex h-14 w-14 items-center justify-center"
               >
-                <span className="absolute -inset-2 animate-spin-slow rounded-[22px] bg-[conic-gradient(from_0deg,transparent,rgba(0,240,255,0.55),transparent_40%,rgba(252,49,153,0.5),transparent_75%)] opacity-0 blur-[2px] transition-opacity duration-500 group-hover:opacity-100" />
+                <span className="absolute -inset-2 animate-spin-slow rounded-[22px] bg-[conic-gradient(from_0deg,transparent,rgba(0,240,255,0.55),transparent_40%,rgba(252,49,153,0.5),transparent_75%)] opacity-0 blur-[2px] transition-opacity duration-500 [animation-play-state:paused] group-hover:opacity-100 group-hover:[animation-play-state:running]" />
                 <span className="absolute inset-0 rounded-2xl bg-ink" />
                 <span className="glow-border relative flex h-14 w-14 items-center justify-center rounded-2xl bg-panel shadow-glow-sm transition-transform duration-500 group-hover:-translate-y-1">
                   <Icon className="h-6 w-6 text-cyan-glow" />

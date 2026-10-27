@@ -1,10 +1,11 @@
-import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
+import { usePageScroll } from "@/hooks/usePageScroll";
+import { AnimatePresence, motion, useMotionValueEvent } from "framer-motion";
 import { useState } from "react";
 import { ArrowUp } from "lucide-react";
 
 /** Nút lên đầu trang, vòng ngoài hiển thị tiến độ cuộn */
 export function BackToTop() {
-  const { scrollY, scrollYProgress } = useScroll();
+  const { scrollY, scrollYProgress } = usePageScroll();
   const [show, setShow] = useState(false);
   useMotionValueEvent(scrollY, "change", (v) => setShow(v > 900));
   const C = 2 * Math.PI * 21;

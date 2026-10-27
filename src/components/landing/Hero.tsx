@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { AnimatePresence, motion, useTransform } from "framer-motion";
+import { useElementProgress } from "@/hooks/usePageScroll";
 import { ArrowRight, HardDrive, PlayCircle, Sparkles, Users } from "lucide-react";
 import { Link } from "@/components/ui/Link";
 import { ButtonLink } from "@/components/ui/Button";
@@ -65,7 +66,7 @@ function Beams() {
 
 export function Hero() {
   const heroRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const scrollYProgress = useElementProgress(heroRef, 0, 0);
   const mockY = useTransform(scrollYProgress, [0, 1], [0, -60]);
   const glowScale = useTransform(scrollYProgress, [0, 1], [1, 1.3]);
 
@@ -81,8 +82,8 @@ export function Hero() {
         <div className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" />
         <Beams />
         <div className="absolute inset-0 bg-[radial-gradient(600px_circle_at_var(--hx,50%)_var(--hy,20%),rgba(0,240,255,0.08),transparent_60%)]" />
-        <div className="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-cyan-brand/15 blur-[120px]" />
-        <div className="absolute right-[-10%] top-40 h-[420px] w-[520px] rounded-full bg-neon-pink/15 blur-[120px]" />
+        <div className="absolute -top-40 left-1/2 h-[520px] w-[900px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(14,230,250,0.15),rgba(14,230,250,0.083)_45%,transparent)] scale-[1.5]" />
+        <div className="absolute right-[-10%] top-40 h-[420px] w-[520px] rounded-full bg-[radial-gradient(closest-side,rgba(252,49,153,0.15),rgba(252,49,153,0.083)_45%,transparent)] scale-[1.5]" />
       </div>
 
       <div className="container">
@@ -174,7 +175,7 @@ export function Hero() {
             transition={{ duration: 1.3, delay: 0.5, ease }}
             className="relative origin-top"
           >
-            <motion.div style={{ scale: glowScale }} className="absolute -inset-x-10 -inset-y-6 -z-10 animate-pulse-soft rounded-[40px] bg-brand-gradient opacity-20 blur-3xl" />
+            <motion.div style={{ scale: glowScale }} className="absolute -inset-x-24 -inset-y-20 -z-10 animate-pulse-soft bg-[radial-gradient(50%_55%_at_30%_50%,rgba(0,240,255,0.22),transparent_75%),radial-gradient(50%_55%_at_70%_50%,rgba(252,49,153,0.2),transparent_75%)]" />
             <motion.div style={{ y: mockY }}>
               <div className="glow-border relative rounded-2xl bg-panel p-1 shadow-[0_40px_140px_-30px_rgba(0,240,255,0.4)] sm:p-1.5">
                 <StudioMock />

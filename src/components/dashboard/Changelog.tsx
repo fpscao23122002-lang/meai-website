@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useSpring } from "framer-motion";
+import { useElementProgress } from "@/hooks/usePageScroll";
 import { History } from "lucide-react";
 import { changelog } from "@/lib/data";
 import { trackSpotlight } from "@/components/fx/spotlight";
@@ -15,7 +16,7 @@ const ease = [0.22, 1, 0.36, 1] as const;
 
 export function Changelog() {
   const listRef = useRef<HTMLOListElement>(null);
-  const { scrollYProgress } = useScroll({ target: listRef, offset: ["start 80%", "end 60%"] });
+  const scrollYProgress = useElementProgress(listRef, 0.8, 0.6);
   const line = useSpring(scrollYProgress, { stiffness: 90, damping: 24 });
 
   return (

@@ -4,10 +4,12 @@ import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { ScrollManager } from "@/components/layout/ScrollManager";
 import { ScrollProgress } from "@/components/fx/ScrollProgress";
 import { Aurora } from "@/components/fx/Aurora";
+import { ScrollProvider } from "@/components/fx/ScrollProvider";
 import { CursorGlow } from "@/components/fx/CursorGlow";
 import { RippleLayer } from "@/components/fx/Ripple";
 import { BackToTop } from "@/components/fx/BackToTop";
 import { Intro } from "@/components/fx/Intro";
+import { OffscreenPause } from "@/components/fx/OffscreenPause";
 import HomePage from "@/pages/HomePage";
 
 // Trang phụ tải theo nhu cầu để trang chủ nhẹ hơn
@@ -31,6 +33,7 @@ export default function App() {
   return (
     // reducedMotion="user": tự tắt hiệu ứng chuyển động nếu người dùng bật "Giảm chuyển động" trong hệ điều hành
     <MotionConfig reducedMotion="user">
+      <ScrollProvider>
       <Intro onReveal={() => setRevealed(true)} />
       <Aurora />
       <CursorGlow />
@@ -39,6 +42,7 @@ export default function App() {
       <BackToTop />
       {/* ScrollManager dựng cùng trang để cuộn tới #section sau khi màn mở đầu kết thúc */}
       {revealed ? <ScrollManager /> : null}
+      {revealed ? <OffscreenPause /> : null}
       {revealed ? (
         <AnimatePresence mode="wait">
           <motion.div
@@ -59,6 +63,7 @@ export default function App() {
           </motion.div>
         </AnimatePresence>
       ) : null}
+      </ScrollProvider>
     </MotionConfig>
   );
 }

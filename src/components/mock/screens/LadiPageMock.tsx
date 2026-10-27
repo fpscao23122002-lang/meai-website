@@ -95,7 +95,7 @@ export function LadiPageMock({ play }: { play: boolean }) {
         {STEPS.map((s, i) => (
           <div key={s} className="min-w-0">
             <div className="h-1 overflow-hidden rounded-full bg-white/[0.06]">
-              <motion.div className="h-full bg-brand-gradient" animate={{ width: i <= step ? "100%" : "0%" }} transition={{ duration: 0.5 }} />
+              <motion.div className="h-full w-full origin-left bg-brand-gradient" initial={false} animate={{ scaleX: i <= step ? 1 : 0 }} transition={{ duration: 0.5 }} />
             </div>
             <p className={cn("mt-1 truncate text-[10px] font-semibold", i <= step ? "text-cyan-glow" : "text-slate-500")}>
               {i + 1}. {s}

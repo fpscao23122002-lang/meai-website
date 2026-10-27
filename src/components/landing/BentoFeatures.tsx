@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import { Image } from "@/components/ui/Image";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -25,6 +26,7 @@ import {
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { TiltCard } from "@/components/fx/TiltCard";
 import { useTicker } from "@/hooks/useTicker";
+import { useIndicator } from "@/hooks/useIndicator";
 import { engines, platforms } from "@/lib/data";
 import { cn } from "@/lib/cn";
 
@@ -39,8 +41,8 @@ function Card({ className, delay = 0, children }: { className?: string; delay?: 
       transition={{ duration: 0.7, delay, ease: [0.22, 1, 0.36, 1] }}
       className="glow-border group relative h-full overflow-hidden rounded-3xl bg-panel p-6 shadow-panel transition-shadow duration-500 hover:shadow-[0_0_0_1px_rgba(0,240,255,0.25),0_30px_80px_-30px_rgba(0,240,255,0.45)] sm:p-8"
     >
-      <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-cyan-brand/10 blur-3xl transition-transform duration-700 group-hover:scale-150" />
-      <div className="pointer-events-none absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-neon-pink/0 blur-3xl transition-colors duration-700 group-hover:bg-neon-pink/10" />
+      <div className="pointer-events-none absolute -right-24 -top-24 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(14,230,250,0.10),rgba(14,230,250,0.055)_45%,transparent)] transition-transform duration-700 group-hover:scale-150" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 h-56 w-56 rounded-full bg-[radial-gradient(closest-side,rgba(252,49,153,0.10),rgba(252,49,153,0.055)_45%,transparent)] scale-125 opacity-0 transition-opacity duration-700 group-hover:opacity-100" />
       {children}
     </TiltCard>
   );
@@ -83,6 +85,9 @@ const ACC_STATES = [
 
 export function BentoFeatures() {
   const { ref, tick } = useTicker<HTMLElement>(1700);
+  const splitMode = Math.floor(tick / 3) % 2 === 0 ? "Luân phiên" : "Lần lượt";
+  const ratioInd = useIndicator(RATIOS[tick % RATIOS.length]);
+  const splitInd = useIndicator(splitMode);
 
   return (
     <section ref={ref} id="tinh-nang" className="relative py-24">
@@ -167,11 +172,9 @@ export function BentoFeatures() {
                   </span>
                 ))}
               </div>
-              <motion.span
+              <span
                 aria-hidden
-                className="absolute bottom-0 left-0 h-px w-24 bg-gradient-to-r from-transparent via-cyan-glow to-transparent"
-                animate={{ x: ["-100%", "900%"] }}
-                transition={{ duration: 2.6, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute bottom-0 left-0 h-px w-24 animate-[fx-sweep_2.6s_ease-in-out_infinite] bg-gradient-to-r from-transparent via-cyan-glow to-transparent"
               />
             </div>
           </Card>
@@ -236,18 +239,17 @@ export function BentoFeatures() {
                 </li>
               ))}
             </ul>
-            <div className="relative mt-5 flex flex-wrap gap-1.5">
+            <div ref={ratioInd.containerRef} className="relative mt-5 flex flex-wrap gap-1.5">
+              <span aria-hidden style={ratioInd.style} className="pointer-events-none absolute left-0 top-0 rounded-md bg-cyan-glow will-change-transform" />
               {RATIOS.map((r, i) => (
                 <span
                   key={r}
+                  data-ind={r}
                   className={cn(
                     "relative rounded-md border px-2 py-0.5 font-mono text-[11px] transition-colors duration-500",
                     tick % RATIOS.length === i ? "border-cyan-glow text-ink" : "border-cyan-brand/25 bg-cyan-brand/10 text-cyan-glow",
                   )}
                 >
-                  {tick % RATIOS.length === i ? (
-                    <motion.span layoutId="bento-ratio" className="absolute inset-0 rounded-[5px] bg-cyan-glow" transition={{ type: "spring", stiffness: 400, damping: 30 }} />
-                  ) : null}
                   <span className="relative">{r}</span>
                 </span>
               ))}
@@ -288,21 +290,22 @@ export function BentoFeatures() {
             </div>
             <div className="relative mt-3 flex items-center gap-2 rounded-lg border border-white/[0.06] bg-ink/60 p-2 text-[11px] text-slate-400">
               Chia việc:
-              {["Luân phiên", "Lần lượt"].map((m, i) => {
-                const on = Math.floor(tick / 3) % 2 === i;
-                return (
-                  <span key={m} className={cn("relative rounded-md px-2 py-0.5 font-semibold transition-colors", on ? "text-cyan-glow" : "text-slate-400")}>
-                    {on ? (
-                      <motion.span
-                        layoutId="bento-split"
-                        className="absolute inset-0 rounded-md border border-cyan-glow/50 bg-cyan-glow/10"
-                        transition={{ type: "spring", stiffness: 380, damping: 30 }}
-                      />
-                    ) : null}
-                    <span className="relative">{m}</span>
+              <span ref={splitInd.containerRef} className="relative flex items-center gap-1">
+                <span
+                  aria-hidden
+                  style={splitInd.style}
+                  className="pointer-events-none absolute left-0 top-0 rounded-md border border-cyan-glow/50 bg-cyan-glow/10 will-change-transform"
+                />
+                {["Luân phiên", "Lần lượt"].map((m) => (
+                  <span
+                    key={m}
+                    data-ind={m}
+                    className={cn("relative rounded-md px-2 py-0.5 font-semibold transition-colors duration-300", splitMode === m ? "text-cyan-glow" : "text-slate-400")}
+                  >
+                    {m}
                   </span>
-                );
-              })}
+                ))}
+              </span>
             </div>
             <ul className="relative mt-5 space-y-2 text-sm text-slate-400">
               {[
@@ -371,11 +374,16 @@ export function BentoFeatures() {
                 Giọng đọc AI
                 <span aria-hidden className="flex h-3 items-end gap-px">
                   {[0, 1, 2, 3, 4, 5].map((b) => (
-                    <motion.span
+                    <span
                       key={b}
-                      className="w-0.5 rounded-full bg-gradient-to-t from-cyan-glow to-neon-pink"
-                      animate={{ height: [3, 6 + ((b * 5) % 7), 3] }}
-                      transition={{ duration: 0.5 + b * 0.08, repeat: Infinity, ease: "easeInOut" }}
+                      className="fx-eq w-0.5 rounded-full bg-gradient-to-t from-cyan-glow to-neon-pink"
+                      style={
+                        {
+                          height: 6 + ((b * 5) % 7),
+                          "--eq-lo": 3 / (6 + ((b * 5) % 7)),
+                          "--eq-d": `${0.5 + b * 0.08}s`,
+                        } as CSSProperties
+                      }
                     />
                   ))}
                 </span>

@@ -14,6 +14,7 @@ import { CONFIGS, DEFAULT_OPTS, type Kind, type OptValue, type Seg } from "@/lib
 import { cn } from "@/lib/cn";
 import { ScreenMock } from "@/components/mock/ScreenMock";
 import { BareFrame, SIDEBAR } from "@/components/mock/mockUtils";
+import { useIndicator } from "@/hooks/useIndicator";
 
 /* ------------------------------------------------------------------ */
 /* Cấu hình tuỳ chọn — mô phỏng đúng panel trái của Studio trong app   */
@@ -141,6 +142,8 @@ export function InteractiveDemo() {
 
   const nextId = useRef(3);
   const [screen, setScreen] = useState("studio");
+  const sbInd = useIndicator<HTMLElement>(screen);
+  const sbIndM = useIndicator(screen);
   const demoRef = useRef<HTMLDivElement>(null);
   const demoInView = useInView(demoRef, { margin: "-15% 0px" });
   const screenLabel = SIDEBAR.find((x) => x.id === screen)?.label ?? "Studio";
@@ -325,8 +328,8 @@ export function InteractiveDemo() {
   return (
     <section id="demo" className="relative py-24">
       <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute left-0 top-1/3 h-[420px] w-[420px] rounded-full bg-neon-pink/10 blur-[120px]" />
-        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-cyan-brand/10 blur-[120px]" />
+        <div className="absolute left-0 top-1/3 h-[420px] w-[420px] rounded-full bg-[radial-gradient(closest-side,rgba(252,49,153,0.10),rgba(252,49,153,0.055)_45%,transparent)] scale-[1.5]" />
+        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-[radial-gradient(closest-side,rgba(14,230,250,0.10),rgba(14,230,250,0.055)_45%,transparent)] scale-[1.5]" />
       </div>
       <div className="container max-w-[1400px]">
         <div className="mx-auto max-w-3xl text-center">
@@ -390,12 +393,18 @@ export function InteractiveDemo() {
 
           <div className="flex">
             {/* Menu trái giống app: bấm để chuyển màn hình */}
-            <aside className="hidden w-16 shrink-0 flex-col items-center gap-1 border-r border-white/[0.06] bg-[#0B0B14] py-3 lg:flex">
+            <aside ref={sbInd.containerRef} className="relative hidden w-16 shrink-0 flex-col items-center gap-1 border-r border-white/[0.06] bg-[#0B0B14] py-3 lg:flex">
+              <span
+                aria-hidden
+                style={sbInd.style}
+                className="pointer-events-none absolute left-0 top-0 rounded-lg bg-cyan-glow/10 ring-1 ring-cyan-glow/40 will-change-transform"
+              />
               <Image src="/brand/meai-logo.webp" alt="" width={36} height={36} className="mb-2 rounded-lg" />
               {SIDEBAR.map(({ id, label, Icon }) => (
                 <button
                   key={id}
                   type="button"
+                  data-ind={id}
                   onClick={() => setScreen(id)}
                   title={label}
                   className={cn(
@@ -403,13 +412,6 @@ export function InteractiveDemo() {
                     screen === id ? "text-cyan-glow" : "text-slate-500 hover:bg-white/5 hover:text-white",
                   )}
                 >
-                  {screen === id ? (
-                    <motion.span
-                      layoutId="demo-sb"
-                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                      className="absolute inset-0 rounded-lg bg-cyan-glow/10 ring-1 ring-cyan-glow/40"
-                    />
-                  ) : null}
                   <Icon className="relative h-3.5 w-3.5" />
                   <span className="relative">{label}</span>
                 </button>
@@ -418,18 +420,19 @@ export function InteractiveDemo() {
 
             <div className="min-w-0 flex-1">
             {/* Menu dạng thanh trượt ngang (mobile / màn hình nhỏ) */}
-            <div className="flex gap-1.5 overflow-x-auto border-b border-white/[0.06] px-3 py-2 lg:hidden">
+            <div ref={sbIndM.containerRef} className="relative flex gap-1.5 overflow-x-auto border-b border-white/[0.06] px-3 py-2 lg:hidden">
+              <span aria-hidden style={sbIndM.style} className="pointer-events-none absolute left-0 top-0 rounded-full bg-cyan-glow/10 will-change-transform" />
               {SIDEBAR.map(({ id, label, Icon }) => (
                 <button
                   key={id}
                   type="button"
+                  data-ind={id}
                   onClick={() => setScreen(id)}
                   className={cn(
                     "relative flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors",
                     screen === id ? "border-cyan-glow/50 text-cyan-glow" : "border-white/10 text-slate-400",
                   )}
                 >
-                  {screen === id ? <motion.span layoutId="demo-sb-m" className="absolute inset-0 rounded-full bg-cyan-glow/10" /> : null}
                   <Icon className="relative h-3.5 w-3.5" />
                   <span className="relative">{label}</span>
                 </button>
@@ -940,7 +943,7 @@ function TaskRow({
         </span>
         {task.status === "running" ? (
           <span className="mt-1 block h-0.5 overflow-hidden rounded-full bg-white/[0.06]">
-            <span className="block h-full bg-brand-gradient transition-all duration-300" style={{ width: `${task.progress}%` }} />
+            <span className="block h-full w-full origin-left bg-brand-gradient transition-transform duration-300" style={{ transform: `scaleX(${task.progress / 100})` }} />
           </span>
         ) : null}
       </span>
