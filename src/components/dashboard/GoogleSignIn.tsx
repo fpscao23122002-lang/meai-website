@@ -66,21 +66,20 @@ export function GoogleLogo({ className }: { className?: string }) {
 /**
  * Nút "Đăng nhập với Google".
  * - Có clientId: nút chính thức của Google (popup chọn tài khoản), trả về ID token để server xác minh.
- * - Không có (bản xem thử): nút cùng kiểu dáng, đăng nhập bằng tài khoản mô phỏng.
+ * - Chưa có (hệ thống tài khoản chưa bật trên website): nút cùng kiểu dáng, bấm vào báo chưa sẵn sàng.
  */
 export function GoogleSignIn({
   clientId,
   onCredential,
-  onDemo,
   busy,
 }: {
   clientId: string | null;
   onCredential: (credential: string) => void;
-  onDemo: () => void;
   busy?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const [state, setState] = useState<"loading" | "ready" | "failed">(clientId ? "loading" : "ready");
+  const [notReady, setNotReady] = useState(false);
   const cb = useRef(onCredential);
   cb.current = onCredential;
 
@@ -134,16 +133,22 @@ export function GoogleSignIn({
 
   if (!clientId) {
     return (
-      <button
-        type="button"
-        disabled={busy}
-        onClick={onDemo}
-        className="group relative flex h-12 w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-white text-sm font-semibold text-slate-800 shadow-[0_10px_30px_-12px_rgba(255,255,255,0.45)] transition hover:-translate-y-0.5 active:scale-[0.98] disabled:opacity-70"
-      >
-        <span className="absolute inset-y-0 left-0 w-1/3 -translate-x-full skew-x-[-20deg] bg-gradient-to-r from-transparent via-slate-200/70 to-transparent transition-transform duration-700 group-hover:translate-x-[400%]" />
-        {busy ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <GoogleLogo className="h-5 w-5" />}
-        Tiếp tục với Google
-      </button>
+      <div className="w-full">
+        <button
+          type="button"
+          onClick={() => setNotReady(true)}
+          className="group relative flex h-12 w-full items-center justify-center gap-3 overflow-hidden rounded-full bg-white text-sm font-semibold text-slate-800 shadow-[0_10px_30px_-12px_rgba(255,255,255,0.45)] transition hover:-translate-y-0.5 active:scale-[0.98]"
+        >
+          <span className="absolute inset-y-0 left-0 w-1/3 -translate-x-full skew-x-[-20deg] bg-gradient-to-r from-transparent via-slate-200/70 to-transparent transition-transform duration-700 group-hover:translate-x-[400%]" />
+          <GoogleLogo className="h-5 w-5" />
+          Tiếp tục với Google
+        </button>
+        {notReady ? (
+          <p role="status" className="mt-3 rounded-xl border border-amber-300/25 bg-amber-300/10 px-3 py-2 text-center text-xs leading-5 text-amber-100">
+            Đăng nhập Google đang được kích hoạt cho website này. Bạn có thể xem tài khoản demo bên dưới, hoặc nhắn Telegram để được hỗ trợ.
+          </p>
+        ) : null}
+      </div>
     );
   }
 

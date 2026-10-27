@@ -31,7 +31,7 @@ function seoFiles(siteUrl: string): Plugin {
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "VITE_");
-  const siteUrl = (env.VITE_SITE_URL || "https://meai.vn").replace(/\/$/, "");
+  const siteUrl = (env.VITE_SITE_URL || "https://meai-website.pages.dev").replace(/\/$/, "");
 
   return {
     plugins: [react(), seoFiles(siteUrl)],
