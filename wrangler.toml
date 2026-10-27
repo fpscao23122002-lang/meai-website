@@ -6,7 +6,7 @@ compatibility_date = "2026-10-01"
 # ---------------------------------------------------------------------------
 # Đăng nhập Google & gói cước (API /api/*, xem docs/TAI-KHOAN.md)
 # 1) Cloudflare Dashboard → Storage & Databases → D1 → Create → tên "meai" → copy Database ID
-# 2) Bỏ dấu # ở khối [[d1_databases]] + [vars] bên dưới, dán Database ID và Google Client ID
+# 2) Bỏ dấu # ở khối [[d1_databases]] bên dưới và dán Database ID (Google Client ID đã khai báo ở [vars])
 # 3) Push lên main → Cloudflare Pages tự deploy. Bảng dữ liệu tự tạo ở lần gọi API đầu tiên.
 # Khi chưa bật, website vẫn chạy bình thường; Khu vực khách hàng chỉ mở được tài khoản demo.
 # ---------------------------------------------------------------------------
@@ -15,8 +15,10 @@ compatibility_date = "2026-10-01"
 # database_name = "meai"
 # database_id = "DÁN_DATABASE_ID_VÀO_ĐÂY"
 
-# [vars]
-# GOOGLE_CLIENT_ID = "xxxxxxxx.apps.googleusercontent.com"
+[vars]
+# OAuth Client ID (Web application) — không phải bí mật, trình duyệt nào cũng thấy
+GOOGLE_CLIENT_ID = "612950915443-j9u4gqlpopbpfpdkup2uadgqitjpp9hv.apps.googleusercontent.com"
+# Thông tin nhận chuyển khoản (VietQR) để trống: sẽ khai báo sau (dự kiến quản lý từ app admin), không gắn cứng.
 # BANK_ID = "MB"
 # BANK_ACCOUNT = "0123456789"
 # BANK_ACCOUNT_NAME = "TEN CHU TAI KHOAN"
