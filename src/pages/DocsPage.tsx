@@ -1,5 +1,4 @@
 import { Link } from "@/components/ui/Link";
-import { useEffect } from "react";
 import { motion } from "framer-motion";
 import { ArrowRight, BookOpen, Download } from "lucide-react";
 import { TelegramIcon } from "@/components/ui/TelegramIcon";
@@ -12,6 +11,7 @@ import { Callout, CodeBlock, DocShot, DocTable, Steps } from "@/components/docs/
 import { ButtonLink } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/site";
 import { usePageMeta } from "@/hooks/usePageMeta";
+import { useProseReveal } from "@/hooks/useProseReveal";
 
 const DOCS_DESCRIPTION =
   "Hướng dẫn MeAI Studio: cài đặt, thêm tài khoản Muse/Flow/Seedance/Dola, tạo ảnh & video hàng loạt, Tư liệu & ảnh tham chiếu, hàng đợi, Kịch bản, LadiPage và đăng Facebook Reels.";
@@ -32,22 +32,7 @@ const SCRIPT_EXAMPLE = `0-10s: Cô gái Việt giơ hộp giữa kho hàng đầ
 export default function DocsPage() {
   usePageMeta({ title: "Hướng dẫn sử dụng", description: DOCS_DESCRIPTION, path: "/docs" });
 
-  // Đánh dấu mục đã cuộn tới để chạy hiệu ứng xuất hiện (CSS .in-view)
-  useEffect(() => {
-    const sections = document.querySelectorAll<HTMLElement>(".prose-doc > section");
-    const io = new IntersectionObserver(
-      (entries) =>
-        entries.forEach((e) => {
-          if (e.isIntersecting) {
-            e.target.classList.add("in-view");
-            io.unobserve(e.target);
-          }
-        }),
-      { rootMargin: "0px 0px -12% 0px" },
-    );
-    sections.forEach((el) => io.observe(el));
-    return () => io.disconnect();
-  }, []);
+  useProseReveal();
 
   return (
     <>

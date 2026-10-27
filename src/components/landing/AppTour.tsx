@@ -68,7 +68,7 @@ export function AppTour() {
     <section
       ref={sectionRef}
       id="giao-dien"
-      className="relative py-24"
+      className="relative overflow-x-clip py-24"
       onMouseEnter={() => setHovering(true)}
       onMouseLeave={() => setHovering(false)}
     >

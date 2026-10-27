@@ -4,7 +4,8 @@ import { Plus, Search, X } from "lucide-react";
 import { TelegramIcon } from "@/components/ui/TelegramIcon";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { trackSpotlight } from "@/components/fx/spotlight";
-import { faqs } from "@/lib/data";
+import { faqCategories, faqs } from "@/lib/data";
+import { useIndicator } from "@/hooks/useIndicator";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
@@ -27,11 +28,21 @@ function Highlight({ text, q }: { text: string; q: string }) {
 export function FAQ() {
   const [open, setOpen] = useState<number | null>(0);
   const [q, setQ] = useState("");
+  const [cat, setCat] = useState<string>("all");
+  const tabs = useIndicator(cat);
 
   const list = useMemo(() => {
     const k = q.trim().toLowerCase();
-    return faqs.map((f, i) => ({ ...f, i })).filter((f) => !k || f.q.toLowerCase().includes(k) || f.a.toLowerCase().includes(k));
-  }, [q]);
+    return faqs
+      .map((f, i) => ({ ...f, i }))
+      .filter((f) => cat === "all" || f.cat === cat)
+      .filter((f) => !k || f.q.toLowerCase().includes(k) || f.a.toLowerCase().includes(k));
+  }, [q, cat]);
+
+  const pickCat = (id: string) => {
+    setCat(id);
+    setOpen(id === "all" ? 0 : faqs.findIndex((f) => f.cat === id));
+  };
 
   return (
     <section id="faq" className="relative py-24">
@@ -76,6 +87,29 @@ export function FAQ() {
             ) : null}
           </AnimatePresence>
         </motion.label>
+
+        {/* Nhóm câu hỏi */}
+        <div className="mt-6 flex justify-center">
+          <div ref={tabs.containerRef} className="relative flex max-w-full flex-wrap justify-center gap-1 rounded-2xl border border-white/[0.08] bg-panel/70 p-1">
+            <span aria-hidden style={tabs.style} className="pointer-events-none absolute left-0 top-0 rounded-xl bg-brand-gradient will-change-transform" />
+            {[{ id: "all", label: "Tất cả" }, ...faqCategories].map((c) => (
+              <button
+                key={c.id}
+                type="button"
+                data-ind={c.id}
+                data-no-ripple
+                onClick={() => pickCat(c.id)}
+                className={cn(
+                  "relative rounded-xl px-3.5 py-1.5 text-sm font-medium transition-colors",
+                  cat === c.id ? "text-white" : "text-slate-400 hover:text-white",
+                )}
+              >
+                {c.label}
+                <span className="ml-1.5 text-[11px] opacity-60">{c.id === "all" ? faqs.length : faqs.filter((f) => f.cat === c.id).length}</span>
+              </button>
+            ))}
+          </div>
+        </div>
 
         <motion.div layout className="mt-8 space-y-3">
           <AnimatePresence mode="popLayout" initial={false}>

@@ -4,6 +4,7 @@ import { Hero } from "@/components/landing/Hero";
 import { TechMarquee } from "@/components/landing/TechMarquee";
 import { BentoFeatures } from "@/components/landing/BentoFeatures";
 import { AppTour } from "@/components/landing/AppTour";
+import { UseCases } from "@/components/landing/UseCases";
 import { Workflow } from "@/components/landing/Workflow";
 import { InteractiveDemo } from "@/components/landing/InteractiveDemo";
 import { Pricing } from "@/components/landing/Pricing";
@@ -33,6 +34,7 @@ export default function HomePage() {
         <TechMarquee />
         <BentoFeatures />
         <AppTour />
+        <UseCases />
         <Workflow />
         <InteractiveDemo />
         <Pricing />

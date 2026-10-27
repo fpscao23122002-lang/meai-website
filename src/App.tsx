@@ -17,6 +17,9 @@ const DocsPage = lazy(() => import("@/pages/DocsPage"));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 const AppConnectPage = lazy(() => import("@/pages/AppConnectPage"));
+const DownloadPage = lazy(() => import("@/pages/DownloadPage"));
+const PromptLibraryPage = lazy(() => import("@/pages/PromptLibraryPage"));
+const LegalPage = lazy(() => import("@/pages/LegalPage"));
 
 function PageFallback() {
   return (
@@ -61,6 +64,10 @@ export default function App() {
                 <Route path="/docs" element={<DocsPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
                 <Route path="/app/connect" element={<AppConnectPage />} />
+                <Route path="/tai-ve" element={<DownloadPage />} />
+                <Route path="/prompt-mau" element={<PromptLibraryPage />} />
+                <Route path="/dieu-khoan" element={<LegalPage doc="terms" />} />
+                <Route path="/bao-mat" element={<LegalPage doc="privacy" />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>

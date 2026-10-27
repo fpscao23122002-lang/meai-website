@@ -16,6 +16,13 @@ export const siteConfig = {
     youtube: "https://youtube.com/@meai.studio",
     email: "support@meai.vn",
   },
+  // Thông tin pháp lý: điền khi có pháp nhân — hiện ở chân trang, trang Điều khoản & Chính sách bảo mật (để trống thì ẩn)
+  legal: {
+    company: "",
+    taxId: "",
+    address: "",
+    updatedAt: "27/10/2026",
+  },
 };
 
 export const navLinks = [

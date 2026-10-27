@@ -13,6 +13,7 @@ const columns = [
       { href: "/#giao-dien", label: "Giao diện app" },
       { href: "/#demo", label: "Trải nghiệm thử" },
       { href: "/#bang-gia", label: "Bảng giá" },
+      { href: "/tai-ve", label: "Tải về" },
       { href: "/dashboard#changelog", label: "Lịch sử cập nhật" },
     ],
   },
@@ -20,10 +21,11 @@ const columns = [
     title: "Tài nguyên",
     links: [
       { href: "/docs", label: "Hướng dẫn sử dụng" },
+      { href: "/prompt-mau", label: "Prompt mẫu" },
       { href: "/docs#cai-dat", label: "Cài đặt & đăng nhập" },
       { href: "/docs#studio", label: "Tạo ảnh & video hàng loạt" },
       { href: "/docs#kich-ban", label: "Kịch bản & LadiPage" },
-      { href: "/docs#dang-reels", label: "Đăng Facebook Reels" },
+      { href: "/#ung-dung", label: "Ứng dụng thực tế" },
     ],
   },
   {
@@ -159,9 +161,28 @@ export function Footer() {
       <div className="border-t border-white/[0.06]">
         <div className="container flex flex-col items-center justify-between gap-3 py-6 text-xs text-slate-500 sm:flex-row">
           <p>© {new Date().getFullYear()} MeAI Studio. Bảo lưu mọi quyền.</p>
-          <p>
-            Muse, Google Flow, Seedance, Facebook và LadiPage là thương hiệu của các chủ sở hữu tương ứng.
+          <p className="flex gap-4">
+            <Link href="/dieu-khoan" className="hover:text-cyan-glow">
+              Điều khoản sử dụng
+            </Link>
+            <Link href="/bao-mat" className="hover:text-cyan-glow">
+              Chính sách bảo mật
+            </Link>
           </p>
+        </div>
+        <div className="container space-y-1.5 pb-8 text-[11px] leading-5 text-slate-600">
+          <p>
+            MeAI là công cụ tự động hoá thao tác trên tài khoản của chính người dùng tại các nền tảng AI. MeAI không cung cấp, không bán
+            tài khoản hay lượt tạo video; người dùng tự chịu trách nhiệm tuân thủ điều khoản của từng nền tảng. Muse, Google Flow, Seedance,
+            Facebook và LadiPage là thương hiệu của các chủ sở hữu tương ứng.
+          </p>
+          {siteConfig.legal.company ? (
+            <p>
+              Đơn vị chủ quản: {siteConfig.legal.company}
+              {siteConfig.legal.taxId ? ` · MST ${siteConfig.legal.taxId}` : ""}
+              {siteConfig.legal.address ? ` · ${siteConfig.legal.address}` : ""}
+            </p>
+          ) : null}
         </div>
       </div>
     </footer>
