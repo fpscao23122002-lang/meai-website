@@ -88,7 +88,9 @@ image/, app-preview.png.png  # Ảnh gốc bạn tải lên (nguồn để tạo
 ## Giao diện app & hiệu ứng
 
 - **Giao diện app dựng bằng code** (`src/components/mock/`): 8 màn hình (Studio cho từng engine, Tư liệu, Kịch bản, Thư viện, Tài khoản, LadiPage, Đăng FB Reels, Cài đặt) dựng lại bằng HTML/CSS nên luôn sắc nét và tự co giãn theo PC/mobile. Mỗi màn hình tự chạy thao tác mẫu (gõ chữ, con trỏ ảo bấm nút, hàng đợi chạy…) khi hiện trên màn hình (`src/hooks/useScript.ts`). Ảnh chụp thật trong `public/screens/` mở qua nút "Xem ảnh chụp thật" (`ShotButton` + `Lightbox`).
-- **Hiệu ứng dùng chung** (`src/components/fx/`): màn chào logo, nền aurora, quầng sáng theo con trỏ (PC), gợn sóng khi bấm/chạm, nút "nam châm" (PC), thanh tiến trình cuộn, nút lên đầu trang, thẻ nghiêng 3D + spotlight, chữ hiện từng từ, số đếm tăng dần, băng chạy chữ.
+- **Màn mở đầu** (`src/components/fx/Intro.tsx`, ~4.5 giây mỗi lần mở web, có nút "Bỏ qua"): lưới phối cảnh, hạt sáng hội tụ, logo giữa các vòng quỹ đạo engine, thanh tiến độ % + trạng thái kết nối từng engine, kết thúc bằng hiệu ứng mở rèm. Chỉnh thời lượng ở hằng số `DURATION`.
+- **Demo tương tác:** menu trái của khung "Bấm thử Studio" chuyển được giữa 8 màn hình; mọi màn hình đều bấm/gõ được. Màn hình tự chạy demo cho đến khi người dùng chạm vào (nút "Xem lại demo" để chạy lại).
+- **Hiệu ứng dùng chung** (`src/components/fx/`): nền aurora, quầng sáng theo con trỏ (PC), gợn sóng khi bấm/chạm, nút "nam châm" (PC), thanh tiến trình cuộn, nút lên đầu trang, thẻ nghiêng 3D + spotlight, chữ hiện từng từ, số đếm tăng dần, băng chạy chữ.
 - Hiệu ứng tự tắt khi người dùng bật "Giảm chuyển động" trong hệ điều hành; hiệu ứng theo con trỏ chỉ bật trên thiết bị có chuột.
 
 ## Tùy chỉnh nhanh

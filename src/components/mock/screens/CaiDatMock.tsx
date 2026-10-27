@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check } from "lucide-react";
-import { useScript } from "@/hooks/useScript";
-import { AppFrame, Btn, Caret, Field, Label, Panel, PTitle } from "../atoms";
+import { useDemoControl, useScript, useTask } from "@/hooks/useScript";
+import { AppFrame, Btn, Field, Interactive, Label, Panel, PTitle } from "../atoms";
 
 const PAGES = ["Serum Dưỡng Trắng", "Gia Dụng Thông Minh", "Review Đồ Công Nghệ"];
 
@@ -13,8 +13,29 @@ export function CaiDatMock({ play }: { play: boolean }) {
   const [token, setToken] = useState("");
   const [scan, setScan] = useState(false);
   const [pages, setPages] = useState(0);
+  const [limits, setLimits] = useState({ img: 5, vid: 30 });
+  const [folder, setFolder] = useState("D:\\MeAI\\output");
+  const ctl = useDemoControl(play);
+  const task = useTask();
 
-  useScript(play, async ({ wait, type }) => {
+  const scanPages = async (wait: (ms: number) => Promise<void>) => {
+    setPages(0);
+    setScan(true);
+    await wait(900);
+    setScan(false);
+    if (!token.trim() && !ctl.active) return;
+    for (let i = 1; i <= PAGES.length; i++) {
+      await wait(260);
+      setPages(i);
+    }
+  };
+  const save = async (wait: (ms: number) => Promise<void>) => {
+    setSaved(false);
+    await wait(60);
+    setSaved(true);
+  };
+
+  useScript(ctl.active, async ({ wait, type }) => {
     setRetry(1);
     setSaved(false);
     setToken("");
@@ -37,7 +58,22 @@ export function CaiDatMock({ play }: { play: boolean }) {
     await wait(2000);
   });
 
+  const numInput = (value: number, set: (n: number) => void, max: number) => (
+    <input
+      type="number"
+      min={0}
+      max={max}
+      value={value}
+      onChange={(e) => {
+        setSaved(false);
+        set(Math.max(0, Math.min(max, Number(e.target.value) || 0)));
+      }}
+      className="mt-0.5 w-full rounded-md border border-white/[0.08] bg-ink/60 px-2 py-1 text-[11px] tabular-nums text-slate-200 outline-none focus:border-cyan-glow/50"
+    />
+  );
+
   return (
+    <Interactive user={ctl.user} onTakeOver={ctl.takeOver} onReplay={ctl.replay}>
     <AppFrame title="Cài đặt" active="cai-dat">
       <PTitle>Cài đặt</PTitle>
       <p className="text-[10.5px] text-slate-500">Thư mục lưu, giới hạn thời gian, token Facebook</p>
@@ -46,24 +82,29 @@ export function CaiDatMock({ play }: { play: boolean }) {
         <p className="text-[10px] text-slate-500">Áp dụng cho task chạy sau khi lưu.</p>
         <Label className="mt-2 text-[10px]">Thư mục lưu</Label>
         <div className="mt-0.5 flex gap-1.5">
-          <Field mono className="flex-1">D:\MeAI\output</Field>
-          <Btn>Chọn thư mục</Btn>
+          <Field mono className="flex-1">{folder}</Field>
+          <Btn
+            onClick={() => {
+              setSaved(false);
+              setFolder((f) => (f.startsWith("D:") ? "E:\\Content\\MeAI" : "D:\\MeAI\\output"));
+            }}
+          >
+            Chọn thư mục
+          </Btn>
         </div>
         <div className="mt-2 grid grid-cols-3 gap-1.5">
-          {[
-            { l: "Số lần thử khi lỗi", v: retry },
-            { l: "Giới hạn tạo ảnh (phút)", v: 5 },
-            { l: "Giới hạn tạo video (phút)", v: 30 },
-          ].map((f) => (
-            <div key={f.l}>
-              <Label className="truncate text-[10px]">{f.l}</Label>
-              <Field className="mt-0.5 tabular-nums">
-                <motion.span key={String(f.v)} initial={{ y: -8, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="inline-block">
-                  {f.v}
-                </motion.span>
-              </Field>
-            </div>
-          ))}
+          <div>
+            <Label className="truncate text-[10px]">Số lần thử khi lỗi</Label>
+            {numInput(retry, setRetry, 5)}
+          </div>
+          <div>
+            <Label className="truncate text-[10px]">Giới hạn tạo ảnh (phút)</Label>
+            {numInput(limits.img, (n) => setLimits((l) => ({ ...l, img: n })), 60)}
+          </div>
+          <div>
+            <Label className="truncate text-[10px]">Giới hạn tạo video (phút)</Label>
+            {numInput(limits.vid, (n) => setLimits((l) => ({ ...l, vid: n })), 120)}
+          </div>
         </div>
         <div className="mt-2 flex items-center justify-end gap-2">
           <AnimatePresence>
@@ -73,7 +114,7 @@ export function CaiDatMock({ play }: { play: boolean }) {
               </motion.span>
             ) : null}
           </AnimatePresence>
-          <Btn variant="primary" pressed={saved}>
+          <Btn variant="primary" pressed={saved} onClick={() => task(save)}>
             Lưu
           </Btn>
         </div>
@@ -82,16 +123,21 @@ export function CaiDatMock({ play }: { play: boolean }) {
         <Label>Facebook token</Label>
         <p className="text-[10px] text-slate-500">Dán 1 token (User hoặc Page), app tự lấy danh sách Fanpage bạn quản lý.</p>
         <div className="mt-1.5 flex gap-1.5">
-          <Field mono className="min-w-0 flex-1 truncate">
-            {token || <span className="text-slate-600">Bắt đầu bằng EAA…</span>}
-            <Caret show={Boolean(token) && pages === 0 && !scan} />
-          </Field>
-          <Btn variant="primary" pressed={scan}>
+          <input
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            placeholder="Bắt đầu bằng EAA…"
+            className="min-w-0 flex-1 truncate rounded-md border border-white/[0.08] bg-ink/60 px-2 py-1 font-mono text-[11px] text-slate-200 outline-none placeholder:text-slate-600 focus:border-cyan-glow/50"
+          />
+          <Btn variant="primary" pressed={scan} onClick={() => task(scanPages)}>
             {scan ? <span className="h-2.5 w-2.5 animate-spin rounded-full border border-ink border-t-transparent" /> : null}
             Quét Fanpage
           </Btn>
         </div>
         <div className="mt-2 flex flex-wrap gap-1.5">
+          {!scan && pages === 0 && ctl.user && !token.trim() ? (
+            <span className="text-[10.5px] text-neon-pink">Dán token trước khi quét Fanpage</span>
+          ) : null}
           <AnimatePresence>
             {PAGES.slice(0, pages).map((p) => (
               <motion.span
@@ -108,5 +154,6 @@ export function CaiDatMock({ play }: { play: boolean }) {
         </div>
       </Panel>
     </AppFrame>
+    </Interactive>
   );
 }

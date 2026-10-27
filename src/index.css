@@ -213,3 +213,19 @@
     opacity: 0;
   }
 }
+
+/* Lưới phối cảnh chạy về phía người xem (màn mở đầu) */
+.intro-grid {
+  background-image: linear-gradient(rgba(0, 240, 255, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 240, 255, 0.35) 1px, transparent 1px);
+  background-size: 56px 56px;
+  animation: intro-grid 1.4s linear infinite;
+}
+@keyframes intro-grid {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: 0 56px;
+  }
+}

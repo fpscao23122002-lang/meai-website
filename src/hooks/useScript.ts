@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export type ScriptCtx = {
   /** Chờ ms mili-giây; tự huỷ khi component ẩn/unmount */
@@ -48,4 +48,40 @@ export function useScript(play: boolean, script: (ctx: ScriptCtx) => Promise<voi
       timers.forEach((t) => window.clearTimeout(t));
     };
   }, [play]);
+}
+
+/**
+ * Điều khiển demo tự chạy: `active` = đang hiển thị và người dùng chưa chạm vào.
+ * `takeOver` chuyển sang chế độ người dùng tự thao tác; `replay` chạy lại demo từ đầu.
+ */
+export function useDemoControl(visible: boolean) {
+  const [user, setUser] = useState(false);
+  return {
+    user,
+    active: visible && !user,
+    takeOver: () => setUser(true),
+    replay: () => setUser(false),
+  };
+}
+
+/**
+ * Chạy một chuỗi hành động có thời gian chờ khi người dùng bấm nút (VD: "Đưa vào hàng đợi").
+ * Gọi lại `start` sẽ huỷ chuỗi đang chạy; tự huỷ khi component unmount.
+ */
+export function useTask() {
+  const gen = useRef(0);
+  useEffect(() => {
+    const g = gen;
+    return () => {
+      g.current++;
+    };
+  }, []);
+  return (fn: (wait: (ms: number) => Promise<void>) => Promise<void>) => {
+    const my = ++gen.current;
+    const wait = (ms: number) =>
+      new Promise<void>((resolve, reject) => window.setTimeout(() => (gen.current === my ? resolve() : reject(CANCEL)), ms));
+    fn(wait).catch((e) => {
+      if (e !== CANCEL) throw e;
+    });
+  };
 }

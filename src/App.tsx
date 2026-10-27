@@ -1,4 +1,4 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { ScrollManager } from "@/components/layout/ScrollManager";
@@ -25,35 +25,40 @@ function PageFallback() {
 
 export default function App() {
   const location = useLocation();
+  // Trang chính chỉ dựng khi màn mở đầu bắt đầu "mở rèm" → hiệu ứng xuất hiện của trang chạy đúng lúc
+  const [revealed, setRevealed] = useState(false);
 
   return (
     // reducedMotion="user": tự tắt hiệu ứng chuyển động nếu người dùng bật "Giảm chuyển động" trong hệ điều hành
     <MotionConfig reducedMotion="user">
-      <Intro />
+      <Intro onReveal={() => setRevealed(true)} />
       <Aurora />
       <CursorGlow />
       <RippleLayer />
       <ScrollProgress />
       <BackToTop />
-      <ScrollManager />
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={location.pathname}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-        >
-          <Suspense fallback={<PageFallback />}>
-            <Routes location={location}>
-              <Route path="/" element={<HomePage />} />
-              <Route path="/docs" element={<DocsPage />} />
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="*" element={<NotFoundPage />} />
-            </Routes>
-          </Suspense>
-        </motion.div>
-      </AnimatePresence>
+      {/* ScrollManager dựng cùng trang để cuộn tới #section sau khi màn mở đầu kết thúc */}
+      {revealed ? <ScrollManager /> : null}
+      {revealed ? (
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Suspense fallback={<PageFallback />}>
+              <Routes location={location}>
+                <Route path="/" element={<HomePage />} />
+                <Route path="/docs" element={<DocsPage />} />
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="*" element={<NotFoundPage />} />
+              </Routes>
+            </Suspense>
+          </motion.div>
+        </AnimatePresence>
+      ) : null}
     </MotionConfig>
   );
 }

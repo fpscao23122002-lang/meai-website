@@ -1,19 +1,46 @@
-import type { AnchorHTMLAttributes } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import type { AnchorHTMLAttributes, MouseEvent } from "react";
+import { Link as RouterLink, useLocation, useNavigate } from "react-router-dom";
 
 type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, "href"> & { href: string };
 
-/** Link nội bộ dùng React Router; link ngoài (http, mailto, tel) dùng thẻ <a> thường */
-export function Link({ href, children, ...rest }: LinkProps) {
+/** Cuộn mượt tới section theo id (bù chiều cao thanh menu) */
+function scrollToId(id: string) {
+  const el = document.getElementById(id);
+  if (!el) return false;
+  el.scrollIntoView({ behavior: "smooth", block: "start" });
+  return true;
+}
+
+/**
+ * Link nội bộ dùng React Router; link ngoài (http, mailto, tel) dùng thẻ <a> thường.
+ * Link tới section (#id hoặc /#id) trên cùng trang luôn cuộn tới nơi, kể cả khi URL đã có sẵn #id đó.
+ */
+export function Link({ href, children, onClick, ...rest }: LinkProps) {
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
   if (/^(https?:|mailto:|tel:)/.test(href)) {
     return (
-      <a href={href} {...rest}>
+      <a href={href} onClick={onClick} {...rest}>
         {children}
       </a>
     );
   }
+
+  const hashMatch = href.match(/^(\/?[^#]*)#(.+)$/);
+  const handle = (e: MouseEvent<HTMLAnchorElement>) => {
+    onClick?.(e);
+    if (e.defaultPrevented || !hashMatch || e.metaKey || e.ctrlKey || e.shiftKey) return;
+    const targetPath = hashMatch[1] || pathname;
+    if (targetPath !== pathname) return; // khác trang: để router chuyển trang, ScrollManager cuộn sau
+    e.preventDefault();
+    const id = hashMatch[2];
+    if (`#${id}` !== window.location.hash) navigate({ pathname, hash: id }, { replace: false, preventScrollReset: true });
+    scrollToId(id);
+  };
+
   return (
-    <RouterLink to={href} {...rest}>
+    <RouterLink to={href} onClick={handle} {...rest}>
       {children}
     </RouterLink>
   );
