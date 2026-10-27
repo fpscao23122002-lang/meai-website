@@ -1,11 +1,8 @@
 node_modules/
-.next/
-out/
-build/
+dist/
 coverage/
 *.tsbuildinfo
-next-env.d.ts
 .env*.local
+.wrangler/
 .DS_Store
 npm-debug.log*
-.vercel

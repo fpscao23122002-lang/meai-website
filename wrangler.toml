@@ -1,0 +1,4 @@
+# Cấu hình Cloudflare Pages (dùng cho `npm run deploy` / `wrangler pages deploy`)
+name = "meai-website"
+pages_build_output_dir = "./dist"
+compatibility_date = "2026-10-01"

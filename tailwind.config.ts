@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
-  content: ["./app/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./lib/**/*.{ts,tsx}"],
+  content: ["./index.html", "./src/**/*.{ts,tsx}"],
   theme: {
     container: {
       center: true,
@@ -19,7 +19,7 @@ const config: Config = {
         engine: { muse: "#00F0FF", flow: "#A855F7", seedance: "#EAB308", dola: "#EC4899" },
       },
       fontFamily: {
-        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        sans: ["\"Be Vietnam Pro\"", "ui-sans-serif", "system-ui", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       backgroundImage: {
