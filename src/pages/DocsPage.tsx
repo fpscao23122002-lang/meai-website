@@ -1,5 +1,9 @@
 import { Link } from "@/components/ui/Link";
-import { ArrowRight, Download, MessageCircle } from "lucide-react";
+import { useEffect } from "react";
+import { motion } from "framer-motion";
+import { ArrowRight, BookOpen, Download, MessageCircle } from "lucide-react";
+import { SplitText } from "@/components/fx/SplitText";
+import { docSections } from "@/lib/docs";
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { DocsSidebar } from "@/components/docs/DocsSidebar";
@@ -27,6 +31,23 @@ const SCRIPT_EXAMPLE = `0-10s: Cô gái Việt giơ hộp giữa kho hàng đầ
 export default function DocsPage() {
   usePageMeta({ title: "Hướng dẫn sử dụng", description: DOCS_DESCRIPTION, path: "/docs" });
 
+  // Đánh dấu mục đã cuộn tới để chạy hiệu ứng xuất hiện (CSS .in-view)
+  useEffect(() => {
+    const sections = document.querySelectorAll<HTMLElement>(".prose-doc > section");
+    const io = new IntersectionObserver(
+      (entries) =>
+        entries.forEach((e) => {
+          if (e.isIntersecting) {
+            e.target.classList.add("in-view");
+            io.unobserve(e.target);
+          }
+        }),
+      { rootMargin: "0px 0px -12% 0px" },
+    );
+    sections.forEach((el) => io.observe(el));
+    return () => io.disconnect();
+  }, []);
+
   return (
     <>
       <Navbar />
@@ -35,15 +56,49 @@ export default function DocsPage() {
           <div className="absolute left-1/2 top-[-200px] h-[400px] w-[800px] -translate-x-1/2 rounded-full bg-cyan-brand/15 blur-[120px]" />
         </div>
 
-        <header className="container border-b border-white/[0.06] py-14">
-          <p className="text-sm font-semibold text-cyan-glow">Tài liệu · v{siteConfig.latestVersion}</p>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Hướng dẫn sử dụng <span className="text-gradient">MeAI Studio</span>
+        <header className="container relative border-b border-white/[0.06] py-14">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center gap-2 rounded-full border border-cyan-glow/25 bg-cyan-glow/10 px-3 py-1 text-xs font-semibold text-cyan-glow"
+          >
+            <BookOpen className="h-3.5 w-3.5" /> Tài liệu · v{siteConfig.latestVersion}
+          </motion.p>
+          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
+            <SplitText inView={false} delay={0.1} parts={["Hướng dẫn sử dụng ", { text: "MeAI Studio", className: "text-gradient" }]} />
           </h1>
-          <p className="mt-4 max-w-2xl text-slate-400">
-            Từ lúc cài app đến khi video đầu tiên lên sóng Reels — đi theo đúng thứ tự menu trong app, kèm ảnh chụp màn hình
-            thật. Mất khoảng 15 phút để làm chủ toàn bộ workflow.
-          </p>
+          <motion.p
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="mt-4 max-w-2xl text-slate-400"
+          >
+            Từ lúc cài app đến khi video đầu tiên lên sóng Reels — đi theo đúng thứ tự menu trong app, kèm màn hình minh hoạ
+            bấm thử được. Mất khoảng 15 phút để làm chủ toàn bộ workflow.
+          </motion.p>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {docSections.slice(0, 6).map((sec, i) => (
+              <motion.a
+                key={sec.id}
+                href={`#${sec.id}`}
+                initial={{ opacity: 0, y: 10, scale: 0.9 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ delay: 0.55 + i * 0.06, type: "spring", stiffness: 300, damping: 20 }}
+                whileHover={{ y: -3 }}
+                className="rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 text-xs text-slate-300 transition-colors hover:border-cyan-glow/40 hover:text-white"
+              >
+                {sec.title}
+              </motion.a>
+            ))}
+          </div>
+          <motion.span
+            aria-hidden
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.2, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="absolute inset-x-4 bottom-0 h-px origin-left bg-brand-gradient sm:inset-x-6 lg:inset-x-8"
+          />
         </header>
 
         <div className="container grid gap-10 pb-10 lg:grid-cols-[250px_minmax(0,1fr)] lg:gap-14">
