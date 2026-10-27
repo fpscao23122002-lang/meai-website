@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@/components/ui/Link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
@@ -27,6 +27,11 @@ import { WindowsIcon } from "@/components/ui/WindowsIcon";
 import { plans } from "@/lib/data";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/cn";
+import { SplitText } from "@/components/fx/SplitText";
+import { CountUp } from "@/components/fx/CountUp";
+import { trackSpotlight } from "@/components/fx/spotlight";
+
+const ease = [0.22, 1, 0.36, 1] as const;
 
 /**
  * Khu vực khách hàng chạy ở chế độ DEMO: dữ liệu được mô phỏng và lưu trong localStorage của trình duyệt.
@@ -103,6 +108,34 @@ const api = {
 const formatDate = (iso: string) =>
   new Date(iso).toLocaleDateString("vi-VN", { day: "2-digit", month: "2-digit", year: "numeric" });
 
+const SCRAMBLE = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+/** Chữ "giải mã": các ký tự xáo trộn rồi dừng dần về giá trị thật (khi hiện/ẩn License Key) */
+function Scramble({ text }: { text: string }) {
+  const [out, setOut] = useState(text);
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) {
+      first.current = false;
+      setOut(text);
+      return;
+    }
+    let frame = 0;
+    const id = window.setInterval(() => {
+      frame++;
+      setOut(
+        text
+          .split("")
+          .map((ch, i) => (ch === "-" || i < frame * 1.4 ? ch : SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)]))
+          .join(""),
+      );
+      if (frame * 1.4 >= text.length) window.clearInterval(id);
+    }, 35);
+    return () => window.clearInterval(id);
+  }, [text]);
+  return <>{out}</>;
+}
+
 function maskKey(key: string) {
   const parts = key.split("-");
   return parts.map((p, i) => (i === 0 || i === parts.length - 1 ? p : "••••")).join("-");
@@ -159,10 +192,16 @@ function LoginCard({ onLogin, selectedPlan }: { onLogin: (email: string) => void
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [errorKey, setErrorKey] = useState(0);
+  const fail = (m: string) => {
+    setError(m);
+    setErrorKey((k) => k + 1);
+  };
+
   const submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!/^\S+@\S+\.\S+$/.test(email)) return setError("Email không hợp lệ.");
-    if (password.length < 6) return setError("Mật khẩu tối thiểu 6 ký tự.");
+    if (!/^\S+@\S+\.\S+$/.test(email)) return fail("Email không hợp lệ.");
+    if (password.length < 6) return fail("Mật khẩu tối thiểu 6 ký tự.");
     setError(null);
     setLoading(true);
     window.setTimeout(() => onLogin(email.trim().toLowerCase()), 700);
@@ -172,25 +211,36 @@ function LoginCard({ onLogin, selectedPlan }: { onLogin: (email: string) => void
     <div className="mx-auto grid max-w-5xl items-center gap-10 lg:grid-cols-2">
       <div>
         <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-          Khu vực <span className="text-gradient">Khách hàng</span>
+          <SplitText inView={false} parts={["Khu vực ", { text: "Khách hàng", className: "text-gradient" }]} />
         </h1>
-        <p className="mt-4 text-slate-400">
+        <motion.p initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-4 text-slate-400">
           Đăng nhập bằng email đã dùng khi mua License để kiểm tra hạn sử dụng, quản lý mã kích hoạt, gỡ/thêm thiết bị và
           tải bản cập nhật mới nhất.
-        </p>
+        </motion.p>
         <ul className="mt-8 space-y-3 text-sm text-slate-300">
           {[
             "Xem hạn dùng & gia hạn gói cước",
             "Quản lý License Key và thiết bị đã kích hoạt",
             "Tự gỡ máy cũ khi đổi máy — không cần chờ admin",
             "Tải bộ cài mới nhất & xem lịch sử cập nhật",
-          ].map((t) => (
-            <li key={t} className="flex items-center gap-3">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-brand/15">
+          ].map((t, i) => (
+            <motion.li
+              key={t}
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.4 + i * 0.1, ease }}
+              className="flex items-center gap-3"
+            >
+              <motion.span
+                initial={{ scale: 0, rotate: -90 }}
+                animate={{ scale: 1, rotate: 0 }}
+                transition={{ delay: 0.55 + i * 0.1, type: "spring", stiffness: 400, damping: 15 }}
+                className="flex h-5 w-5 items-center justify-center rounded-full bg-cyan-brand/15"
+              >
                 <Check className="h-3 w-3 text-cyan-glow" strokeWidth={3} />
-              </span>
+              </motion.span>
               {t}
-            </li>
+            </motion.li>
           ))}
         </ul>
         {selectedPlan ? (
@@ -201,11 +251,26 @@ function LoginCard({ onLogin, selectedPlan }: { onLogin: (email: string) => void
         ) : null}
       </div>
 
-      <form onSubmit={submit} className="glow-border rounded-3xl bg-panel p-7 shadow-panel sm:p-9" noValidate>
+      <motion.form
+        onSubmit={submit}
+        noValidate
+        initial={{ opacity: 0, y: 40, rotateX: 12 }}
+        animate={errorKey ? { opacity: 1, y: 0, rotateX: 0, x: [0, -10, 9, -6, 4, 0] } : { opacity: 1, y: 0, rotateX: 0 }}
+        transition={{ duration: errorKey ? 0.45 : 0.8, ease }}
+        style={{ transformPerspective: 1200 }}
+        className="glow-border relative overflow-hidden rounded-3xl bg-panel p-7 shadow-panel sm:p-9"
+      >
+        <span aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px overflow-hidden">
+          <span className="block h-px w-1/3 animate-shine bg-gradient-to-r from-transparent via-cyan-glow to-transparent" />
+        </span>
         <div className="flex items-center gap-3">
-          <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-gradient-soft ring-1 ring-cyan-brand/30">
+          <motion.span
+            animate={loading ? { rotate: [0, -12, 12, 0] } : {}}
+            transition={{ duration: 0.5, repeat: loading ? Infinity : 0 }}
+            className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-gradient-soft ring-1 ring-cyan-brand/30"
+          >
             <Lock className="h-5 w-5 text-cyan-glow" />
-          </span>
+          </motion.span>
           <div>
             <p className="text-lg font-bold text-white">Đăng nhập</p>
             <p className="text-xs text-slate-500">Chưa có tài khoản? Tài khoản tự tạo khi mua gói.</p>
@@ -252,11 +317,18 @@ function LoginCard({ onLogin, selectedPlan }: { onLogin: (email: string) => void
           </button>
         </div>
 
-        {error ? (
-          <p className="mt-4 flex items-center gap-2 text-sm text-rose-400">
-            <TriangleAlert className="h-4 w-4" /> {error}
-          </p>
-        ) : null}
+        <AnimatePresence>
+          {error ? (
+            <motion.p
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mt-4 flex items-center gap-2 overflow-hidden text-sm text-rose-400"
+            >
+              <TriangleAlert className="h-4 w-4" /> {error}
+            </motion.p>
+          ) : null}
+        </AnimatePresence>
 
         <button type="submit" disabled={loading} className={buttonClass("primary", "lg", "mt-7 w-full")}>
           {loading ? <LoaderCircle className="h-5 w-5 animate-spin" /> : <>Đăng nhập <ArrowRight className="h-4 w-4" /></>}
@@ -277,7 +349,7 @@ function LoginCard({ onLogin, selectedPlan }: { onLogin: (email: string) => void
         <p className="mt-6 rounded-lg bg-white/[0.03] px-3 py-2 text-[11px] leading-5 text-slate-500">
           Bản xem trước: dữ liệu tài khoản được mô phỏng và chỉ lưu trên trình duyệt này.
         </p>
-      </form>
+      </motion.form>
     </div>
   );
 }
@@ -305,9 +377,18 @@ function Account({
     <div className="space-y-6">
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
         <div>
-          <p className="text-sm text-slate-500">Xin chào,</p>
+          <p className="text-sm text-slate-500">
+            Xin chào{" "}
+            <motion.span
+              className="inline-block origin-[70%_70%]"
+              animate={{ rotate: [0, 18, -8, 18, 0] }}
+              transition={{ duration: 1.4, delay: 0.4, repeat: 2, repeatDelay: 2 }}
+            >
+              👋
+            </motion.span>
+          </p>
           <h1 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            {session.name}
+            <SplitText inView={false} parts={[session.name]} />
           </h1>
           <p className="mt-1 text-sm text-slate-500">{session.email}</p>
         </div>
@@ -317,15 +398,28 @@ function Account({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        {primary ? <PlanCard license={primary} onRenew={() => onSelectPlan(primary.planId)} /> : null}
-        <DownloadCard />
+        {primary ? (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.1, ease }}
+            className="lg:col-span-2"
+          >
+            <PlanCard license={primary} onRenew={() => onSelectPlan(primary.planId)} />
+          </motion.div>
+        ) : null}
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.22, ease }}>
+          <DownloadCard />
+        </motion.div>
       </div>
 
       <AnimatePresence>
         {selectedPlan ? <Checkout planId={selectedPlan} email={session.email} onClose={() => onSelectPlan(null)} /> : null}
       </AnimatePresence>
 
-      <LicenseManager licenses={session.licenses} onChange={setLicenses} />
+      <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.34, ease }}>
+        <LicenseManager licenses={session.licenses} onChange={setLicenses} />
+      </motion.div>
     </div>
   );
 }
@@ -343,13 +437,19 @@ function PlanCard({ license, onRenew }: { license: License; onRenew: () => void 
   const warn = left !== null && left <= 14;
 
   return (
-    <div className="glow-border relative overflow-hidden rounded-3xl bg-panel p-7 shadow-panel lg:col-span-2">
-      <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full bg-neon-pink/15 blur-3xl" />
+    <div onMouseMove={trackSpotlight} className="spotlight glow-border relative h-full overflow-hidden rounded-3xl bg-panel p-7 shadow-panel">
+      <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 animate-aurora-2 rounded-full bg-neon-pink/15 blur-3xl" />
       <div className="relative flex flex-wrap items-start justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-gradient shadow-glow">
-            <Crown className="h-6 w-6 text-white" />
-          </span>
+          <motion.span
+            initial={{ scale: 0, rotate: -45 }}
+            animate={{ scale: 1, rotate: 0 }}
+            transition={{ type: "spring", stiffness: 260, damping: 14, delay: 0.3 }}
+            className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-gradient shadow-glow"
+          >
+            <span className="absolute inset-0 animate-pulse-soft rounded-2xl bg-white/20" />
+            <Crown className="relative h-6 w-6 text-white" />
+          </motion.span>
           <div>
             <p className="text-xs uppercase tracking-wider text-slate-500">Gói hiện tại</p>
             <p className="text-xl font-bold text-white">{meta.name}</p>
@@ -361,7 +461,10 @@ function PlanCard({ license, onRenew }: { license: License; onRenew: () => void 
             warn ? "bg-amber-400/15 text-amber-300" : "bg-emerald-400/15 text-emerald-300",
           )}
         >
-          <span className={cn("h-1.5 w-1.5 rounded-full", warn ? "bg-amber-300" : "bg-emerald-300")} />
+          <span className="relative flex h-1.5 w-1.5">
+            <span className={cn("absolute inset-0 animate-ping rounded-full", warn ? "bg-amber-300" : "bg-emerald-300")} />
+            <span className={cn("relative h-1.5 w-1.5 rounded-full", warn ? "bg-amber-300" : "bg-emerald-300")} />
+          </span>
           {warn ? "Sắp hết hạn" : "Đang hoạt động"}
         </span>
       </div>
@@ -377,15 +480,17 @@ function PlanCard({ license, onRenew }: { license: License; onRenew: () => void 
           <span className="flex items-center gap-2 text-slate-400">
             <CalendarClock className="h-4 w-4 text-cyan-glow" /> Thời hạn còn lại
           </span>
-          <span className="font-semibold text-white">{left === null ? "∞" : `${left} ngày`}</span>
+          <span className="font-semibold tabular-nums text-white">{left === null ? "∞" : <><CountUp value={String(left)} /> ngày</>}</span>
         </div>
-        <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/[0.06]">
+        <div className="relative mt-2 h-2.5 overflow-hidden rounded-full bg-white/[0.06]">
           <motion.div
             initial={{ width: 0 }}
             animate={{ width: `${pct}%` }}
-            transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
-            className="h-full rounded-full bg-brand-gradient"
-          />
+            transition={{ duration: 1.4, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            className="relative h-full overflow-hidden rounded-full bg-brand-gradient"
+          >
+            <span className="absolute inset-y-0 left-0 w-1/3 animate-shimmer bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+          </motion.div>
         </div>
       </div>
 
@@ -414,9 +519,11 @@ function Stat({ label, value }: { label: string; value: string }) {
 
 function DownloadCard() {
   return (
-    <div className="glow-border flex flex-col rounded-3xl bg-panel p-7 shadow-panel">
-      <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-cyan-brand/15 ring-1 ring-cyan-brand/30">
-        <MonitorDown className="h-6 w-6 text-cyan-glow" />
+    <div onMouseMove={trackSpotlight} className="spotlight glow-border group flex h-full flex-col rounded-3xl bg-panel p-7 shadow-panel">
+      <span className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-cyan-brand/15 ring-1 ring-cyan-brand/30">
+        <motion.span animate={{ y: [0, 4, 0] }} transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}>
+          <MonitorDown className="h-6 w-6 text-cyan-glow" />
+        </motion.span>
       </span>
       <p className="mt-5 text-xs uppercase tracking-wider text-slate-500">Bản cập nhật mới nhất</p>
       <p className="mt-1 text-2xl font-bold text-white">v{siteConfig.latestVersion}</p>
@@ -564,11 +671,18 @@ function LicenseManager({ licenses, onChange }: { licenses: License[]; onChange:
           const meta = planMeta[l.planId];
           const shown = revealed[l.key];
           return (
-            <div key={l.key} className="rounded-2xl border border-white/[0.07] bg-black/20 p-5">
+            <motion.div
+              key={l.key}
+              layout
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ type: "spring", stiffness: 260, damping: 24 }}
+              className="rounded-2xl border border-white/[0.07] bg-black/20 p-5 transition-colors hover:border-cyan-glow/25"
+            >
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex min-w-0 items-center gap-2">
                   <code className="truncate font-mono text-base font-semibold tracking-wider text-white">
-                    {shown ? l.key : maskKey(l.key)}
+                    <Scramble text={shown ? l.key : maskKey(l.key)} />
                   </code>
                   <button
                     type="button"
@@ -596,10 +710,21 @@ function LicenseManager({ licenses, onChange }: { licenses: License[]; onChange:
                   <p className="mt-2 text-sm text-slate-500">Chưa có máy nào. Nhập mã này trong app MeAI để kích hoạt.</p>
                 ) : (
                   <ul className="mt-2 divide-y divide-white/[0.05]">
-                    {l.devices.map((d) => (
-                      <li key={d.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+                    <AnimatePresence initial={false}>
+                    {l.devices.map((d, di) => (
+                      <motion.li
+                        key={d.id}
+                        initial={{ opacity: 0, x: -16 }}
+                        animate={{ opacity: 1, x: 0, transition: { delay: 0.4 + di * 0.1 } }}
+                        exit={{ opacity: 0, x: 60, height: 0, paddingTop: 0, paddingBottom: 0 }}
+                        transition={{ duration: 0.35 }}
+                        className="flex flex-wrap items-center justify-between gap-3 overflow-hidden py-3"
+                      >
                         <span className="flex items-center gap-3">
-                          <Laptop className="h-4 w-4 text-cyan-brand" />
+                          <span className="relative">
+                            <Laptop className="h-4 w-4 text-cyan-brand" />
+                            <span className="absolute -right-0.5 -top-0.5 h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                          </span>
                           <span>
                             <span className="block text-sm font-medium text-slate-200">{d.name}</span>
                             <span className="block font-mono text-[11px] text-slate-500">
@@ -614,12 +739,13 @@ function LicenseManager({ licenses, onChange }: { licenses: License[]; onChange:
                         >
                           <Trash2 className="h-3.5 w-3.5" /> Gỡ thiết bị
                         </button>
-                      </li>
+                      </motion.li>
                     ))}
+                    </AnimatePresence>
                   </ul>
                 )}
               </div>
-            </div>
+            </motion.div>
           );
         })}
       </div>
@@ -639,12 +765,21 @@ function LicenseManager({ licenses, onChange }: { licenses: License[]; onChange:
           <Plus className="h-4 w-4" /> Thêm mã
         </button>
       </form>
-      {msg ? (
-        <p className={cn("mt-3 flex items-center gap-2 text-sm", msg.type === "ok" ? "text-emerald-400" : "text-rose-400")}>
-          {msg.type === "ok" ? <ShieldCheck className="h-4 w-4" /> : <TriangleAlert className="h-4 w-4" />}
-          {msg.text}
-        </p>
-      ) : null}
+      <AnimatePresence mode="wait">
+        {msg ? (
+          <motion.p
+            key={msg.text}
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0, x: msg.type === "err" ? [0, -8, 8, -4, 0] : 0 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className={cn("mt-3 flex items-center gap-2 text-sm", msg.type === "ok" ? "text-emerald-400" : "text-rose-400")}
+          >
+            {msg.type === "ok" ? <ShieldCheck className="h-4 w-4" /> : <TriangleAlert className="h-4 w-4" />}
+            {msg.text}
+          </motion.p>
+        ) : null}
+      </AnimatePresence>
       <p className="mt-4 flex items-center gap-2 text-xs text-slate-500">
         <Info className="h-3.5 w-3.5" /> Gỡ thiết bị sẽ đăng xuất MeAI trên máy đó ở lần khởi động kế tiếp.
       </p>

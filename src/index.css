@@ -229,3 +229,73 @@
     background-position: 0 56px;
   }
 }
+
+/* Trang Hướng dẫn: tiêu đề mục trượt lên + gạch chân gradient khi cuộn tới */
+.prose-doc > section > h2,
+.prose-doc > section > p,
+.prose-doc > section > ul,
+.prose-doc > section > ol,
+.prose-doc > section > h3 {
+  transition:
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.prose-doc > section:not(.in-view) > h2,
+.prose-doc > section:not(.in-view) > p,
+.prose-doc > section:not(.in-view) > ul,
+.prose-doc > section:not(.in-view) > ol,
+.prose-doc > section:not(.in-view) > h3 {
+  opacity: 0;
+  transform: translateY(18px);
+}
+.prose-doc > section > h2 {
+  position: relative;
+  padding-bottom: 0.5rem;
+}
+.prose-doc > section > h2::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 4rem;
+  border-radius: 9999px;
+  background: linear-gradient(90deg, #00f0ff, #fc3199);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.2s;
+}
+.prose-doc > section.in-view > h2::after {
+  transform: scaleX(1);
+}
+
+/* Hiệu ứng nhiễu kỹ thuật số cho số 404 */
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.glitch::before {
+  color: #00f0ff;
+  mix-blend-mode: screen;
+  animation: glitch-a 2.6s infinite steps(1);
+}
+.glitch::after {
+  color: #fc3199;
+  mix-blend-mode: screen;
+  animation: glitch-b 2.2s infinite steps(1);
+}
+@keyframes glitch-a {
+  0%, 82%, 100% { clip-path: inset(100% 0 0 0); transform: none; }
+  84% { clip-path: inset(10% 0 70% 0); transform: translate(-6px, -2px); }
+  88% { clip-path: inset(55% 0 20% 0); transform: translate(5px, 1px); }
+  92% { clip-path: inset(30% 0 50% 0); transform: translate(-3px, 2px); }
+}
+@keyframes glitch-b {
+  0%, 76%, 100% { clip-path: inset(100% 0 0 0); transform: none; }
+  78% { clip-path: inset(65% 0 10% 0); transform: translate(6px, 2px); }
+  83% { clip-path: inset(20% 0 60% 0); transform: translate(-5px, -1px); }
+  90% { clip-path: inset(45% 0 35% 0); transform: translate(4px, 0); }
+}

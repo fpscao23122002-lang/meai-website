@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { AnimatePresence, motion, useScroll, useSpring } from "framer-motion";
 import { BookOpen, ChevronDown } from "lucide-react";
 import { docSections } from "@/lib/docs";
 import { cn } from "@/lib/cn";
@@ -23,6 +24,9 @@ export function DocsSidebar() {
   }, []);
 
   const current = docSections.find((s) => s.id === active) ?? docSections[0];
+  const activeIdx = docSections.findIndex((s) => s.id === active);
+  const { scrollYProgress } = useScroll();
+  const progress = useSpring(scrollYProgress, { stiffness: 120, damping: 30 });
 
   const list = (
     <ul className="space-y-0.5">
@@ -32,14 +36,23 @@ export function DocsSidebar() {
             href={`#${s.id}`}
             onClick={() => setOpen(false)}
             className={cn(
-              "flex items-center gap-3 rounded-lg border-l-2 px-3 py-2 text-sm transition-colors",
-              active === s.id
-                ? "border-cyan-glow bg-cyan-brand/10 font-semibold text-white"
-                : "border-transparent text-slate-400 hover:bg-white/[0.03] hover:text-white",
+              "group relative flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
+              active === s.id ? "font-semibold text-white" : "text-slate-400 hover:text-white",
             )}
           >
-            <span className="font-mono text-[10px] text-slate-600">{String(i + 1).padStart(2, "0")}</span>
-            {s.title}
+            {active === s.id ? (
+              <motion.span
+                layoutId="docs-active"
+                transition={{ type: "spring", stiffness: 380, damping: 32 }}
+                className="absolute inset-0 rounded-lg border-l-2 border-cyan-glow bg-cyan-brand/10"
+              />
+            ) : (
+              <span className="absolute inset-0 rounded-lg bg-white/[0.03] opacity-0 transition-opacity group-hover:opacity-100" />
+            )}
+            <span className={cn("relative font-mono text-[10px] transition-colors", i <= activeIdx ? "text-cyan-glow" : "text-slate-600")}>
+              {i < activeIdx ? "✓" : String(i + 1).padStart(2, "0")}
+            </span>
+            <span className="relative transition-transform duration-300 group-hover:translate-x-0.5">{s.title}</span>
           </a>
         </li>
       ))}
@@ -61,13 +74,35 @@ export function DocsSidebar() {
           </span>
           <ChevronDown className={cn("h-4 w-4 transition-transform", open && "rotate-180")} />
         </button>
-        {open ? <div className="mt-2 rounded-xl border border-white/10 bg-panel p-2">{list}</div> : null}
+        <AnimatePresence>
+          {open ? (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mt-2 rounded-xl border border-white/10 bg-panel p-2">{list}</div>
+            </motion.div>
+          ) : null}
+        </AnimatePresence>
+        <div className="absolute inset-x-0 bottom-0 h-0.5 bg-white/5">
+          <motion.div style={{ scaleX: progress }} className="h-full origin-left bg-brand-gradient" />
+        </div>
       </div>
 
       {/* Desktop */}
       <aside className="hidden lg:block">
         <div className="sticky top-24">
-          <p className="mb-3 px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Mục lục</p>
+          <p className="mb-3 flex items-center justify-between px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">
+            Mục lục
+            <span className="font-mono normal-case tracking-normal text-cyan-glow">
+              {activeIdx + 1}/{docSections.length}
+            </span>
+          </p>
+          <div className="mx-3 mb-3 h-1 overflow-hidden rounded-full bg-white/[0.06]">
+            <motion.div style={{ scaleX: progress }} className="h-full origin-left bg-brand-gradient" />
+          </div>
           {list}
         </div>
       </aside>
