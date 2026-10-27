@@ -154,7 +154,12 @@ export function GoogleSignIn({
 
   return (
     <div className="relative flex min-h-[44px] w-full justify-center">
-      <div ref={ref} className={cn("flex w-full justify-center transition-opacity", (state !== "ready" || busy) && "opacity-0")} />
+      {/* color-scheme light: trang dùng nền tối nên iframe của Google sẽ bị phủ nền trắng nếu không đặt lại */}
+      <div
+        ref={ref}
+        style={{ colorScheme: "light" }}
+        className={cn("flex w-full justify-center transition-opacity", (state !== "ready" || busy) && "opacity-0")}
+      />
       {state === "loading" || busy ? (
         <span className="absolute inset-0 flex items-center justify-center gap-2 text-sm text-slate-400">
           <LoaderCircle className="h-4 w-4 animate-spin" /> {busy ? "Đang đăng nhập…" : "Đang tải Google…"}
