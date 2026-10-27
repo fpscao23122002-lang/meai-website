@@ -85,6 +85,12 @@ src/
 image/, app-preview.png.png  # Ảnh gốc bạn tải lên (nguồn để tạo các file trong public/)
 ```
 
+## Hiệu ứng & ảnh
+
+- **Hiệu ứng dùng chung** nằm trong `src/components/fx/`: nền aurora động (`Aurora`), thanh tiến trình cuộn (`ScrollProgress`), thẻ nghiêng 3D + spotlight theo con trỏ (`TiltCard`, `spotlight.ts`), chữ hiện từng từ (`SplitText`), số đếm tăng dần (`CountUp`), băng chạy chữ (`Marquee`), kính lúp (`ZoomImage`) và trình xem ảnh 100% (`Lightbox`).
+- Hiệu ứng tự tắt khi người dùng bật "Giảm chuyển động" trong hệ điều hành (`MotionConfig reducedMotion="user"` + CSS `prefers-reduced-motion`).
+- **Ảnh màn hình app** (`public/screens/`): mỗi ảnh có bản gốc ~2560px (màn hình lớn/Retina, kính lúp, xem 100%) và bản `-1280.webp` cho điện thoại, chọn tự động qua `srcset`. Ảnh `*-panel.webp`, `detail-*.webp`, `*-focus.webp` là ảnh cắt cận cảnh ở độ phân giải gốc, hiển thị tỉ lệ 1:1 để chữ luôn rõ.
+
 ## Tùy chỉnh nhanh
 
 - **Phiên bản / ngày phát hành / dung lượng / liên hệ:** `src/lib/site.ts`.

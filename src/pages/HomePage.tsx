@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
 import { Hero } from "@/components/landing/Hero";
+import { TechMarquee } from "@/components/landing/TechMarquee";
 import { BentoFeatures } from "@/components/landing/BentoFeatures";
 import { AppTour } from "@/components/landing/AppTour";
 import { Workflow } from "@/components/landing/Workflow";
@@ -29,6 +30,7 @@ export default function HomePage() {
       <Navbar />
       <main>
         <Hero />
+        <TechMarquee />
         <BentoFeatures />
         <AppTour />
         <Workflow />

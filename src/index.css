@@ -67,6 +67,66 @@
     z-index: -1;
   }
 
+  /* Quầng sáng chạy theo con trỏ (dùng với trackSpotlight) */
+  .spotlight {
+    position: relative;
+  }
+  .spotlight::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    background: radial-gradient(
+      420px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(0, 240, 255, 0.1),
+      rgba(252, 49, 153, 0.06) 40%,
+      transparent 70%
+    );
+  }
+  .spotlight:hover::after {
+    opacity: 1;
+  }
+
+  /* Vệt sáng quét qua nút chính */
+  .btn-shine {
+    overflow: hidden;
+  }
+  .btn-shine::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    width: 40%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+    animation: shine 3.2s ease-in-out infinite;
+    pointer-events: none;
+  }
+
+  /* Viền gradient xoay vòng (thẻ nổi bật) */
+  .border-spin {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+  .border-spin::before {
+    content: "";
+    position: absolute;
+    inset: -60%;
+    z-index: -2;
+    background: conic-gradient(from 0deg, #00f0ff, #a855f7, #fc3199, #00f0ff 60%, transparent 70%, #00f0ff);
+    animation: spin 6s linear infinite;
+  }
+  .border-spin::after {
+    content: "";
+    position: absolute;
+    inset: 1.5px;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(180deg, #191936, #121224);
+  }
+
   .bg-grid {
     background-size: 48px 48px;
     @apply bg-grid-pattern;
@@ -120,5 +180,15 @@
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+@keyframes shine {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  60%,
+  100% {
+    transform: translateX(260%) skewX(-20deg);
   }
 }

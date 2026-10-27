@@ -1,6 +1,9 @@
 import { lazy, Suspense } from "react";
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useLocation } from "react-router-dom";
+import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { ScrollManager } from "@/components/layout/ScrollManager";
+import { ScrollProgress } from "@/components/fx/ScrollProgress";
+import { Aurora } from "@/components/fx/Aurora";
 import HomePage from "@/pages/HomePage";
 
 // Trang phụ tải theo nhu cầu để trang chủ nhẹ hơn
@@ -17,17 +20,32 @@ function PageFallback() {
 }
 
 export default function App() {
+  const location = useLocation();
+
   return (
-    <>
+    // reducedMotion="user": tự tắt hiệu ứng chuyển động nếu người dùng bật "Giảm chuyển động" trong hệ điều hành
+    <MotionConfig reducedMotion="user">
+      <Aurora />
+      <ScrollProgress />
       <ScrollManager />
-      <Suspense fallback={<PageFallback />}>
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/docs" element={<DocsPage />} />
-          <Route path="/dashboard" element={<DashboardPage />} />
-          <Route path="*" element={<NotFoundPage />} />
-        </Routes>
-      </Suspense>
-    </>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={location.pathname}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Suspense fallback={<PageFallback />}>
+            <Routes location={location}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/docs" element={<DocsPage />} />
+              <Route path="/dashboard" element={<DashboardPage />} />
+              <Route path="*" element={<NotFoundPage />} />
+            </Routes>
+          </Suspense>
+        </motion.div>
+      </AnimatePresence>
+    </MotionConfig>
   );
 }

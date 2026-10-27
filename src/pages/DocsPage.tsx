@@ -6,6 +6,7 @@ import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import { Callout, CodeBlock, DocShot, DocTable, Steps } from "@/components/docs/DocBlocks";
 import { ButtonLink } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/site";
+import { screenSet } from "@/lib/data";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 const DOCS_DESCRIPTION =
@@ -58,7 +59,7 @@ export default function DocsPage() {
                 tạo ảnh & video. Bạn cung cấp tài khoản, prompt và tư liệu — MeAI lo chia việc, chạy song song, xử lý lỗi,
                 lưu thành phẩm, ghép video và đăng Reels.
               </p>
-              <DocShot src="/screens/studio-muse-anh.webp" caption="Màn hình Studio — cấu hình · hàng đợi · xem trước" />
+              <DocShot src="/screens/studio-muse-anh.webp" srcSet={screenSet("studio-muse-anh", 2558)} caption="Màn hình Studio — cấu hình · hàng đợi · xem trước" />
               <h3>Menu bên trái</h3>
               <DocTable
                 head={["Mục", "Dùng để"]}
@@ -276,7 +277,7 @@ export default function DocsPage() {
                   ],
                 ]}
               />
-              <DocShot src="/screens/studio-seedance.webp" caption="Studio với Seedance: Chế độ, độ phân giải, thời lượng, seed" />
+              <DocShot src="/screens/studio-seedance.webp" srcSet={screenSet("studio-seedance", 2558)} h={1391} caption="Studio với Seedance: Chế độ, độ phân giải, thời lượng, seed" />
               <h3>Mẹo viết prompt ra video “ăn view”</h3>
               <ul>
                 <li>

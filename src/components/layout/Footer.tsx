@@ -1,3 +1,4 @@
+import { motion } from "framer-motion";
 import { Link } from "@/components/ui/Link";
 import { Facebook, Mail, MessageCircle, Phone, Youtube } from "lucide-react";
 import { Logo } from "@/components/ui/Logo";
@@ -68,7 +69,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="glow-border inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-slate-300 transition hover:text-white hover:shadow-glow-sm"
+                className="glow-border inline-flex h-10 w-10 items-center justify-center rounded-xl bg-white/[0.03] text-slate-300 transition duration-300 hover:-translate-y-1 hover:text-white hover:shadow-glow-sm"
               >
                 <Icon className="h-4 w-4" />
               </a>
@@ -90,6 +91,18 @@ export function Footer() {
             </ul>
           </div>
         ))}
+      </div>
+      {/* Chữ thương hiệu cỡ lớn, gradient chạy chậm */}
+      <div aria-hidden className="container overflow-hidden">
+        <motion.p
+          initial={{ opacity: 0, y: 60 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 1, ease: [0.22, 1, 0.36, 1] }}
+          className="select-none bg-[linear-gradient(90deg,rgba(0,240,255,0.25),rgba(252,49,153,0.25),rgba(0,240,255,0.25))] bg-[length:200%_auto] bg-clip-text text-center text-[22vw] font-extrabold leading-[0.85] tracking-tighter text-transparent animate-gradient-x lg:text-[220px]"
+        >
+          MeAI
+        </motion.p>
       </div>
       <div className="border-t border-white/[0.06]">
         <div className="container flex flex-col items-center justify-between gap-3 py-6 text-xs text-slate-500 sm:flex-row">
