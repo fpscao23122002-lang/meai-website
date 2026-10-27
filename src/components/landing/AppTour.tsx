@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AnimatePresence, motion, useInView } from "framer-motion";
+import { motion, useInView } from "framer-motion";
 import {
   CheckCircle2,
   Clapperboard,
@@ -14,7 +14,8 @@ import {
   Volume2,
 } from "lucide-react";
 import { SectionHeading } from "@/components/ui/SectionHeading";
-import { ZoomImage } from "@/components/fx/ZoomImage";
+import { ShotButton } from "@/components/mock/ShotButton";
+import { ScreenMock } from "@/components/mock/ScreenMock";
 import { appScreens } from "@/lib/data";
 import { cn } from "@/lib/cn";
 
@@ -30,7 +31,7 @@ const icons: Record<string, typeof Sparkles> = {
   "cai-dat": Settings,
 };
 
-const AUTO_MS = 7000;
+const AUTO_MS = 11000;
 const ease = [0.22, 1, 0.36, 1] as const;
 
 export function AppTour() {
@@ -73,7 +74,7 @@ export function AppTour() {
         <SectionHeading
           eyebrow="Giao diện thật"
           title={["Đi một vòng ", { text: "bên trong MeAI", className: "text-gradient" }]}
-          description="8 khu vực, đúng như menu bên trái của app. Rê chuột lên ảnh để soi chi tiết bằng kính lúp, bấm để xem toàn màn hình ở độ phân giải gốc."
+          description="8 khu vực, đúng như menu bên trái của app — dựng lại bằng code nên luôn sắc nét trên mọi màn hình, và tự chạy thao tác mẫu để bạn thấy app làm việc thế nào."
         />
 
         <div className="mt-14 grid gap-6 lg:grid-cols-[230px_minmax(0,1fr)]">
@@ -127,8 +128,8 @@ export function AppTour() {
           </div>
 
           <div className="min-w-0">
-            <AnimatePresence mode="wait">
-              <motion.div
+            {/* Chỉ hiệu ứng xuất hiện (không dùng exit) để tránh kẹt khi chuyển màn nhanh trên mobile */}
+            <motion.div
                 key={`${screen.id}-${shotIdx}`}
                 initial={{ opacity: 0, clipPath: "inset(0% 0% 12% 0% round 18px)", filter: "blur(10px)", y: 16 }}
                 animate={{
@@ -139,8 +140,7 @@ export function AppTour() {
                   // Bỏ hẳn filter/clip sau khi xong để ảnh hiển thị sắc nét nhất
                   transitionEnd: { filter: "none", clipPath: "none" },
                 }}
-                exit={{ opacity: 0, filter: "blur(8px)", y: -10 }}
-                transition={{ duration: 0.55, ease }}
+                                transition={{ duration: 0.55, ease }}
               >
                 {screen.shots.length > 1 ? (
                   <div className="mb-4 flex flex-wrap gap-2">
@@ -166,48 +166,17 @@ export function AppTour() {
                   </div>
                 ) : null}
 
-                {shot.panel ? (
-                  <div className="grid gap-4 md:grid-cols-[minmax(0,240px)_minmax(0,1fr)]">
-                    <motion.figure
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.25, duration: 0.5, ease }}
-                      className="glow-border mx-auto w-full max-w-[260px] overflow-hidden rounded-2xl bg-panel md:max-w-none"
-                    >
-                      <img
-                        src={shot.panel.src}
-                        alt={`Panel cấu hình ${shot.label}`}
-                        width={shot.panel.w}
-                        height={shot.panel.h}
-                        loading="lazy"
-                        className="block h-auto w-full"
-                      />
-                      <figcaption className="border-t border-white/10 px-3 py-2 text-center text-[11px] font-medium text-cyan-glow">
-                        Cận cảnh panel · {shot.label}
-                      </figcaption>
-                    </motion.figure>
-                    <ZoomImage
-                      src={shot.src}
-                      srcSet={shot.srcSet}
-                      sizes="(min-width: 1280px) 760px, 100vw"
-                      alt={`Màn hình ${shot.label} trong app MeAI`}
-                      w={shot.w}
-                      h={shot.h}
-                      className="glow-border self-start rounded-2xl bg-panel shadow-[0_30px_100px_-40px_rgba(0,240,255,0.45)]"
-                    />
-                  </div>
-                ) : (
-                  <ZoomImage
-                    src={shot.src}
-                    alt={`Màn hình ${shot.label} trong app MeAI`}
-                    w={shot.w}
-                    h={shot.h}
-                    full={shot.full}
-                    fullW={2559}
-                    sizes="(min-width: 1280px) 1000px, 100vw"
-                    className="glow-border rounded-2xl bg-panel shadow-[0_30px_100px_-40px_rgba(0,240,255,0.45)]"
-                  />
-                )}
+                <div className="relative">
+                  <div className="absolute -inset-4 -z-10 rounded-[28px] bg-brand-gradient opacity-[0.12] blur-2xl" />
+                  <ScreenMock id={screen.id} shotIdx={shotIdx} play={inView} />
+                </div>
+                <div className="mt-3 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+                  <span className="flex items-center gap-1.5">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-glow" />
+                    Dựng lại từ app thật — đang tự chạy thao tác mẫu
+                  </span>
+                  <ShotButton src={shot.src} w={2559} label={`Ảnh chụp màn hình ${shot.label} thật`} />
+                </div>
 
                 <div className="mt-6 grid gap-6 md:grid-cols-[1fr_1.1fr]">
                   <div>
@@ -230,7 +199,6 @@ export function AppTour() {
                   </ul>
                 </div>
               </motion.div>
-            </AnimatePresence>
           </div>
         </div>
       </div>

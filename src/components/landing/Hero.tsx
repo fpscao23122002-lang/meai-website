@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { AnimatePresence, motion, useInView } from "framer-motion";
-import { ArrowRight, CheckCircle2, HardDrive, PlayCircle, Sparkles, Users } from "lucide-react";
+import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { ArrowRight, HardDrive, PlayCircle, Sparkles, Users } from "lucide-react";
 import { Link } from "@/components/ui/Link";
 import { ButtonLink } from "@/components/ui/Button";
 import { WindowsIcon } from "@/components/ui/WindowsIcon";
 import { SplitText } from "@/components/fx/SplitText";
 import { CountUp } from "@/components/fx/CountUp";
-import { ZoomImage } from "@/components/fx/ZoomImage";
-import { engines, screenSet } from "@/lib/data";
+import { StudioMock } from "@/components/mock/StudioMock";
+import { ShotButton } from "@/components/mock/ShotButton";
+import { engines } from "@/lib/data";
 import { siteConfig } from "@/lib/site";
 import { cn } from "@/lib/cn";
 
@@ -16,50 +17,6 @@ const stats = [
   { value: "4", label: "Nền tảng tài khoản (có Dola)" },
   { value: "6", label: "Ảnh tham chiếu / prompt" },
   { value: "4K", label: "Độ phân giải tối đa" },
-];
-
-/** Các điểm nóng trên ảnh Studio: rê để xem cận cảnh, hiển thị đúng tỉ lệ 1:1 với ảnh gốc nên chữ rõ nét */
-const hotspots = [
-  {
-    id: "config",
-    x: 10,
-    y: 22,
-    title: "Chọn engine & tuỳ chọn",
-    desc: "Muse · Google Flow · Seedance, mỗi prompt cách nhau 1 dòng trống",
-    img: { src: "/screens/detail-config.webp", w: 318, h: 560 },
-    width: 318,
-    card: "left-[calc(10%+28px)] top-[4%]",
-  },
-  {
-    id: "queue",
-    x: 40,
-    y: 14,
-    title: "Hàng đợi thông minh",
-    desc: "Lọc trạng thái, Chọn lỗi, Chạy lại lỗi — tự chia cho tài khoản rảnh",
-    img: { src: "/screens/detail-queue.webp", w: 710, h: 269 },
-    width: 710,
-    card: "left-[18%] top-[calc(14%+30px)]",
-  },
-  {
-    id: "preview",
-    x: 92,
-    y: 22,
-    title: "Xem trước thành phẩm",
-    desc: "Mở file, Tạo lại, Chỉnh sửa prompt ngay tại chỗ",
-    img: { src: "/screens/detail-preview.webp", w: 339, h: 550 },
-    width: 339,
-    card: "right-[calc(8%+28px)] top-[6%]",
-  },
-  {
-    id: "topbar",
-    x: 79,
-    y: 1.4,
-    title: "Điều khiển toàn xưởng",
-    desc: "Tài khoản rảnh, Chạy tiếp, Dừng tất cả — chỉ một chạm",
-    img: { src: "/screens/detail-topbar.webp", w: 653, h: 36 },
-    width: 653,
-    card: "right-[3%] top-[calc(1.4%+30px)]",
-  },
 ];
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -106,129 +63,12 @@ function Beams() {
   );
 }
 
-function StudioShowcase() {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { margin: "-20% 0px" });
-  const [active, setActive] = useState<string | null>(null);
-  const [userTouched, setUserTouched] = useState(false);
-
-  // Tự giới thiệu lần lượt từng khu vực khi người xem chưa tương tác
-  useEffect(() => {
-    if (!inView || userTouched) return;
-    let i = 0;
-    const start = window.setTimeout(() => setActive(hotspots[0].id), 1800);
-    const id = window.setInterval(() => {
-      i = (i + 1) % (hotspots.length + 1);
-      setActive(i === hotspots.length ? null : hotspots[i].id);
-    }, 3200);
-    return () => {
-      window.clearTimeout(start);
-      window.clearInterval(id);
-    };
-  }, [inView, userTouched]);
-
-  return (
-    <div ref={ref} className="relative">
-      <div
-        onPointerEnter={(e) => {
-          // Người xem tự khám phá bằng kính lúp → dừng tự giới thiệu
-          if (e.pointerType === "mouse" && !userTouched) {
-            setUserTouched(true);
-            setActive(null);
-          }
-        }}
-        className="glow-border relative rounded-2xl bg-panel p-1.5 shadow-[0_40px_140px_-30px_rgba(0,240,255,0.4)] sm:p-2">
-        <ZoomImage
-          src="/screens/studio-muse-anh.webp"
-          srcSet={screenSet("studio-muse-anh", 2558)}
-          sizes="(min-width: 1280px) 1216px, 100vw"
-          alt="Giao diện Studio của phần mềm MeAI: chọn engine Muse, nhập prompt, hàng đợi task và xem trước kết quả"
-          w={2558}
-          h={1384}
-          priority
-          className="rounded-xl"
-        />
-
-        {/* Điểm nóng (máy tính) */}
-        <div className="pointer-events-none absolute inset-1.5 hidden sm:inset-2 md:block">
-          {hotspots.map((h) => {
-            const on = active === h.id;
-            return (
-              <div key={h.id}>
-                <button
-                  type="button"
-                  className="pointer-events-auto absolute z-10 -translate-x-1/2 -translate-y-1/2"
-                  style={{ left: `${h.x}%`, top: `${h.y}%` }}
-                  onMouseEnter={() => {
-                    setUserTouched(true);
-                    setActive(h.id);
-                  }}
-                  onFocus={() => {
-                    setUserTouched(true);
-                    setActive(h.id);
-                  }}
-                  onMouseLeave={() => setActive(null)}
-                  onBlur={() => setActive(null)}
-                  aria-label={h.title}
-                >
-                  <span className="relative flex h-6 w-6 items-center justify-center">
-                    <span className="absolute inset-0 animate-ping rounded-full bg-cyan-glow/50" />
-                    <span
-                      className={cn(
-                        "relative flex h-6 w-6 items-center justify-center rounded-full border-2 text-[10px] font-bold transition",
-                        on ? "border-white bg-neon-pink text-white" : "border-cyan-glow bg-ink/90 text-cyan-glow",
-                      )}
-                    >
-                      +
-                    </span>
-                  </span>
-                </button>
-                <AnimatePresence>
-                  {on ? (
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.92, y: 8, filter: "blur(6px)" }}
-                      animate={{ opacity: 1, scale: 1, y: 0, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
-                      exit={{ opacity: 0, scale: 0.95, y: 4, filter: "blur(4px)" }}
-                      transition={{ duration: 0.35, ease }}
-                      className={cn(
-                        "absolute z-20 overflow-hidden rounded-xl border border-cyan-glow/40 bg-ink/95 shadow-[0_20px_60px_-10px_rgba(0,0,0,0.9),0_0_40px_-10px_rgba(0,240,255,0.5)] backdrop-blur",
-                        h.card,
-                      )}
-                      style={{ width: h.width }}
-                    >
-                      <img src={h.img.src} alt={h.title} width={h.img.w} height={h.img.h} className="block h-auto w-full" />
-                      <div className="border-t border-white/10 px-3 py-2">
-                        <p className="text-xs font-bold text-white">{h.title}</p>
-                        <p className="text-[11px] leading-4 text-slate-400">{h.desc}</p>
-                      </div>
-                    </motion.div>
-                  ) : null}
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Cận cảnh dạng băng trượt (điện thoại) */}
-      <div className="-mx-4 mt-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-2 md:hidden">
-        {hotspots.map((h) => (
-          <figure key={h.id} className="w-[78%] shrink-0 snap-center overflow-hidden rounded-xl border border-white/10 bg-panel">
-            <div className="flex max-h-56 items-start justify-center overflow-hidden bg-ink">
-              <img src={h.img.src} alt={h.title} width={h.img.w} height={h.img.h} loading="lazy" className="h-auto w-full object-contain object-top" />
-            </div>
-            <figcaption className="px-3 py-2">
-              <p className="text-xs font-bold text-white">{h.title}</p>
-              <p className="text-[11px] text-slate-400">{h.desc}</p>
-            </figcaption>
-          </figure>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 export function Hero() {
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const mockY = useTransform(scrollYProgress, [0, 1], [0, -60]);
+  const glowScale = useTransform(scrollYProgress, [0, 1], [1, 1.3]);
+
   const trackGlow = (e: MouseEvent<HTMLElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
     e.currentTarget.style.setProperty("--hx", `${e.clientX - r.left}px`);
@@ -236,7 +76,7 @@ export function Hero() {
   };
 
   return (
-    <section onMouseMove={trackGlow} className="relative overflow-hidden pb-20 pt-32 sm:pt-36">
+    <section ref={heroRef} onMouseMove={trackGlow} className="relative overflow-hidden pb-20 pt-32 sm:pt-36">
       <div className="pointer-events-none absolute inset-0 -z-10">
         <div className="bg-grid absolute inset-0 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)]" />
         <Beams />
@@ -334,32 +174,20 @@ export function Hero() {
             transition={{ duration: 1.3, delay: 0.5, ease }}
             className="relative origin-top"
           >
-            <div className="absolute -inset-x-10 -inset-y-6 -z-10 animate-pulse-soft rounded-[40px] bg-brand-gradient opacity-20 blur-3xl" />
-            <StudioShowcase />
+            <motion.div style={{ scale: glowScale }} className="absolute -inset-x-10 -inset-y-6 -z-10 animate-pulse-soft rounded-[40px] bg-brand-gradient opacity-20 blur-3xl" />
+            <motion.div style={{ y: mockY }}>
+              <div className="glow-border relative rounded-2xl bg-panel p-1 shadow-[0_40px_140px_-30px_rgba(0,240,255,0.4)] sm:p-1.5">
+                <StudioMock />
+              </div>
+            </motion.div>
+            <div className="mt-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-xs text-slate-500">
+              <span className="flex items-center gap-1.5">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-glow" />
+                Giao diện dựng lại từ app thật — đang tự chạy demo
+              </span>
+              <ShotButton src="/screens/studio-muse-anh.webp" w={2558} label="Ảnh chụp màn hình Studio thật" />
+            </div>
 
-            <motion.div
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 1.8, duration: 0.6 }}
-              className="pointer-events-none absolute -left-4 top-[58%] hidden xl:block"
-            >
-              <div className="flex animate-float items-center gap-2 rounded-xl border border-cyan-glow/30 bg-ink/90 px-3 py-2 text-xs font-semibold text-cyan-glow shadow-glow-sm backdrop-blur">
-                <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-glow" /> Tài khoản: 2/2 rảnh
-              </div>
-            </motion.div>
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 2, duration: 0.6 }}
-              className="pointer-events-none absolute -right-4 bottom-[18%] hidden xl:block"
-            >
-              <div
-                style={{ animationDelay: "1.2s" }}
-                className="flex animate-float items-center gap-2 rounded-xl border border-neon-pink/30 bg-ink/90 px-3 py-2 text-xs font-semibold text-pink-300 shadow-glow-pink backdrop-blur"
-              >
-                <CheckCircle2 className="h-4 w-4" /> Xong · tự lưu vào Thư viện
-              </div>
-            </motion.div>
           </motion.div>
         </div>
 

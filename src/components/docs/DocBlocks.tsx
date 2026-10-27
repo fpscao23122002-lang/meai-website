@@ -1,4 +1,7 @@
-import { ZoomImage } from "@/components/fx/ZoomImage";
+import { useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import { ScreenMock } from "@/components/mock/ScreenMock";
+import { ShotButton } from "@/components/mock/ShotButton";
 import { Info, Lightbulb, TriangleAlert } from "lucide-react";
 import { cn } from "@/lib/cn";
 
@@ -91,35 +94,24 @@ export function DocTable({ head, rows }: { head: string[]; rows: React.ReactNode
   );
 }
 
-export function DocShot({
-  src,
-  caption,
-  w = 2558,
-  h = 1384,
-  full,
-  srcSet,
-}: {
-  src: string;
-  caption: string;
-  w?: number;
-  h?: number;
-  full?: string;
-  srcSet?: string;
-}) {
+/** Minh hoạ màn hình app trong tài liệu: bản dựng tự chạy + nút xem ảnh chụp thật */
+export function DocShot({ screen, shot = 0, real, caption }: { screen: string; shot?: number; real: string; caption: string }) {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { margin: "-15% 0px" });
   return (
-    <figure className="mt-6">
-      <ZoomImage
-        src={src}
-        srcSet={srcSet}
-        sizes="(min-width: 1024px) 768px, 100vw"
-        alt={caption}
-        w={w}
-        h={h}
-        full={full}
-        fullW={2559}
-        className="glow-border rounded-xl bg-panel transition-shadow hover:shadow-glow-sm"
-      />
-      <figcaption className="mt-2 text-center text-xs text-slate-500">{caption}</figcaption>
-    </figure>
+    <motion.figure
+      ref={ref}
+      initial={{ opacity: 0, y: 30, scale: 0.98 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      viewport={{ once: true, margin: "-60px" }}
+      transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+      className="mt-6"
+    >
+      <ScreenMock id={screen} shotIdx={shot} play={inView} />
+      <figcaption className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1.5 text-center text-xs text-slate-500">
+        {caption}
+        <ShotButton src={real} w={2559} label={caption} />
+      </figcaption>
+    </motion.figure>
   );
 }
