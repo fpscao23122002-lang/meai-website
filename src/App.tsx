@@ -4,6 +4,10 @@ import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { ScrollManager } from "@/components/layout/ScrollManager";
 import { ScrollProgress } from "@/components/fx/ScrollProgress";
 import { Aurora } from "@/components/fx/Aurora";
+import { CursorGlow } from "@/components/fx/CursorGlow";
+import { RippleLayer } from "@/components/fx/Ripple";
+import { BackToTop } from "@/components/fx/BackToTop";
+import { Intro } from "@/components/fx/Intro";
 import HomePage from "@/pages/HomePage";
 
 // Trang phụ tải theo nhu cầu để trang chủ nhẹ hơn
@@ -25,8 +29,12 @@ export default function App() {
   return (
     // reducedMotion="user": tự tắt hiệu ứng chuyển động nếu người dùng bật "Giảm chuyển động" trong hệ điều hành
     <MotionConfig reducedMotion="user">
+      <Intro />
       <Aurora />
+      <CursorGlow />
+      <RippleLayer />
       <ScrollProgress />
+      <BackToTop />
       <ScrollManager />
       <AnimatePresence mode="wait">
         <motion.div

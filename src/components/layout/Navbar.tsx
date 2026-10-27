@@ -11,6 +11,7 @@ import { cn } from "@/lib/cn";
 
 export function Navbar() {
   const [scrolled, setScrolled] = useState(false);
+  const [hidden, setHidden] = useState(false);
   const [open, setOpen] = useState(false);
   const [section, setSection] = useState<string | null>(null);
   const { pathname } = useLocation();
@@ -35,7 +36,14 @@ export function Navbar() {
     href.startsWith("/#") ? pathname === "/" && section === href.slice(2) : pathname === href;
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    let last = window.scrollY;
+    const onScroll = () => {
+      const y = window.scrollY;
+      setScrolled(y > 12);
+      setHidden(y > 400 && y > last + 4);
+      if (y < last - 4) setHidden(false);
+      last = y;
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -51,7 +59,7 @@ export function Navbar() {
   return (
     <motion.header
       initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
+      animate={{ y: hidden && !open ? -80 : 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
       className={cn(
         "fixed inset-x-0 top-0 z-50 transition-all duration-300",
@@ -104,7 +112,17 @@ export function Navbar() {
           aria-label={open ? "Đóng menu" : "Mở menu"}
           aria-expanded={open}
         >
-          {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.span
+              key={open ? "x" : "m"}
+              initial={{ rotate: -90, opacity: 0 }}
+              animate={{ rotate: 0, opacity: 1 }}
+              exit={{ rotate: 90, opacity: 0 }}
+              transition={{ duration: 0.18 }}
+            >
+              {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </motion.span>
+          </AnimatePresence>
         </button>
       </nav>
 
@@ -118,15 +136,25 @@ export function Navbar() {
             className="overflow-hidden border-t border-white/[0.06] lg:hidden"
           >
             <div className="container flex flex-col gap-1 py-4">
-              {navLinks.map((l) => (
-                <Link
+              {navLinks.map((l, i) => (
+                <motion.div
                   key={l.href}
-                  href={l.href}
-                  onClick={() => setOpen(false)}
-                  className="rounded-lg px-3 py-3 text-base font-medium text-slate-300 hover:bg-white/5 hover:text-white"
+                  initial={{ opacity: 0, x: -24 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.05 + i * 0.05, type: "spring", stiffness: 300, damping: 24 }}
                 >
-                  {l.label}
-                </Link>
+                  <Link
+                    href={l.href}
+                    onClick={() => setOpen(false)}
+                    className={cn(
+                      "flex items-center justify-between rounded-lg px-3 py-3 text-base font-medium hover:bg-white/5 hover:text-white",
+                      isActive(l.href) ? "bg-white/[0.04] text-white" : "text-slate-300",
+                    )}
+                  >
+                    {l.label}
+                    {isActive(l.href) ? <span className="h-1.5 w-1.5 rounded-full bg-cyan-glow shadow-glow-sm" /> : null}
+                  </Link>
+                </motion.div>
               ))}
               <div className="mt-3 grid grid-cols-2 gap-3">
                 <ButtonLink href="/dashboard" variant="outline">

@@ -67,37 +67,10 @@ export type AppScreen = {
   shots: Shot[];
 };
 
-/**
- * Ảnh màn hình app.
- * - src/w/h: ảnh hiển thị chính (Studio = toàn màn hình độ phân giải gốc; mục khác = cận cảnh vùng nội dung)
- * - srcSet: bản 1280px cho màn hình nhỏ, bản gốc cho màn hình lớn/Retina
- * - full: ảnh toàn màn hình độ phân giải gốc để phóng to
- * - panel: cận cảnh panel cấu hình (chỉ Studio) — đọc rõ từng tuỳ chọn
- */
-export type Shot = {
-  label: string;
-  src: string;
-  srcSet?: string;
-  w: number;
-  h: number;
-  full?: string;
-  panel?: { src: string; w: number; h: number };
-};
+/** Ảnh chụp màn hình thật của app (mở bằng nút "Xem ảnh chụp thật"); giao diện hiển thị trên web được dựng bằng code */
+export type Shot = { label: string; src: string; full?: string };
 
-/** Ảnh toàn màn hình: bản gốc + bản 1280px */
-export function screenSet(name: string, w: number) {
-  return `/screens/${name}-1280.webp 1280w, /screens/${name}.webp ${w}w`;
-}
-
-const studioShot = (label: string, name: string, w: number, h: number, panelH: number): Shot => ({
-  label,
-  src: `/screens/${name}.webp`,
-  srcSet: screenSet(name, w),
-  w,
-  h,
-  full: `/screens/${name}.webp`,
-  panel: { src: `/screens/${name}-panel.webp`, w: 318, h: panelH },
-});
+const studioShot = (label: string, name: string): Shot => ({ label, src: `/screens/${name}.webp` });
 
 /** Các màn hình thật của app, theo đúng thứ tự menu bên trái */
 export const appScreens: AppScreen[] = [
@@ -113,11 +86,11 @@ export const appScreens: AppScreen[] = [
       "Xem trước kết quả, Mở file, Tạo lại hoặc Chỉnh sửa prompt",
     ],
     shots: [
-      studioShot("Muse · Ảnh", "studio-muse-anh", 2558, 1384, 695),
-      studioShot("Muse · Video", "studio-muse-video", 2559, 1389, 695),
-      studioShot("Flow · Ảnh", "studio-flow-anh", 2548, 1374, 804),
-      studioShot("Flow · Video", "studio-flow-video", 2559, 1384, 874),
-      studioShot("Seedance", "studio-seedance", 2558, 1391, 890),
+      studioShot("Muse · Ảnh", "studio-muse-anh"),
+      studioShot("Muse · Video", "studio-muse-video"),
+      studioShot("Flow · Ảnh", "studio-flow-anh"),
+      studioShot("Flow · Video", "studio-flow-video"),
+      studioShot("Seedance", "studio-seedance"),
     ],
   },
   {
@@ -131,7 +104,7 @@ export const appScreens: AppScreen[] = [
       "Ảnh luân phiên: mỗi task lấy 1 ảnh kế tiếp, nạp cả Folder",
       "Mẫu prompt lưu từ Studio, dùng lại cho mọi dự án",
     ],
-    shots: [{ label: "Tư liệu", src: "/screens/tu-lieu-focus.webp", w: 1215, h: 482, full: "/screens/tu-lieu.webp" }],
+    shots: [{ label: "Tư liệu", src: "/screens/tu-lieu.webp" }],
   },
   {
     id: "kich-ban",
@@ -144,7 +117,7 @@ export const appScreens: AppScreen[] = [
       "Giọng đọc, Người dẫn, Nhân vật dẫn lấy từ Tư liệu",
       "Ảnh sản phẩm: mỗi ảnh ra 1 bộ video riêng · Tự ghép khi xong · Ghép nhạc",
     ],
-    shots: [{ label: "Kịch bản", src: "/screens/kich-ban-focus.webp", w: 1462, h: 737, full: "/screens/kich-ban.webp" }],
+    shots: [{ label: "Kịch bản", src: "/screens/kich-ban.webp" }],
   },
   {
     id: "thu-vien",
@@ -156,7 +129,7 @@ export const appScreens: AppScreen[] = [
       "Ghép video nhiều clip, Lưu vào Tư liệu ảnh đẹp",
       "Đăng FB Reels ngay trên từng video",
     ],
-    shots: [{ label: "Thư viện", src: "/screens/thu-vien-focus.webp", w: 1209, h: 983, full: "/screens/thu-vien.webp" }],
+    shots: [{ label: "Thư viện", src: "/screens/thu-vien.webp" }],
   },
   {
     id: "tai-khoan",
@@ -169,7 +142,7 @@ export const appScreens: AppScreen[] = [
       "Tự tối ưu prompt khi dính bộ lọc an toàn Google (Safety Filter)",
       "Proxy riêng từng tài khoản + kho proxy dự phòng (US/Global)",
     ],
-    shots: [{ label: "Tài khoản", src: "/screens/tai-khoan-focus.webp", w: 1209, h: 514, full: "/screens/tai-khoan.webp" }],
+    shots: [{ label: "Tài khoản", src: "/screens/tai-khoan.webp" }],
   },
   {
     id: "ladipage",
@@ -181,7 +154,7 @@ export const appScreens: AppScreen[] = [
       "Bước 3: Sửa kịch bản, chọn cách làm",
       "Bước 4: Đưa vào hàng đợi — video tự chạy",
     ],
-    shots: [{ label: "LadiPage", src: "/screens/ladipage-focus.webp", w: 1209, h: 246, full: "/screens/ladipage.webp" }],
+    shots: [{ label: "LadiPage", src: "/screens/ladipage.webp" }],
   },
   {
     id: "dang-reels",
@@ -193,7 +166,7 @@ export const appScreens: AppScreen[] = [
       "Caption kèm hashtag (#reels #xuhuong #freeship)",
       "Định dạng Reels dọc 9:16 · có Lịch sử đăng",
     ],
-    shots: [{ label: "Đăng FB Reels", src: "/screens/dang-reels-focus.webp", w: 1209, h: 665, full: "/screens/dang-reels.webp" }],
+    shots: [{ label: "Đăng FB Reels", src: "/screens/dang-reels.webp" }],
   },
   {
     id: "cai-dat",
@@ -205,7 +178,7 @@ export const appScreens: AppScreen[] = [
       "Số lần thử khi lỗi, giới hạn thời gian tạo ảnh / tạo video",
       "Facebook token: dán 1 token, app tự quét danh sách Fanpage",
     ],
-    shots: [{ label: "Cài đặt", src: "/screens/cai-dat-focus.webp", w: 1209, h: 681, full: "/screens/cai-dat.webp" }],
+    shots: [{ label: "Cài đặt", src: "/screens/cai-dat.webp" }],
   },
 ];
 

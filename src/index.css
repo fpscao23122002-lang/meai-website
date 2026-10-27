@@ -192,3 +192,24 @@
     transform: translateX(260%) skewX(-20deg);
   }
 }
+
+/* Gợn sóng khi bấm/chạm (RippleLayer) */
+.fx-ripple-host {
+  overflow: hidden;
+  isolation: isolate;
+}
+.fx-ripple {
+  position: absolute;
+  border-radius: 9999px;
+  pointer-events: none;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.35), rgba(0, 240, 255, 0.15) 45%, transparent 70%);
+  transform: scale(0);
+  animation: fx-ripple 0.65s ease-out forwards;
+  z-index: 0;
+}
+@keyframes fx-ripple {
+  to {
+    transform: scale(1);
+    opacity: 0;
+  }
+}

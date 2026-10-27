@@ -6,7 +6,6 @@ import { DocsSidebar } from "@/components/docs/DocsSidebar";
 import { Callout, CodeBlock, DocShot, DocTable, Steps } from "@/components/docs/DocBlocks";
 import { ButtonLink } from "@/components/ui/Button";
 import { siteConfig } from "@/lib/site";
-import { screenSet } from "@/lib/data";
 import { usePageMeta } from "@/hooks/usePageMeta";
 
 const DOCS_DESCRIPTION =
@@ -59,7 +58,7 @@ export default function DocsPage() {
                 tạo ảnh & video. Bạn cung cấp tài khoản, prompt và tư liệu — MeAI lo chia việc, chạy song song, xử lý lỗi,
                 lưu thành phẩm, ghép video và đăng Reels.
               </p>
-              <DocShot src="/screens/studio-muse-anh.webp" srcSet={screenSet("studio-muse-anh", 2558)} caption="Màn hình Studio — cấu hình · hàng đợi · xem trước" />
+              <DocShot screen="studio" shot={0} real="/screens/studio-muse-anh.webp" caption="Màn hình Studio — cấu hình · hàng đợi · xem trước" />
               <h3>Menu bên trái</h3>
               <DocTable
                 head={["Mục", "Dùng để"]}
@@ -149,7 +148,7 @@ export default function DocsPage() {
               <p>
                 Vào <strong>Cài đặt → Chạy task</strong>. Thiết lập áp dụng cho các task chạy sau khi bấm <strong>Lưu</strong>.
               </p>
-              <DocShot src="/screens/cai-dat-focus.webp" w={1209} h={681} full="/screens/cai-dat.webp" caption="Cài đặt: Chạy task & Facebook token" />
+              <DocShot screen="cai-dat" real="/screens/cai-dat.webp" caption="Cài đặt: Chạy task & Facebook token" />
               <DocTable
                 head={["Tuỳ chọn", "Ý nghĩa", "Gợi ý"]}
                 rows={[
@@ -175,7 +174,7 @@ export default function DocsPage() {
                 Tab <strong>Tài khoản</strong> gom 4 nền tảng: <strong>Muse</strong>, <strong>Flow</strong>,{" "}
                 <strong>Seedance</strong>, <strong>Dola</strong>. Mỗi tab hiện số tài khoản rảnh, ví dụ <code>1/1 rảnh</code>.
               </p>
-              <DocShot src="/screens/tai-khoan-focus.webp" w={1209} h={514} full="/screens/tai-khoan.webp" caption="Tài khoản: cấu hình luồng, chia việc, proxy" />
+              <DocShot screen="tai-khoan" real="/screens/tai-khoan.webp" caption="Tài khoản: cấu hình luồng, chia việc, proxy" />
               <Steps
                 items={[
                   {
@@ -277,7 +276,7 @@ export default function DocsPage() {
                   ],
                 ]}
               />
-              <DocShot src="/screens/studio-seedance.webp" srcSet={screenSet("studio-seedance", 2558)} h={1391} caption="Studio với Seedance: Chế độ, độ phân giải, thời lượng, seed" />
+              <DocShot screen="studio" shot={4} real="/screens/studio-seedance.webp" caption="Studio với Seedance: Chế độ, độ phân giải, thời lượng, seed" />
               <h3>Mẹo viết prompt ra video “ăn view”</h3>
               <ul>
                 <li>
@@ -299,7 +298,7 @@ export default function DocsPage() {
                 Tab <strong>Tư liệu</strong> là nơi giữ “bản gốc” để mọi video đồng nhất. Người mẫu và ảnh luân phiên quản lý
                 ở đây và bật/tắt nhanh ngay trong Studio.
               </p>
-              <DocShot src="/screens/tu-lieu-focus.webp" w={1215} h={482} full="/screens/tu-lieu.webp" caption="Tư liệu: Nhân vật, Mẫu prompt, Người mẫu cố định, Ảnh luân phiên" />
+              <DocShot screen="tu-lieu" real="/screens/tu-lieu.webp" caption="Tư liệu: Nhân vật, Mẫu prompt, Người mẫu cố định, Ảnh luân phiên" />
               <DocTable
                 head={["Khối", "Cách hoạt động", "Dùng khi"]}
                 rows={[
@@ -365,7 +364,7 @@ export default function DocsPage() {
                 </li>
               </ol>
               <h3>Thư viện & ghép video</h3>
-              <DocShot src="/screens/thu-vien-focus.webp" w={1209} h={983} full="/screens/thu-vien.webp" caption="Thư viện: lọc dự án, ảnh/video, Ghép video, Đăng FB Reels" />
+              <DocShot screen="thu-vien" real="/screens/thu-vien.webp" caption="Thư viện: lọc dự án, ảnh/video, Ghép video, Đăng FB Reels" />
               <p>
                 Thành phẩm nằm ở <strong>Thư viện</strong> (đường dẫn hiện ngay dưới tiêu đề). Chọn nhiều video →{" "}
                 <strong>Ghép video</strong>; chọn ảnh đẹp → <strong>Lưu vào Tư liệu…</strong>; mỗi video có nút{" "}
@@ -382,7 +381,7 @@ export default function DocsPage() {
                 <strong>Từ ảnh</strong>.
               </p>
               <CodeBlock title="Kịch bản theo mốc thời gian">{SCRIPT_EXAMPLE}</CodeBlock>
-              <DocShot src="/screens/kich-ban-focus.webp" w={1462} h={737} full="/screens/kich-ban.webp" caption="Kịch bản: cách làm, tỉ lệ, giọng đọc, người dẫn, nhạc nền" />
+              <DocShot screen="kich-ban" real="/screens/kich-ban.webp" caption="Kịch bản: cách làm, tỉ lệ, giọng đọc, người dẫn, nhạc nền" />
               <DocTable
                 head={["Tuỳ chọn", "Ý nghĩa"]}
                 rows={[
@@ -411,7 +410,7 @@ export default function DocsPage() {
                 Có sẵn landing page bán hàng? Dán link, MeAI lấy <strong>ảnh gốc, giá, chính sách</strong> và sinh{" "}
                 <strong>3 kịch bản phân cảnh cho Muse</strong>.
               </p>
-              <DocShot src="/screens/ladipage-focus.webp" w={1209} h={246} full="/screens/ladipage.webp" caption="LadiPage: 4 bước từ link đến hàng đợi" />
+              <DocShot screen="ladipage" real="/screens/ladipage.webp" caption="LadiPage: 4 bước từ link đến hàng đợi" />
               <Steps
                 items={[
                   { title: "Dán link", body: "Dán link LadiPage của sản phẩm, bấm Quét và sinh kịch bản." },
@@ -462,7 +461,7 @@ export default function DocsPage() {
                 ]}
               />
               <h3>Đăng video</h3>
-              <DocShot src="/screens/dang-reels-focus.webp" w={1209} h={665} full="/screens/dang-reels.webp" caption="Đăng FB Reels: chọn video, caption, Đăng lên Reels" />
+              <DocShot screen="dang-reels" real="/screens/dang-reels.webp" caption="Đăng FB Reels: chọn video, caption, Đăng lên Reels" />
               <ol>
                 <li>
                   Vào <strong>Đăng FB Reels</strong> (hoặc bấm nút <em>Đăng FB Reels</em> trên video trong Thư viện).

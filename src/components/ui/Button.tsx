@@ -1,5 +1,6 @@
 import { Link } from "@/components/ui/Link";
 import { buttonClass, type Size, type Variant } from "./buttonClass";
+import { Magnetic } from "@/components/fx/Magnetic";
 
 type ButtonLinkProps = {
   href: string;
@@ -13,8 +14,11 @@ type ButtonLinkProps = {
 
 export function ButtonLink({ href, variant, size, className, children, download, external }: ButtonLinkProps) {
   const cls = buttonClass(variant, size, className);
+  const full = className?.includes("w-full");
+  const wrap = (el: React.ReactNode) =>
+    variant === "ghost" ? el : <Magnetic className={full ? "w-full sm:w-auto" : undefined}>{el}</Magnetic>;
   if (download || external) {
-    return (
+    return wrap(
       <a
         href={href}
         className={cls}
@@ -23,12 +27,12 @@ export function ButtonLink({ href, variant, size, className, children, download,
         rel={external ? "noopener noreferrer" : undefined}
       >
         {children}
-      </a>
+      </a>,
     );
   }
-  return (
+  return wrap(
     <Link href={href} className={cls}>
       {children}
-    </Link>
+    </Link>,
   );
 }

@@ -85,11 +85,11 @@ src/
 image/, app-preview.png.png  # Ảnh gốc bạn tải lên (nguồn để tạo các file trong public/)
 ```
 
-## Hiệu ứng & ảnh
+## Giao diện app & hiệu ứng
 
-- **Hiệu ứng dùng chung** nằm trong `src/components/fx/`: nền aurora động (`Aurora`), thanh tiến trình cuộn (`ScrollProgress`), thẻ nghiêng 3D + spotlight theo con trỏ (`TiltCard`, `spotlight.ts`), chữ hiện từng từ (`SplitText`), số đếm tăng dần (`CountUp`), băng chạy chữ (`Marquee`), kính lúp (`ZoomImage`) và trình xem ảnh 100% (`Lightbox`).
-- Hiệu ứng tự tắt khi người dùng bật "Giảm chuyển động" trong hệ điều hành (`MotionConfig reducedMotion="user"` + CSS `prefers-reduced-motion`).
-- **Ảnh màn hình app** (`public/screens/`): mỗi ảnh có bản gốc ~2560px (màn hình lớn/Retina, kính lúp, xem 100%) và bản `-1280.webp` cho điện thoại, chọn tự động qua `srcset`. Ảnh `*-panel.webp`, `detail-*.webp`, `*-focus.webp` là ảnh cắt cận cảnh ở độ phân giải gốc, hiển thị tỉ lệ 1:1 để chữ luôn rõ.
+- **Giao diện app dựng bằng code** (`src/components/mock/`): 8 màn hình (Studio cho từng engine, Tư liệu, Kịch bản, Thư viện, Tài khoản, LadiPage, Đăng FB Reels, Cài đặt) dựng lại bằng HTML/CSS nên luôn sắc nét và tự co giãn theo PC/mobile. Mỗi màn hình tự chạy thao tác mẫu (gõ chữ, con trỏ ảo bấm nút, hàng đợi chạy…) khi hiện trên màn hình (`src/hooks/useScript.ts`). Ảnh chụp thật trong `public/screens/` mở qua nút "Xem ảnh chụp thật" (`ShotButton` + `Lightbox`).
+- **Hiệu ứng dùng chung** (`src/components/fx/`): màn chào logo, nền aurora, quầng sáng theo con trỏ (PC), gợn sóng khi bấm/chạm, nút "nam châm" (PC), thanh tiến trình cuộn, nút lên đầu trang, thẻ nghiêng 3D + spotlight, chữ hiện từng từ, số đếm tăng dần, băng chạy chữ.
+- Hiệu ứng tự tắt khi người dùng bật "Giảm chuyển động" trong hệ điều hành; hiệu ứng theo con trỏ chỉ bật trên thiết bị có chuột.
 
 ## Tùy chỉnh nhanh
 
