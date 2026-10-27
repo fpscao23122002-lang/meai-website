@@ -6,7 +6,8 @@ export function Aurora() {
     // Sinh vị trí cố định (giả ngẫu nhiên) để không đổi giữa các lần render
     let seed = 7;
     const rand = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280);
-    return Array.from({ length: 36 }, () => ({
+    const count = typeof window !== "undefined" && window.innerWidth < 768 ? 16 : 36;
+    return Array.from({ length: count }, () => ({
       left: `${rand() * 100}%`,
       top: `${rand() * 100}%`,
       size: 1 + rand() * 2.2,
