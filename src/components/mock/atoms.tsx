@@ -1,7 +1,7 @@
-import type { ReactNode } from "react";
-import { motion } from "framer-motion";
+import { useContext, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { LoaderCircle } from "lucide-react";
-import { SIDEBAR } from "./mockUtils";
+import { BareFrame, SIDEBAR } from "./mockUtils";
 import { cn } from "@/lib/cn";
 
 /* Bộ "linh kiện" dựng lại giao diện app MeAI bằng HTML/CSS: luôn sắc nét, tự co giãn theo màn hình */
@@ -25,6 +25,8 @@ export function AppFrame({
   className?: string;
   bodyClassName?: string;
 }) {
+  const bare = useContext(BareFrame);
+  if (bare) return <div className={cn("min-w-0 text-left", bodyClassName)}>{children}</div>;
   return (
     <div className={cn("overflow-hidden rounded-2xl border border-white/10 bg-[#0B0B14] text-left shadow-[0_30px_100px_-30px_rgba(0,0,0,0.9)]", className)}>
       <div className="flex items-center gap-2 border-b border-cyan-glow/25 px-3 py-2 text-[11px] sm:px-4">
@@ -85,32 +87,41 @@ export function Btn({
   variant = "default",
   className,
   pressed,
+  onClick,
+  disabled,
 }: {
   children: ReactNode;
   variant?: "default" | "primary" | "danger";
   className?: string;
   pressed?: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
 }) {
-  return (
-    <motion.span
-      animate={pressed ? { scale: [1, 0.92, 1] } : { scale: 1 }}
-      transition={{ duration: 0.3 }}
-      className={cn(
-        "inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1 text-[11px] font-semibold",
-        variant === "primary" && "bg-brand-gradient text-ink shadow-glow-sm",
-        variant === "default" && "border border-white/10 bg-ink/50 text-slate-100",
-        variant === "danger" && "border border-white/10 bg-ink/50 text-neon-pink",
-        className,
-      )}
-    >
+  const cls = cn(
+    "inline-flex items-center justify-center gap-1 whitespace-nowrap rounded-md px-2.5 py-1 text-[11px] font-semibold transition-[filter,background-color,opacity]",
+    variant === "primary" && "bg-brand-gradient text-ink shadow-glow-sm",
+    variant === "default" && "border border-white/10 bg-ink/50 text-slate-100",
+    variant === "danger" && "border border-white/10 bg-ink/50 text-neon-pink",
+    onClick && "cursor-pointer hover:brightness-125 active:scale-95",
+    onClick && variant !== "primary" && "hover:bg-white/10",
+    disabled && "pointer-events-none opacity-50",
+    className,
+  );
+  const anim = pressed ? { scale: [1, 0.92, 1] } : { scale: 1 };
+  return onClick ? (
+    <motion.button type="button" onClick={onClick} animate={anim} transition={{ duration: 0.3 }} whileTap={{ scale: 0.92 }} className={cls}>
+      {children}
+    </motion.button>
+  ) : (
+    <motion.span animate={anim} transition={{ duration: 0.3 }} className={cls}>
       {children}
     </motion.span>
   );
 }
 
-export function Toggle({ on, label, hint }: { on: boolean; label?: ReactNode; hint?: string }) {
-  return (
-    <span className="flex items-center gap-2 text-[11px] text-slate-200">
+export function Toggle({ on, label, hint, onChange }: { on: boolean; label?: ReactNode; hint?: string; onChange?: (v: boolean) => void }) {
+  const inner = (
+    <>
       <span className={cn("relative h-4 w-7 shrink-0 rounded-full transition-colors duration-300", on ? "bg-gradient-to-r from-cyan-glow to-neon-pink" : "bg-white/15")}>
         <motion.span
           animate={{ left: on ? 14 : 2 }}
@@ -120,7 +131,14 @@ export function Toggle({ on, label, hint }: { on: boolean; label?: ReactNode; hi
       </span>
       {label}
       {hint ? <span className="text-[10px] text-slate-500">({hint})</span> : null}
-    </span>
+    </>
+  );
+  return onChange ? (
+    <button type="button" role="switch" aria-checked={on} onClick={() => onChange(!on)} className="flex items-center gap-2 text-left text-[11px] text-slate-200">
+      {inner}
+    </button>
+  ) : (
+    <span className="flex items-center gap-2 text-[11px] text-slate-200">{inner}</span>
   );
 }
 
@@ -143,6 +161,7 @@ export function Seg({
   className,
   layoutKey,
   dataKey,
+  onPick,
 }: {
   options: string[];
   value: string;
@@ -150,6 +169,7 @@ export function Seg({
   layoutKey: string;
   /** Gắn data-opt để con trỏ ảo tìm tới từng lựa chọn */
   dataKey?: string;
+  onPick?: (o: string) => void;
 }) {
   return (
     <div className={cn("flex gap-0.5 rounded-md border border-white/[0.06] p-0.5", className)}>
@@ -157,9 +177,14 @@ export function Seg({
         <span
           key={o}
           data-opt={dataKey ? `${dataKey}:${o}` : undefined}
+          role={onPick ? "button" : undefined}
+          tabIndex={onPick ? 0 : undefined}
+          onClick={onPick ? () => onPick(o) : undefined}
+          onKeyDown={onPick ? (e) => (e.key === "Enter" || e.key === " ") && onPick(o) : undefined}
           className={cn(
             "relative min-w-0 flex-1 whitespace-nowrap rounded px-1 py-0.5 text-center text-[10.5px] font-medium",
             value === o ? "text-cyan-glow" : "text-slate-400",
+            onPick && value !== o && "cursor-pointer hover:bg-white/5 hover:text-white",
           )}
         >
           {value === o ? (
@@ -240,6 +265,58 @@ export function Toast({ show, children }: { show: boolean; children: ReactNode }
       >
         {children}
       </motion.div>
+    </div>
+  );
+}
+
+/**
+ * Bọc một màn hình dựng bằng code: khi người dùng chạm/bấm vào, demo tự chạy dừng lại để họ tự thao tác;
+ * nhãn góc trên cho biết trạng thái và có nút "Xem lại demo".
+ */
+export function Interactive({
+  user,
+  onTakeOver,
+  onReplay,
+  children,
+}: {
+  user: boolean;
+  onTakeOver: () => void;
+  onReplay: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <div className="relative" onPointerDownCapture={() => !user && onTakeOver()}>
+      {/* Dòng trạng thái riêng phía trên để không che nút nào của màn hình */}
+      <div className="mb-2 flex h-6 justify-end">
+        <AnimatePresence mode="wait" initial={false}>
+          {user ? (
+            <motion.button
+              key="replay"
+              type="button"
+              data-no-ripple
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              onClick={onReplay}
+              className="flex items-center gap-1 rounded-full border border-neon-pink/40 bg-ink/90 px-2.5 py-1 text-[10.5px] font-semibold text-pink-200 shadow-glow-pink hover:text-white"
+            >
+              ↻ Bạn đang tự thao tác · Xem lại demo
+            </motion.button>
+          ) : (
+            <motion.span
+              key="auto"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              className="flex items-center gap-1.5 rounded-full border border-cyan-glow/30 bg-ink/90 px-2.5 py-1 text-[10.5px] font-medium text-cyan-glow"
+            >
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-glow" />
+              Đang tự chạy demo · chạm vào để tự thao tác
+            </motion.span>
+          )}
+        </AnimatePresence>
+      </div>
+      {children}
     </div>
   );
 }

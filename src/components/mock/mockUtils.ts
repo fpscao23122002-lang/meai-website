@@ -1,3 +1,4 @@
+import { createContext } from "react";
 import { Clapperboard, LayoutGrid, Search, Settings, Sparkles, UserRound, Users, Volume2 } from "lucide-react";
 
 /** Menu bên trái của app (đúng thứ tự trong app) */
@@ -19,3 +20,6 @@ export function pointTo(container: HTMLElement | null, target: HTMLElement | nul
   const t = target.getBoundingClientRect();
   return { x: t.left - c.left + t.width * 0.55, y: t.top - c.top + t.height * 0.6 };
 }
+
+/** Khi đặt true, AppFrame chỉ hiển thị nội dung (dùng bên trong khung demo đã có thanh tiêu đề & menu riêng) */
+export const BareFrame = createContext(false);

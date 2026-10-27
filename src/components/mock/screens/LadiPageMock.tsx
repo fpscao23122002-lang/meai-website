@@ -1,8 +1,8 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { Check, Link2 } from "lucide-react";
-import { useScript } from "@/hooks/useScript";
-import { AppFrame, Btn, Caret, Field, Label, Panel, PTitle } from "../atoms";
+import { useDemoControl, useScript, useTask } from "@/hooks/useScript";
+import { AppFrame, Btn, Interactive, Label, Panel, PTitle } from "../atoms";
 import { cn } from "@/lib/cn";
 
 const STEPS = ["Dán link", "Chọn ảnh sản phẩm", "Sửa kịch bản", "Đưa vào hàng đợi"];
@@ -23,19 +23,16 @@ export function LadiPageMock({ play }: { play: boolean }) {
   const [facts, setFacts] = useState(0);
   const [scripts, setScripts] = useState(0);
   const [queued, setQueued] = useState(false);
+  const ctl = useDemoControl(play);
+  const task = useTask();
 
-  useScript(play, async ({ wait, type }) => {
+  const scan = async (wait: (ms: number) => Promise<void>, autoPick: boolean) => {
     setStep(0);
-    setUrl("");
-    setScanning(false);
     setImgs(0);
     setPicked([]);
     setFacts(0);
     setScripts(0);
     setQueued(false);
-    await wait(400);
-    await type("https://serum-duong-trang.ladipage.vn", setUrl, 26);
-    await wait(300);
     setScanning(true);
     await wait(1100);
     setScanning(false);
@@ -49,15 +46,38 @@ export function LadiPageMock({ play }: { play: boolean }) {
     }
     setStep(1);
     await wait(500);
-    for (const i of [0, 2]) {
-      await wait(350);
-      setPicked((p) => [...p, i]);
+    if (autoPick) {
+      for (const i of [0, 2]) {
+        await wait(350);
+        setPicked((p) => [...p, i]);
+      }
+    } else {
+      setPicked([0]);
     }
     setStep(2);
     for (let i = 1; i <= 3; i++) {
       await wait(380);
       setScripts(i);
     }
+  };
+  const togglePick = (i: number) => {
+    if (i >= imgs) return;
+    setPicked((p) => (p.includes(i) ? p.filter((x) => x !== i) : [...p, i]));
+  };
+
+  useScript(ctl.active, async ({ wait, type }) => {
+    setStep(0);
+    setUrl("");
+    setScanning(false);
+    setImgs(0);
+    setPicked([]);
+    setFacts(0);
+    setScripts(0);
+    setQueued(false);
+    await wait(400);
+    await type("https://serum-duong-trang.ladipage.vn", setUrl, 26);
+    await wait(300);
+    await scan(wait, true);
     await wait(700);
     setStep(3);
     setQueued(true);
@@ -65,6 +85,7 @@ export function LadiPageMock({ play }: { play: boolean }) {
   });
 
   return (
+    <Interactive user={ctl.user} onTakeOver={ctl.takeOver} onReplay={ctl.replay}>
     <AppFrame title="LadiPage" active="ladipage">
       <PTitle>LadiPage → kịch bản video</PTitle>
       <p className="text-[10.5px] text-slate-500">Dán link, AI lấy ảnh gốc, giá, chính sách và sinh 3 kịch bản phân cảnh cho Muse</p>
@@ -85,12 +106,17 @@ export function LadiPageMock({ play }: { play: boolean }) {
 
       <Panel className="mt-2.5">
         <div className="flex gap-1.5">
-          <Field className="flex min-w-0 flex-1 items-center gap-1.5">
+          <label className="flex min-h-[26px] min-w-0 flex-1 items-center gap-1.5 rounded-md border border-white/[0.08] bg-ink/60 px-2 focus-within:border-cyan-glow/50">
             <Link2 className="h-3 w-3 shrink-0 text-slate-500" />
-            <span className="truncate">{url || <span className="text-slate-600">Dán link LadiPage sản phẩm…</span>}</span>
-            <Caret show={Boolean(url) && !scanning && imgs === 0} />
-          </Field>
-          <Btn variant="primary" pressed={scanning}>
+            <input
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && url.trim() && task((w) => scan(w, false))}
+              placeholder="Dán link LadiPage sản phẩm…"
+              className="min-w-0 flex-1 bg-transparent py-1 text-[11px] text-slate-200 outline-none placeholder:text-slate-600"
+            />
+          </label>
+          <Btn variant="primary" pressed={scanning} onClick={() => task((w) => scan(w, false))}>
             {scanning ? <span className="h-2.5 w-2.5 animate-spin rounded-full border border-ink border-t-transparent" /> : null}
             {scanning ? "Đang quét…" : "Quét & sinh kịch bản"}
           </Btn>
@@ -101,7 +127,15 @@ export function LadiPageMock({ play }: { play: boolean }) {
             <Label className="text-[10px]">Ảnh gốc từ landing page</Label>
             <div className="mt-1 grid grid-cols-4 gap-1">
               {PRODUCTS.map((src, i) => (
-                <span key={src} className="relative aspect-square overflow-hidden rounded-md bg-white/[0.04] ring-1 ring-white/10">
+                <button
+                  type="button"
+                  key={src}
+                  onClick={() => togglePick(i)}
+                  className={cn(
+                    "relative aspect-square overflow-hidden rounded-md bg-white/[0.04] ring-1 transition",
+                    picked.includes(i) ? "ring-2 ring-cyan-glow" : "ring-white/10 hover:ring-cyan-glow/50",
+                  )}
+                >
                   <AnimatePresence>
                     {i < imgs ? (
                       <motion.img
@@ -122,7 +156,7 @@ export function LadiPageMock({ play }: { play: boolean }) {
                       <Check className="h-2 w-2" strokeWidth={4} />
                     </motion.span>
                   ) : null}
-                </span>
+                </button>
               ))}
             </div>
             <div className="mt-2 flex flex-wrap gap-1">
@@ -156,15 +190,24 @@ export function LadiPageMock({ play }: { play: boolean }) {
           <AnimatePresence>
             {queued ? (
               <motion.span initial={{ opacity: 0, x: 10 }} animate={{ opacity: 1, x: 0 }} className="text-[10.5px] font-semibold text-cyan-glow">
-                ✓ Đã đưa 6 video vào hàng đợi Muse
+                ✓ Đã đưa {Math.max(1, picked.length) * 3} video vào hàng đợi Muse
               </motion.span>
             ) : null}
           </AnimatePresence>
-          <Btn variant={step >= 2 ? "primary" : "default"} pressed={queued}>
+          <Btn
+            variant={step >= 2 ? "primary" : "default"}
+            pressed={queued}
+            disabled={scripts < 3}
+            onClick={() => {
+              setStep(3);
+              setQueued(true);
+            }}
+          >
             Đưa vào hàng đợi
           </Btn>
         </div>
       </Panel>
     </AppFrame>
+    </Interactive>
   );
 }

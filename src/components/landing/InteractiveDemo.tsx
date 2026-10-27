@@ -1,25 +1,19 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Image } from "@/components/ui/Image";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, useInView } from "framer-motion";
 import {
-  Clapperboard,
   FolderOpen,
-  LayoutGrid,
   LoaderCircle,
   Play,
   Plus,
-  Search,
-  Settings,
-  Sparkles,
   TriangleAlert,
-  UserRound,
-  Users,
-  Volume2,
   X,
 } from "lucide-react";
 import { engines, type EngineId } from "@/lib/data";
 import { CONFIGS, DEFAULT_OPTS, type Kind, type OptValue, type Seg } from "@/lib/studioConfig";
 import { cn } from "@/lib/cn";
+import { ScreenMock } from "@/components/mock/ScreenMock";
+import { BareFrame, SIDEBAR } from "@/components/mock/mockUtils";
 
 /* ------------------------------------------------------------------ */
 /* Cấu hình tuỳ chọn — mô phỏng đúng panel trái của Studio trong app   */
@@ -146,6 +140,10 @@ export function InteractiveDemo() {
   const [toast, setToast] = useState<string | null>(null);
 
   const nextId = useRef(3);
+  const [screen, setScreen] = useState("studio");
+  const demoRef = useRef<HTMLDivElement>(null);
+  const demoInView = useInView(demoRef, { margin: "-15% 0px" });
+  const screenLabel = SIDEBAR.find((x) => x.id === screen)?.label ?? "Studio";
   const promptRef = useRef<HTMLTextAreaElement>(null);
 
   const kind: Kind = engine === "seedance" ? "video" : kinds[engine];
@@ -339,16 +337,30 @@ export function InteractiveDemo() {
             Bấm thử <span className="text-gradient">Studio MeAI</span> ngay trên trình duyệt
           </h2>
           <p className="mt-5 text-base leading-7 text-slate-400 sm:text-lg">
-            Mô phỏng đúng màn Studio trong app: đổi engine để thấy tuỳ chọn thay đổi, dán prompt (mỗi prompt cách nhau 1
-            dòng trống), bấm <strong className="text-white">Tạo &amp; chạy</strong> rồi thử <em>Chọn lỗi → Chạy lại lỗi</em>,{" "}
-            <em>Ghép video</em>.
+            Mô phỏng đúng app MeAI: đổi engine, dán prompt (mỗi prompt cách nhau 1 dòng trống), bấm{" "}
+            <strong className="text-white">Tạo &amp; chạy</strong> rồi thử <em>Chọn lỗi → Chạy lại lỗi</em>, <em>Ghép video</em>. Bấm menu{" "}
+            <strong className="text-white">Tư liệu, Kịch bản, Thư viện, Tài khoản, LadiPage, Đăng Reels, Cài đặt</strong> để thử mọi chức
+            năng.
           </p>
         </div>
 
-        <div className="glow-border relative mt-14 overflow-hidden rounded-2xl bg-ink shadow-[0_40px_120px_-40px_rgba(252,49,153,0.35)]">
+        <div
+          ref={demoRef}
+          className="glow-border relative mt-14 overflow-hidden rounded-2xl bg-ink shadow-[0_40px_120px_-40px_rgba(252,49,153,0.35)]"
+        >
           {/* Thanh trên cùng */}
           <div className="flex flex-wrap items-center gap-2 border-b border-cyan-glow/30 bg-[#0B0B14] px-4 py-2.5 text-xs">
-            <span className="font-semibold text-white">Studio</span>
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.span
+                key={screen}
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                className="font-semibold text-white"
+              >
+                {screenLabel}
+              </motion.span>
+            </AnimatePresence>
             <span className="ml-auto hidden rounded-md border border-white/10 bg-panel px-2.5 py-1 text-slate-300 sm:inline">
               Mặc định
             </span>
@@ -377,30 +389,66 @@ export function InteractiveDemo() {
           </div>
 
           <div className="flex">
-            {/* Sidebar icon giống app */}
-            <aside className="hidden w-16 shrink-0 flex-col items-center gap-1 border-r border-white/[0.06] bg-[#0B0B14] py-3 xl:flex">
+            {/* Menu trái giống app: bấm để chuyển màn hình */}
+            <aside className="hidden w-16 shrink-0 flex-col items-center gap-1 border-r border-white/[0.06] bg-[#0B0B14] py-3 lg:flex">
               <Image src="/brand/meai-logo.webp" alt="" width={36} height={36} className="mb-2 rounded-lg" />
-              {[
-                { Icon: Sparkles, l: "Studio", on: true },
-                { Icon: UserRound, l: "Tư liệu" },
-                { Icon: Clapperboard, l: "Kịch bản" },
-                { Icon: LayoutGrid, l: "Thư viện" },
-                { Icon: Users, l: "Tài khoản" },
-                { Icon: Search, l: "LadiPage" },
-                { Icon: Volume2, l: "Đăng Reels" },
-                { Icon: Settings, l: "Cài đặt" },
-              ].map(({ Icon, l, on }) => (
-                <span
-                  key={l}
+              {SIDEBAR.map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setScreen(id)}
+                  title={label}
                   className={cn(
-                    "flex w-14 flex-col items-center gap-1 rounded-lg py-1.5 text-[9px]",
-                    on ? "bg-cyan-glow/10 text-cyan-glow ring-1 ring-cyan-glow/40" : "text-slate-500",
+                    "relative flex w-14 flex-col items-center gap-1 rounded-lg py-1.5 text-center text-[9px] leading-tight transition-colors",
+                    screen === id ? "text-cyan-glow" : "text-slate-500 hover:bg-white/5 hover:text-white",
                   )}
                 >
-                  <Icon className="h-3.5 w-3.5" /> {l}
-                </span>
+                  {screen === id ? (
+                    <motion.span
+                      layoutId="demo-sb"
+                      transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                      className="absolute inset-0 rounded-lg bg-cyan-glow/10 ring-1 ring-cyan-glow/40"
+                    />
+                  ) : null}
+                  <Icon className="relative h-3.5 w-3.5" />
+                  <span className="relative">{label}</span>
+                </button>
               ))}
             </aside>
+
+            <div className="min-w-0 flex-1">
+            {/* Menu dạng thanh trượt ngang (mobile / màn hình nhỏ) */}
+            <div className="flex gap-1.5 overflow-x-auto border-b border-white/[0.06] px-3 py-2 lg:hidden">
+              {SIDEBAR.map(({ id, label, Icon }) => (
+                <button
+                  key={id}
+                  type="button"
+                  onClick={() => setScreen(id)}
+                  className={cn(
+                    "relative flex shrink-0 items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors",
+                    screen === id ? "border-cyan-glow/50 text-cyan-glow" : "border-white/10 text-slate-400",
+                  )}
+                >
+                  {screen === id ? <motion.span layoutId="demo-sb-m" className="absolute inset-0 rounded-full bg-cyan-glow/10" /> : null}
+                  <Icon className="relative h-3.5 w-3.5" />
+                  <span className="relative">{label}</span>
+                </button>
+              ))}
+            </div>
+
+            {screen !== "studio" ? (
+              <motion.div
+                key={screen}
+                initial={{ opacity: 0, y: 14 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="p-3"
+              >
+                <BareFrame.Provider value={true}>
+                  <ScreenMock id={screen} play={demoInView} />
+                </BareFrame.Provider>
+              </motion.div>
+            ) : (
 
             <div className="grid min-w-0 flex-1 gap-3 p-3 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_280px]">
               {/* ---------------- Panel cấu hình ---------------- */}
@@ -720,6 +768,8 @@ export function InteractiveDemo() {
                   <p className="p-6 text-center text-xs text-slate-500">Chưa có task nào.</p>
                 )}
               </div>
+            </div>
+            )}
             </div>
           </div>
 

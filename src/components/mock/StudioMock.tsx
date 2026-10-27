@@ -3,8 +3,8 @@ import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-mot
 import { FolderOpen, LoaderCircle, Play, Plus } from "lucide-react";
 import { engines, type EngineId } from "@/lib/data";
 import { CONFIGS, DEFAULT_OPTS, type Kind, type OptValue } from "@/lib/studioConfig";
-import { useScript } from "@/hooks/useScript";
-import { AppFrame, Btn, Caret, FakeCursor, Field, Label, Panel, ProgressBar, Seg, StatusPill, Toast, Toggle } from "./atoms";
+import { useDemoControl, useScript, useTask } from "@/hooks/useScript";
+import { AppFrame, Btn, Caret, FakeCursor, Field, Interactive, Label, Panel, ProgressBar, Seg, StatusPill, Toast, Toggle } from "./atoms";
 import { pointTo } from "./mockUtils";
 import { cn } from "@/lib/cn";
 
@@ -93,6 +93,21 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
   const nextId = useRef(3);
 
   const busy = tasks.filter((t) => t.status === "run").length;
+  const ctl = useDemoControl(Boolean(inView && !reduce));
+  const task = useTask();
+
+  // Người dùng tự thao tác
+  const pickEngine = (engine: EngineId) => {
+    const kind: Kind = engine === "seedance" ? "video" : mode.kind;
+    setMode({ engine, kind });
+    setOpts({ ...DEFAULT_OPTS[`${engine}-${kind}`] });
+  };
+  const pickKind = (label: string) => {
+    const kind: Kind = label === "Tạo ảnh" ? "image" : "video";
+    setMode((m) => ({ ...m, kind }));
+    setOpts({ ...DEFAULT_OPTS[`${mode.engine}-${kind}`] });
+  };
+  const setOpt = (key: string, v: OptValue) => setOpts((o) => ({ ...o, [key]: v }));
 
   const moveTo = (selector: string) => {
     const el = wrapRef.current?.querySelector<HTMLElement>(selector) ?? null;
@@ -104,7 +119,69 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
     if (id) setPressed(`${id}-${Date.now()}`);
   };
 
-  useScript(Boolean(inView && !reduce), async ({ wait, type }) => {
+  /** Tạo task từ prompt → chia tài khoản → chạy tiến độ → hiện thành phẩm (dùng chung cho demo tự chạy & khi người dùng bấm) */
+  const runQueue = async (wait: (ms: number) => Promise<void>, m: { engine: EngineId; kind: Kind }, ratioOpt: string, text: string) => {
+    const titles = text
+      .split(/\n\s*\n/)
+      .map((p) => p.replace(/\n/g, " ").trim())
+      .filter(Boolean)
+      .slice(0, 3);
+    if (!titles.length) {
+      setToast("Nhập ít nhất 1 prompt (mỗi prompt cách nhau 1 dòng trống)");
+      await wait(1800);
+      setToast(null);
+      return;
+    }
+    const created: Task[] = titles.map((title, i) => ({
+      id: nextId.current++,
+      title,
+      engine: m.engine,
+      kind: m.kind,
+      ratio: ratioOpt,
+      status: "wait",
+      progress: 0,
+      account: null,
+      thumb: PORTRAIT[(nextId.current + i) % PORTRAIT.length],
+      time: "00:00",
+    }));
+    const ids = created.map((t) => t.id);
+    setTasks((prev) => [...created.slice().reverse(), ...prev].slice(0, 5));
+    setToast(`Đã tạo ${created.length} task — đang chia cho tài khoản rảnh`);
+    await wait(700);
+
+    setTasks((prev) => prev.map((t) => (ids.includes(t.id) ? { ...t, status: "run", account: ids.indexOf(t.id) + 1 } : t)));
+    await wait(300);
+    setToast(null);
+
+    let progress = titles.map(() => 0);
+    let secs = 0;
+    let shown = false;
+    while (progress.some((p) => p < 100)) {
+      progress = progress.map((p, i) => Math.min(100, p + (i === 0 ? 7 : 5 - Math.min(i, 2)) + Math.round(Math.random() * 5)));
+      secs += 2;
+      const snap = progress;
+      setTasks((prev) =>
+        prev.map((t) => {
+          const i = ids.indexOf(t.id);
+          if (i < 0) return t;
+          const p = snap[i];
+          const time = `00:${String(Math.min(59, 8 + secs)).padStart(2, "0")}`;
+          return p >= 100 ? { ...t, status: "done", progress: 100, time } : { ...t, progress: p, time };
+        }),
+      );
+      if (snap[0] >= 100 && !shown) {
+        // Task đầu xong → hiện ngay lên khung xem trước
+        shown = true;
+        setPreview({ ...created[0], status: "done", progress: 100, account: 1 });
+      }
+      await wait(170);
+    }
+    setToast("Xong · đã lưu vào Thư viện");
+    await wait(2600);
+    setToast(null);
+  };
+
+  useScript(ctl.active, async ({ wait, type }) => {
     const m = fixedEngine ?? ORDER[cycle.current % ORDER.length];
     const key = `${m.engine}-${m.kind}`;
     cycle.current += 1;
@@ -130,55 +207,8 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
     await wait(800);
     click("run");
 
-    const titles = PROMPTS[m.engine].split(/\n\s*\n/).map((p) => p.replace(/\n/g, " "));
-    const created: Task[] = titles.map((title, i) => ({
-      id: nextId.current++,
-      title,
-      engine: m.engine,
-      kind: m.kind,
-      ratio: ratioOpt,
-      status: "wait",
-      progress: 0,
-      account: null,
-      thumb: PORTRAIT[(nextId.current + i) % PORTRAIT.length],
-      time: "00:00",
-    }));
-    const ids = created.map((t) => t.id);
-    setTasks((prev) => [...created.slice().reverse(), ...prev].slice(0, 5));
-    setToast(`Đã tạo ${created.length} task — đang chia cho tài khoản rảnh`);
-    await wait(700);
     setCursor((c) => ({ ...c, visible: false }));
-
-    setTasks((prev) => prev.map((t) => (ids.includes(t.id) ? { ...t, status: "run", account: ids.indexOf(t.id) + 1 } : t)));
-    await wait(300);
-    setToast(null);
-
-    let progress = [0, 0];
-    let secs = 0;
-    let shown = false;
-    while (progress.some((p) => p < 100)) {
-      progress = progress.map((p, i) => Math.min(100, p + (i === 0 ? 7 : 5) + Math.round(Math.random() * 5)));
-      secs += 2;
-      const snap = progress;
-      setTasks((prev) =>
-        prev.map((t) => {
-          const i = ids.indexOf(t.id);
-          if (i < 0) return t;
-          const p = snap[i];
-          const time = `00:${String(Math.min(59, 8 + secs)).padStart(2, "0")}`;
-          return p >= 100 ? { ...t, status: "done", progress: 100, time } : { ...t, progress: p, time };
-        }),
-      );
-      if (snap[0] >= 100 && !shown) {
-        // Task đầu xong → hiện ngay lên khung xem trước
-        shown = true;
-        setPreview({ ...created[0], status: "done", progress: 100, account: 1 });
-      }
-      await wait(170);
-    }
-    setToast("Xong · đã lưu vào Thư viện");
-    await wait(2600);
-    setToast(null);
+    await runQueue(wait, m, ratioOpt, PROMPTS[m.engine]);
     await wait(600);
   });
 
@@ -187,6 +217,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
   const otherSegs = cfg.segs.filter((s) => s.key !== "mode");
 
   return (
+    <Interactive user={ctl.user} onTakeOver={ctl.takeOver} onReplay={ctl.replay}>
     <div ref={wrapRef} className={cn("relative", className)}>
       <AppFrame title="Studio" active="studio" free={2 - busy} total={2}>
         <div className="grid gap-2.5 md:grid-cols-[232px_minmax(0,1fr)] xl:grid-cols-[232px_minmax(0,1fr)_190px]">
@@ -194,11 +225,13 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
           <Panel className="space-y-2.5 p-2.5">
             <div className="flex gap-0.5 rounded-md border border-white/[0.06] bg-ink/50 p-0.5">
               {engines.map((en) => (
-                <span
+                <button
+                  type="button"
                   key={en.id}
+                  onClick={() => pickEngine(en.id)}
                   className={cn(
                     "relative flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded px-1 py-1 text-[10.5px] font-semibold",
-                    en.id === mode.engine ? "text-white" : "text-slate-500",
+                    en.id === mode.engine ? "text-white" : "text-slate-500 hover:text-white",
                   )}
                 >
                   {en.id === mode.engine ? (
@@ -211,22 +244,38 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                   ) : null}
                   <span className={cn("relative h-1.5 w-1.5 rounded-full", en.dot)} />
                   <span className="relative">{en.name}</span>
-                </span>
+                </button>
               ))}
             </div>
 
             {mode.engine !== "seedance" ? (
-              <Seg layoutKey={`${uid}-kind`} options={["Tạo ảnh", "Tạo video"]} value={mode.kind === "image" ? "Tạo ảnh" : "Tạo video"} className="w-36" />
+              <Seg
+                layoutKey={`${uid}-kind`}
+                options={["Tạo ảnh", "Tạo video"]}
+                value={mode.kind === "image" ? "Tạo ảnh" : "Tạo video"}
+                onPick={pickKind}
+                className="w-36"
+              />
             ) : null}
 
             <div>
               <Label>Prompt</Label>
-              <Field className="mt-1 h-[88px] overflow-hidden whitespace-pre-wrap leading-[15px]">
-                <span data-target="prompt">
-                  {prompt ? prompt : <span className="text-slate-600">Mỗi prompt cách nhau 1 dòng trống</span>}
-                  <Caret show={Boolean(prompt)} />
-                </span>
-              </Field>
+              {ctl.user ? (
+                <textarea
+                  value={prompt}
+                  onChange={(e) => setPrompt(e.target.value)}
+                  placeholder="Mỗi prompt cách nhau 1 dòng trống"
+                  spellCheck={false}
+                  className="mt-1 h-[88px] w-full resize-none rounded-md border border-cyan-glow/40 bg-ink/60 px-2 py-1 text-[11px] leading-[15px] text-slate-200 outline-none placeholder:text-slate-600 focus:border-cyan-glow/70"
+                />
+              ) : (
+                <Field className="mt-1 h-[88px] overflow-hidden whitespace-pre-wrap leading-[15px]">
+                  <span data-target="prompt">
+                    {prompt ? prompt : <span className="text-slate-600">Mỗi prompt cách nhau 1 dòng trống</span>}
+                    <Caret show={Boolean(prompt)} />
+                  </span>
+                </Field>
+              )}
             </div>
             <div className="hidden gap-1.5 sm:flex">
               <Field className="min-w-0 flex-1 truncate text-slate-300">Chèn mẫu prompt…</Field>
@@ -245,7 +294,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                 {modeSeg ? (
                   <div>
                     <Label>{modeSeg.label}</Label>
-                    <Seg layoutKey={`${uid}-mode`} options={modeSeg.options} value={String(opts.mode)} className="mt-1" />
+                    <Seg layoutKey={`${uid}-mode`} options={modeSeg.options} value={String(opts.mode)} onPick={(o) => setOpt("mode", o)} className="mt-1" />
                   </div>
                 ) : null}
                 {cfg.model ? (
@@ -278,6 +327,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                       value={String(opts[sg.key])}
                       className="mt-1"
                       dataKey={`${uid}-${sg.key}`}
+                      onPick={(o) => setOpt(sg.key, o)}
                     />
                   </div>
                 ))}
@@ -293,7 +343,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                 {cfg.refs !== "reference" ? (
                   <div className="hidden space-y-1.5 sm:block">
                     {cfg.toggles.map((t) => (
-                      <Toggle key={t.key} on={Boolean(opts[t.key])} label={t.label} />
+                      <Toggle key={t.key} on={Boolean(opts[t.key])} label={t.label} onChange={(v) => setOpt(t.key, v)} />
                     ))}
                   </div>
                 ) : null}
@@ -302,7 +352,12 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
 
             <div className="space-y-1.5 pt-1">
               <span data-target="run" className="block">
-                <Btn variant="primary" className="w-full py-1.5 text-[12px]" pressed={pressed?.startsWith("run")}>
+                <Btn
+                  variant="primary"
+                  className="w-full py-1.5 text-[12px]"
+                  pressed={pressed?.startsWith("run")}
+                  onClick={() => task((w) => runQueue(w, mode, String(opts.ratio ?? "9:16"), prompt))}
+                >
                   Tạo &amp; chạy
                 </Btn>
               </span>
@@ -336,7 +391,8 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                       animate={{ opacity: 1, x: 0, backgroundColor: active ? "rgba(0,240,255,0.06)" : "rgba(0,0,0,0)" }}
                       exit={{ opacity: 0, height: 0 }}
                       transition={{ duration: 0.4 }}
-                      className="relative flex items-center gap-2 border-b border-white/[0.04] px-2.5 py-1.5"
+                      onClick={() => t.status === "done" && setPreview(t)}
+                      className="relative flex cursor-pointer items-center gap-2 border-b border-white/[0.04] px-2.5 py-1.5"
                     >
                       {active ? <motion.span layoutId={`${uid}-row`} className="absolute inset-y-0 left-0 w-0.5 bg-cyan-glow" /> : null}
                       <span className="h-3 w-3 shrink-0 rounded-[3px] border border-white/20" />
@@ -425,8 +481,9 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
           </Panel>
         </div>
       </AppFrame>
-      <FakeCursor {...cursor} />
+      <FakeCursor {...cursor} visible={cursor.visible && !ctl.user} />
       <Toast show={toastOn}>{toastText}</Toast>
     </div>
+    </Interactive>
   );
 }

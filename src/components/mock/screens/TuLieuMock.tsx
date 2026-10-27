@@ -1,14 +1,16 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AtSign, FolderPlus, Plus } from "lucide-react";
-import { useScript } from "@/hooks/useScript";
-import { AppFrame, Btn, Label, Panel, PTitle, Toggle } from "../atoms";
+import { useDemoControl, useScript } from "@/hooks/useScript";
+import { AppFrame, Btn, Interactive, Label, Panel, PTitle, Toggle } from "../atoms";
 import { cn } from "@/lib/cn";
 
 const FACES = ["/samples/video-1.webp", "/samples/video-3.webp", "/samples/video-4.webp", "/samples/video-5.webp", "/samples/video-2.webp", "/samples/anh-1.webp"];
 const CHARACTERS = [
   { name: "Linh", img: "/samples/anh-1.webp" },
   { name: "Ông Tư", img: "/samples/video-4.webp" },
+  { name: "Bác Ba", img: "/samples/video-1.webp" },
+  { name: "Chú Năm", img: "/samples/video-5.webp" },
 ];
 const TEMPLATES = ["Chân dung KOC ảo", "Review sản phẩm UGC", "Unbox sản phẩm"];
 
@@ -20,8 +22,16 @@ export function TuLieuMock({ play }: { play: boolean }) {
   const [modelImgs, setModelImgs] = useState(0);
   const [rotateImgs, setRotateImgs] = useState(3);
   const [next, setNext] = useState(0);
+  const [inserted, setInserted] = useState<string | null>(null);
+  const ctl = useDemoControl(play);
 
-  useScript(play, async ({ wait }) => {
+  const toggleModel = (v: boolean) => {
+    setModelOn(v);
+    if (v && modelImgs === 0) setModelImgs(1);
+  };
+
+  useScript(ctl.active, async ({ wait }) => {
+    setInserted(null);
     setChars(1);
     setTpl(1);
     setModelOn(false);
@@ -50,6 +60,7 @@ export function TuLieuMock({ play }: { play: boolean }) {
   });
 
   return (
+    <Interactive user={ctl.user} onTakeOver={ctl.takeOver} onReplay={ctl.replay}>
     <AppFrame title="Tư liệu" active="tu-lieu">
       <PTitle>Tư liệu</PTitle>
       <p className="text-[10.5px] text-slate-500">Nhân vật, mẫu prompt, người mẫu cố định và ảnh luân phiên</p>
@@ -57,7 +68,7 @@ export function TuLieuMock({ play }: { play: boolean }) {
         <Panel>
           <div className="flex items-center justify-between">
             <Label>Nhân vật</Label>
-            <Btn>
+            <Btn onClick={() => setChars((c) => Math.min(CHARACTERS.length, c + 1))} disabled={chars >= CHARACTERS.length}>
               <Plus className="h-3 w-3" /> Thêm
             </Btn>
           </div>
@@ -67,8 +78,11 @@ export function TuLieuMock({ play }: { play: boolean }) {
           <div className="mt-2 flex flex-wrap gap-2">
             <AnimatePresence>
               {CHARACTERS.slice(0, chars).map((c) => (
-                <motion.span
+                <motion.button
+                  type="button"
                   key={c.name}
+                  title="Bấm để xoá nhân vật"
+                  onClick={() => setChars((n) => Math.max(0, n - 1))}
                   initial={{ opacity: 0, scale: 0.6, y: 10 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   transition={{ type: "spring", stiffness: 400, damping: 20 }}
@@ -77,7 +91,7 @@ export function TuLieuMock({ play }: { play: boolean }) {
                   <img src={c.img} alt="" className="h-6 w-6 rounded-full object-cover object-top" />
                   <AtSign className="h-3 w-3" />
                   {c.name}
-                </motion.span>
+                </motion.button>
               ))}
             </AnimatePresence>
           </div>
@@ -89,15 +103,22 @@ export function TuLieuMock({ play }: { play: boolean }) {
           <div className="mt-2 space-y-1">
             <AnimatePresence>
               {TEMPLATES.slice(0, tpl).map((t) => (
-                <motion.div
+                <motion.button
+                  type="button"
                   key={t}
+                  onClick={() => setInserted(t)}
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="flex items-center justify-between rounded-md border border-white/[0.06] bg-ink/50 px-2 py-1 text-[11px] text-slate-200"
+                  className={cn(
+                    "flex w-full items-center justify-between rounded-md border px-2 py-1 text-left text-[11px] text-slate-200 transition-colors hover:border-cyan-glow/40",
+                    inserted === t ? "border-cyan-glow/60 bg-cyan-glow/10" : "border-white/[0.06] bg-ink/50",
+                  )}
                 >
                   {t}
-                  <span className="text-[10px] text-slate-500">Chèn</span>
-                </motion.div>
+                  <span className={cn("text-[10px]", inserted === t ? "font-semibold text-cyan-glow" : "text-slate-500")}>
+                    {inserted === t ? "✓ Đã chèn" : "Chèn"}
+                  </span>
+                </motion.button>
               ))}
             </AnimatePresence>
           </div>
@@ -106,12 +127,17 @@ export function TuLieuMock({ play }: { play: boolean }) {
         <Panel>
           <div className="flex items-center justify-between">
             <Label>Người mẫu cố định</Label>
-            <Toggle on={modelOn} />
+            <Toggle on={modelOn} onChange={toggleModel} />
           </div>
           <p className="mt-1 text-[10px] text-slate-500">Khi bật, gắn vào mọi task (tối đa 3 ảnh)</p>
           <div className="mt-2 flex gap-1.5">
             {[0, 1, 2].map((i) => (
-              <span key={i} className="relative h-12 w-12 overflow-hidden rounded-lg border border-dashed border-white/15">
+              <button
+                type="button"
+                key={i}
+                onClick={() => setModelImgs((n) => (i < n ? i : i + 1))}
+                className="relative h-12 w-12 overflow-hidden rounded-lg border border-dashed border-white/15 transition-colors hover:border-cyan-glow/50"
+              >
                 <AnimatePresence>
                   {i < modelImgs ? (
                     <motion.img
@@ -122,8 +148,9 @@ export function TuLieuMock({ play }: { play: boolean }) {
                       className="absolute inset-0 h-full w-full object-cover object-top"
                     />
                   ) : null}
+                  {i >= modelImgs ? <Plus className="absolute inset-0 m-auto h-3.5 w-3.5 text-slate-500" /> : null}
                 </AnimatePresence>
-              </span>
+              </button>
             ))}
           </div>
         </Panel>
@@ -132,10 +159,10 @@ export function TuLieuMock({ play }: { play: boolean }) {
           <div className="flex items-center justify-between">
             <Label>Ảnh luân phiên</Label>
             <span className="flex gap-1">
-              <Btn>
+              <Btn onClick={() => setRotateImgs((n) => Math.min(FACES.length, n + 1))} disabled={rotateImgs >= FACES.length}>
                 <Plus className="h-3 w-3" /> Ảnh
               </Btn>
-              <Btn>
+              <Btn onClick={() => setRotateImgs(FACES.length)}>
                 <FolderPlus className="h-3 w-3" /> Folder
               </Btn>
             </span>
@@ -145,23 +172,26 @@ export function TuLieuMock({ play }: { play: boolean }) {
           </p>
           <div className="mt-2 grid grid-cols-6 gap-1">
             {FACES.slice(0, rotateImgs).map((src, i) => (
-              <motion.span
+              <motion.button
+                type="button"
                 key={src}
+                onClick={() => setNext(i)}
                 initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: i * 0.05 }}
                 className={cn(
-                  "relative aspect-square overflow-hidden rounded-md ring-1 transition-all duration-300",
+                  "relative aspect-square overflow-hidden rounded-md ring-1 transition-all duration-300 hover:ring-cyan-glow/60",
                   i === next ? "ring-2 ring-cyan-glow" : "ring-white/10",
                 )}
               >
                 <img src={src} alt="" className="h-full w-full object-cover object-top" />
                 {i === next ? <motion.span layoutId="tl-next" className="absolute inset-0 bg-cyan-glow/20" /> : null}
-              </motion.span>
+              </motion.button>
             ))}
           </div>
         </Panel>
       </div>
     </AppFrame>
+    </Interactive>
   );
 }

@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Zap } from "lucide-react";
-import { useScript } from "@/hooks/useScript";
+import { useDemoControl, useScript, useTask } from "@/hooks/useScript";
 import { platforms } from "@/lib/data";
-import { AppFrame, Btn, Field, Label, Panel, PTitle, Seg, Toggle } from "../atoms";
+import { AppFrame, Btn, Field, Interactive, Label, Panel, PTitle, Seg, Toggle } from "../atoms";
 import { cn } from "@/lib/cn";
 
 type Acc = { email: string; state: "Rảnh" | "Đang chạy" | "Hết lượt"; credit: number; threads: number };
@@ -20,16 +20,32 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
   const [toggles, setToggles] = useState([true, true, false]);
   const [accs, setAccs] = useState<Acc[]>(START);
   const [checking, setChecking] = useState(false);
+  const [opened, setOpened] = useState<string | null>(null);
+  const ctl = useDemoControl(play);
+  const task = useTask();
 
-  useScript(play, async ({ wait }) => {
+  const check = async (wait: (ms: number) => Promise<void>) => {
+    setChecking(true);
+    await wait(900);
+    setChecking(false);
+    // Kiểm tra xong: tài khoản bật & còn tín dụng → Rảnh
+    setAccs((a) => a.map((x) => ({ ...x, state: x.credit > 0 ? "Rảnh" : "Hết lượt" })));
+  };
+  const addAcc = () =>
+    setAccs((a) =>
+      a.length >= 4 ? a : [...a, { email: `studio.0${a.length + 1}@gmail.com`, state: "Rảnh", credit: 120 + a.length * 37, threads: 1 }],
+    );
+  const toggleAcc = (i: number) =>
+    setAccs((a) => a.map((x, j) => (j === i ? { ...x, state: x.state === "Hết lượt" ? (x.credit > 0 ? "Rảnh" : "Hết lượt") : "Hết lượt" } : x)));
+  const setToggle = (i: number, v: boolean) => setToggles((t) => t.map((x, j) => (j === i ? v : x)));
+
+  useScript(ctl.active, async ({ wait }) => {
     setTab("Flow");
     setSplit("Luân phiên");
     setToggles([true, true, false]);
     setAccs(START);
     await wait(700);
-    setChecking(true);
-    await wait(900);
-    setChecking(false);
+    await check(wait);
     // Hàng đợi chạy: tín dụng giảm dần, trạng thái đổi
     setAccs((a) => a.map((x) => ({ ...x, state: "Đang chạy" })));
     for (let i = 0; i < 8; i++) {
@@ -52,29 +68,36 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
   });
 
   return (
-    <AppFrame title="Tài khoản" active="tai-khoan" free={accs.filter((a) => a.state === "Rảnh").length} total={2}>
+    <Interactive user={ctl.user} onTakeOver={ctl.takeOver} onReplay={ctl.replay}>
+    <AppFrame title="Tài khoản" active="tai-khoan" free={accs.filter((a) => a.state === "Rảnh").length} total={accs.length}>
       <div className="flex flex-wrap items-center gap-2">
         <div>
           <PTitle>Tài khoản</PTitle>
-          <p className="text-[10px] text-slate-500">4 nền tảng · 2 tài khoản</p>
+          <p className="text-[10px] text-slate-500">4 nền tảng · {accs.length} tài khoản</p>
         </div>
         <span className="ml-auto flex flex-wrap gap-1.5">
-          <Btn pressed={checking}>
+          <Btn pressed={checking} onClick={() => task(check)}>
             {checking ? <span className="h-2.5 w-2.5 animate-spin rounded-full border border-cyan-glow border-t-transparent" /> : null}
             Kiểm tra phiên
           </Btn>
-          <Btn className="hidden sm:inline-flex">Kiểm tra hạn mức</Btn>
-          <Btn variant="primary">+ Thêm tài khoản {tab}</Btn>
+          <Btn className="hidden sm:inline-flex" onClick={() => task(check)}>
+            Kiểm tra hạn mức
+          </Btn>
+          <Btn variant="primary" onClick={addAcc} disabled={accs.length >= 4}>
+            + Thêm tài khoản {tab}
+          </Btn>
         </span>
       </div>
 
       <div className="mt-2.5 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
         {platforms.map((p) => (
-          <span
+          <button
+            type="button"
             key={p.name}
+            onClick={() => setTab(p.name)}
             className={cn(
-              "relative flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-[11px] font-semibold",
-              tab === p.name ? "border-transparent text-white" : "border-white/[0.07] text-slate-400",
+              "relative flex items-center gap-1.5 rounded-lg border px-2 py-1.5 text-[11px] font-semibold transition-colors",
+              tab === p.name ? "border-transparent text-white" : "border-white/[0.07] text-slate-400 hover:text-white",
             )}
           >
             {tab === p.name ? <motion.span layoutId="tk-tab" className="absolute inset-0 rounded-lg ring-1 ring-cyan-glow/60 shadow-glow-sm" /> : null}
@@ -83,7 +106,7 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
             <span className="relative ml-auto rounded bg-white/[0.06] px-1 text-[9.5px] text-slate-400">
               {p.name === "Muse" || p.name === "Flow" ? "1/1 rảnh" : "0/0"}
             </span>
-          </span>
+          </button>
         ))}
       </div>
 
@@ -99,22 +122,24 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
           </div>
           <div className="col-span-2 sm:col-span-1">
             <Label className="text-[10px]">Chia việc</Label>
-            <Seg layoutKey="tk-split" options={["Luân phiên", "Lần lượt"]} value={split} className="mt-0.5 w-44" />
+            <Seg layoutKey="tk-split" options={["Luân phiên", "Lần lượt"]} value={split} onPick={setSplit} className="mt-0.5 w-44" />
           </div>
         </div>
         <div className="mt-2.5 space-y-1.5">
-          <Toggle on={toggles[0]} label="Tự động chuyển tài khoản khi chạm hạn mức ngày (Daily Limit)" />
-          <Toggle on={toggles[1]} label="Tự động tối ưu prompt khi dính bộ lọc an toàn Google (Safety Filter)" />
-          <Toggle on={toggles[2]} label="Kho proxy dự phòng (US/Global)" />
+          <Toggle on={toggles[0]} onChange={(v) => setToggle(0, v)} label="Tự động chuyển tài khoản khi chạm hạn mức ngày (Daily Limit)" />
+          <Toggle on={toggles[1]} onChange={(v) => setToggle(1, v)} label="Tự động tối ưu prompt khi dính bộ lọc an toàn Google (Safety Filter)" />
+          <Toggle on={toggles[2]} onChange={(v) => setToggle(2, v)} label="Kho proxy dự phòng (US/Global)" />
         </div>
       </Panel>
 
-      <Label className="mt-2.5 text-[10px] text-slate-500">{tab} · 2 tài khoản</Label>
+      <Label className="mt-2.5 text-[10px] text-slate-500">
+        {tab} · {accs.length} tài khoản
+      </Label>
       <div className="mt-1 space-y-1.5">
         {accs.map((a, i) => (
           <Panel key={a.email} className="p-2">
             <div className="flex flex-wrap items-center gap-2">
-              <Toggle on={a.state !== "Hết lượt"} />
+              <Toggle on={a.state !== "Hết lượt"} onChange={() => toggleAcc(i)} />
               <Field className="min-w-0 truncate font-semibold">{a.email}</Field>
               <motion.span
                 key={a.state}
@@ -137,8 +162,10 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
               </span>
               <span className="ml-auto hidden gap-1 md:flex">
                 <Field>{a.threads} luồng</Field>
-                <Btn>Hiện Chrome</Btn>
-                <Btn variant="danger">Xoá</Btn>
+                <Btn onClick={() => setOpened(a.email)}>{opened === a.email ? "✓ Đã mở" : "Hiện Chrome"}</Btn>
+                <Btn variant="danger" onClick={() => setAccs((list) => list.filter((x) => x.email !== a.email))}>
+                  Xoá
+                </Btn>
               </span>
             </div>
             {i === 0 ? (
@@ -154,5 +181,6 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
         ))}
       </div>
     </AppFrame>
+    </Interactive>
   );
 }
