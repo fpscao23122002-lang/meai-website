@@ -102,7 +102,17 @@ export function DashboardApp() {
 /* Đăng nhập                                                           */
 /* ------------------------------------------------------------------ */
 
-export function GoogleLoginCard({ acc, title = "Đăng nhập", subtitle }: { acc: AccountState; title?: string; subtitle?: string }) {
+export function GoogleLoginCard({
+  acc,
+  title = "Đăng nhập",
+  subtitle,
+  allowDemo = true,
+}: {
+  acc: AccountState;
+  title?: string;
+  subtitle?: string;
+  allowDemo?: boolean;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40, rotateX: 12 }}
@@ -125,13 +135,25 @@ export function GoogleLoginCard({ acc, title = "Đăng nhập", subtitle }: { ac
       </div>
 
       <div className="mt-8">
-        <GoogleSignIn
-          clientId={acc.mode === "live" ? acc.config?.googleClientId ?? null : null}
-          onCredential={(c) => void acc.loginWithGoogle(c)}
-          onDemo={() => void acc.loginDemo()}
-          busy={acc.busy}
-        />
+        <GoogleSignIn clientId={acc.configured ? acc.config?.googleClientId ?? null : null} onCredential={(c) => void acc.loginWithGoogle(c)} busy={acc.busy} />
       </div>
+
+      {allowDemo ? (
+        <div className="mt-6">
+          <div className="flex items-center gap-3 text-[11px] uppercase tracking-wider text-slate-600">
+            <span className="h-px flex-1 bg-white/[0.07]" /> hoặc <span className="h-px flex-1 bg-white/[0.07]" />
+          </div>
+          <button
+            type="button"
+            onClick={() => void acc.enterDemo()}
+            disabled={acc.busy}
+            className="mt-4 w-full rounded-full border border-white/10 px-4 py-2.5 text-sm text-slate-300 transition-colors hover:border-cyan-glow/40 hover:text-white disabled:opacity-50"
+          >
+            Xem nhanh bằng tài khoản demo →
+          </button>
+          <p className="mt-2 text-center text-[11px] text-slate-500">Dữ liệu mô phỏng, không cần đăng nhập, không ảnh hưởng tài khoản thật.</p>
+        </div>
+      ) : null}
 
       <ul className="mt-7 space-y-2.5 text-[13px] text-slate-400">
         {[
@@ -152,11 +174,6 @@ export function GoogleLoginCard({ acc, title = "Đăng nhập", subtitle }: { ac
           <TelegramIcon className="h-3.5 w-3.5" /> Nhắn Telegram {siteConfig.contact.telegramHandle}
         </a>
       </div>
-      {acc.mode === "demo" ? (
-        <p className="mt-4 rounded-lg bg-white/[0.03] px-3 py-2 text-[11px] leading-5 text-slate-500">
-          Bản xem thử: dữ liệu tài khoản được mô phỏng và chỉ lưu trên trình duyệt này.
-        </p>
-      ) : null}
     </motion.div>
   );
 }
@@ -253,9 +270,17 @@ function AccountView({
   return (
     <div className="space-y-6">
       {acc.mode === "demo" ? (
-        <p className="flex items-center gap-2 rounded-xl border border-amber-300/20 bg-amber-300/5 px-4 py-2.5 text-xs text-amber-200/90">
-          <Info className="h-4 w-4 shrink-0" /> Bản xem thử — dữ liệu mô phỏng, chưa kết nối tài khoản Google thật.
-        </p>
+        <div className="flex flex-wrap items-center gap-3 rounded-xl border border-amber-300/20 bg-amber-300/5 px-4 py-2.5 text-xs text-amber-200/90">
+          <Info className="h-4 w-4 shrink-0" />
+          <span className="flex-1">Bạn đang xem tài khoản demo — dữ liệu mô phỏng, chỉ lưu trên trình duyệt này.</span>
+          <button
+            type="button"
+            onClick={() => void acc.exitDemo()}
+            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3 py-1 font-semibold text-slate-800 transition hover:-translate-y-0.5"
+          >
+            <GoogleLogo className="h-3.5 w-3.5" /> Đăng nhập Google thật
+          </button>
+        </div>
       ) : null}
 
       <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end">

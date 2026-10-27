@@ -4,34 +4,56 @@ import { ApiError, demoApi, getSiteConfig, liveApi, type Account, type SiteConfi
 
 export type AccountMode = "live" | "demo";
 
+const DEMO_FLAG = "meai-demo-active";
+const readDemoFlag = () => {
+  try {
+    return window.sessionStorage.getItem(DEMO_FLAG) === "1";
+  } catch {
+    return false;
+  }
+};
+const writeDemoFlag = (on: boolean) => {
+  try {
+    if (on) window.sessionStorage.setItem(DEMO_FLAG, "1");
+    else window.sessionStorage.removeItem(DEMO_FLAG);
+  } catch {
+    /* storage bị chặn */
+  }
+};
+
 /**
  * Trạng thái đăng nhập & dữ liệu tài khoản dùng chung cho Khu vực khách hàng và trang kết nối app.
- * "live": API thật (Google + D1). "demo": backend chưa cấu hình → dữ liệu mô phỏng trên trình duyệt.
+ * - Đăng nhập thật bằng Google (API + D1) là luồng chính.
+ * - "Tài khoản demo" là lựa chọn phụ: dữ liệu mô phỏng trên trình duyệt, tách biệt hoàn toàn với tài khoản thật.
  */
 export function useAccount() {
   const [config, setConfig] = useState<SiteConfig | null>(null);
   const [account, setAccount] = useState<Account | null>(null);
+  const [demo, setDemo] = useState(false);
   const [ready, setReady] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const mode: AccountMode = config?.configured ? "live" : "demo";
+  const mode: AccountMode = demo ? "demo" : "live";
+  const configured = Boolean(config?.configured);
 
   useEffect(() => {
     let alive = true;
     (async () => {
       const cfg = await getSiteConfig();
+      const demoOn = readDemoFlag();
       let acc: Account | null = null;
-      if (cfg.configured) {
+      if (demoOn) {
+        acc = (await demoApi.me()) ?? (await demoApi.login());
+      } else if (cfg.configured) {
         try {
           acc = await liveApi.me();
         } catch (e) {
           if (!(e instanceof ApiError && e.status === 401)) setError(e instanceof Error ? e.message : String(e));
         }
-      } else {
-        acc = await demoApi.me();
       }
       if (!alive) return;
       setConfig(cfg);
+      setDemo(demoOn);
       setAccount(acc);
       setReady(true);
     })();
@@ -57,19 +79,39 @@ export function useAccount() {
     }
   }, []);
 
-  const live = mode === "live";
+  /** Thoát tài khoản demo, quay về đăng nhập Google thật */
+  const exitDemo = useCallback(async () => {
+    await demoApi.logout();
+    writeDemoFlag(false);
+    setDemo(false);
+    setError(null);
+    let acc: Account | null = null;
+    if (configured) acc = await liveApi.me().catch(() => null);
+    setAccount(acc);
+  }, [configured]);
+
+  const live = !demo;
 
   return {
     ready,
     mode,
+    /** Backend tài khoản thật đã bật (có D1 + GOOGLE_CLIENT_ID) */
+    configured,
     config,
     account,
     busy,
     error,
     clearError: () => setError(null),
     loginWithGoogle: (credential: string) => run(() => liveApi.loginWithGoogle(credential), (a) => a),
-    loginDemo: () => run(() => demoApi.login(), (a) => a),
-    logout: () => run<unknown>(() => (live ? liveApi.logout() : demoApi.logout()), () => null),
+    /** Vào xem tài khoản demo (không cần đăng nhập) */
+    enterDemo: () =>
+      run(async () => {
+        writeDemoFlag(true);
+        setDemo(true);
+        return demoApi.login();
+      }, (a) => a),
+    exitDemo,
+    logout: () => (demo ? exitDemo() : run<unknown>(() => liveApi.logout(), () => null)),
     /** Làm mới im lặng (dùng khi chờ thanh toán) */
     refresh: useCallback(async () => {
       try {

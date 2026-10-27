@@ -21,8 +21,8 @@ Mã nguồn:
 | Giao diện | `src/components/dashboard/DashboardApp.tsx`, `src/pages/AppConnectPage.tsx` |
 | Kiểm thử | `npm run test:api` |
 
-Khi chưa cấu hình (chưa có D1 hoặc `GOOGLE_CLIENT_ID`), website vẫn chạy bình thường. Khu vực khách hàng tự chuyển
-sang **chế độ xem thử**: dữ liệu mô phỏng, lưu trên trình duyệt.
+Khi chưa cấu hình (chưa có D1 hoặc `GOOGLE_CLIENT_ID`), website vẫn chạy bình thường; nút Google báo "đang được kích hoạt"
+và khách chỉ mở được **tài khoản demo** (dữ liệu mô phỏng trên trình duyệt). Tài khoản demo luôn là lựa chọn phụ nằm dưới nút Google.
 
 ---
 
@@ -34,40 +34,37 @@ sang **chế độ xem thử**: dữ liệu mô phỏng, lưu trên trình duy�
 2. Mở **OAuth consent screen**:
    - User type: **External**.
    - Điền tên app "MeAI Studio", email hỗ trợ và logo.
-   - **Privacy policy**: `https://meai.vn/bao-mat`; **Terms of service**: `https://meai.vn/dieu-khoan` (website đã có sẵn hai trang này).
-   - Bấm **Publish app**.
+   - **Privacy policy**: `https://meai-website.pages.dev/bao-mat`; **Terms of service**: `https://meai-website.pages.dev/dieu-khoan` (đổi sang tên miền riêng khi có) (website đã có sẵn hai trang này).
+   - Bấm **Publish app** (chỉ dùng thông tin cơ bản tên/email/ảnh nên không cần Google duyệt; nếu để chế độ Testing thì chỉ các Gmail trong danh sách test user đăng nhập được).
 3. Mở **Credentials**, chọn **Create credentials → OAuth client ID**:
    - Application type: **Web application**.
-   - **Authorized JavaScript origins**: `https://meai.vn` (tên miền thật), `https://<dự-án>.pages.dev` và `http://localhost:8788`.
+   - **Authorized JavaScript origins**: `https://meai-website.pages.dev`, tên miền riêng nếu có (VD `https://meai.vn`) và `http://localhost:8788` (chạy thử).
 4. Copy **Client ID** (dạng `xxxx.apps.googleusercontent.com`).
 
-### 1.2. Tạo database D1
+### 1.2. Tạo database D1 (không cần dòng lệnh)
 
-```bash
-npx wrangler login
-npx wrangler d1 create meai          # in ra database_id
-```
+Cloudflare Dashboard → **Storage & Databases → D1 SQL Database → Create** → tên `meai` → copy **Database ID**.
+Bảng dữ liệu được API tự tạo ở lần gọi đầu tiên (`server/schema.ts`), không phải chạy migration.
 
-Mở `wrangler.toml`, bỏ dấu `#` ở khối `[[d1_databases]]` và dán `database_id`. Sau đó tạo bảng:
+> Muốn dùng dòng lệnh thay thế: `npx wrangler d1 create meai` rồi `npm run db:migrate`.
 
-```bash
-npm run db:migrate
-```
+### 1.3. Khai báo cấu hình
 
-### 1.3. Khai báo biến môi trường
+Vì dự án có `wrangler.toml`, binding D1 và biến thường được khai báo **trong file này** (Cloudflare sẽ khoá phần
+binding trên Dashboard). Bỏ dấu `#` ở khối `[[d1_databases]]` và `[vars]`, điền:
 
-Vào Cloudflare Dashboard, mở dự án Pages, chọn **Settings → Variables and Secrets** (Production):
-
-| Biến | Bắt buộc | Ý nghĩa |
+| Khai báo | Ở đâu | Ý nghĩa |
 |---|---|---|
-| `GOOGLE_CLIENT_ID` | ✅ | Client ID ở bước 1.1 |
-| `ADMIN_TOKEN` | ✅ | Chuỗi bí mật dài, dùng để kích hoạt gói thủ công (đặt dạng **Secret**) |
-| `BANK_ID`, `BANK_ACCOUNT`, `BANK_ACCOUNT_NAME` | Nên có | Hiện mã VietQR có sẵn số tiền và nội dung. `BANK_ID` theo VietQR, VD: `MB`, `VCB`, `TCB`, `ACB` |
-| `PAYMENT_WEBHOOK_KEY` | Tuỳ chọn | Bật kích hoạt **tự động** khi ngân hàng báo có tiền (mục 3) |
-| `GOOGLE_DESKTOP_CLIENT_IDS` | Tuỳ chọn | Client ID loại *Desktop app*, chỉ cần nếu app tự đăng nhập Google (mục 4.3) |
+| `database_id` | `wrangler.toml` | Database ID ở bước 1.2 |
+| `GOOGLE_CLIENT_ID` | `wrangler.toml` → `[vars]` | Client ID ở bước 1.1 (không phải bí mật — trình duyệt nào cũng thấy) |
+| `BANK_ID`, `BANK_ACCOUNT`, `BANK_ACCOUNT_NAME` | `wrangler.toml` → `[vars]` | Hiện mã VietQR có sẵn số tiền & nội dung. `BANK_ID` theo VietQR: `MB`, `VCB`, `TCB`, `ACB`… |
+| `ADMIN_TOKEN` | Dashboard → dự án Pages → **Settings → Variables and Secrets** → loại **Secret** | Chuỗi bí mật dài, dùng kích hoạt gói thủ công |
+| `PAYMENT_WEBHOOK_KEY` | Như trên (Secret, tuỳ chọn) | Bật kích hoạt **tự động** khi ngân hàng báo có tiền (mục 3) |
+| `GOOGLE_DESKTOP_CLIENT_IDS` | `[vars]` (tuỳ chọn) | Client ID loại *Desktop app* — chỉ cần nếu app tự đăng nhập Google (mục 4.3) |
 
-Deploy lại (`npm run deploy` hoặc push lên `main`). Mở `/dashboard`: khi nút **Tiếp tục với Google** là nút chính thức
-của Google và không còn dòng "Bản xem thử" thì hệ thống đã chạy thật.
+Push lên `main` → Cloudflare Pages tự deploy. Mở `/dashboard`: nút **Tiếp tục với Google** là nút chính thức của Google
+(hiện avatar/tên tài khoản khi bấm) là hệ thống đã chạy thật. Kiểm tra nhanh: `https://<tên-miền>/api/config` trả về
+`"configured": true`.
 
 ---
 

@@ -33,7 +33,7 @@ npm run typecheck  # kiểm tra TypeScript
    | Production branch | `main` |
 
 3. **Settings → Environment variables** (áp dụng cho Production & Preview):
-   - `VITE_SITE_URL` = tên miền chính thức, VD `https://meai.vn` (dùng cho canonical, Open Graph, sitemap)
+   - `VITE_SITE_URL` = tên miền chính thức (mặc định `https://meai-website.pages.dev`; đổi khi gắn tên miền riêng) (dùng cho canonical, Open Graph, sitemap)
    - `VITE_DOWNLOAD_URL` = link tải bộ cài `.exe` (nên dùng Cloudflare R2 hoặc GitHub Releases — Cloudflare Pages giới hạn mỗi file tối đa 25 MB)
    - Phiên bản Node được lấy tự động từ `.nvmrc` (22).
 4. **Custom domains** → thêm tên miền của bạn.

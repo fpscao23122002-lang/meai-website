@@ -4,13 +4,20 @@ pages_build_output_dir = "./dist"
 compatibility_date = "2026-10-01"
 
 # ---------------------------------------------------------------------------
-# Tài khoản Google & gói cước (API /api/*, xem docs/TAI-KHOAN.md)
-# 1) npx wrangler d1 create meai          → copy database_id vào dưới đây
-# 2) Bỏ dấu # ở 4 dòng [[d1_databases]] và deploy lại
-# 3) npm run db:migrate                     → tạo bảng
-# Khi chưa bật, website vẫn chạy bình thường; Khu vực khách hàng hiển thị chế độ xem thử.
+# Đăng nhập Google & gói cước (API /api/*, xem docs/TAI-KHOAN.md)
+# 1) Cloudflare Dashboard → Storage & Databases → D1 → Create → tên "meai" → copy Database ID
+# 2) Bỏ dấu # ở khối [[d1_databases]] + [vars] bên dưới, dán Database ID và Google Client ID
+# 3) Push lên main → Cloudflare Pages tự deploy. Bảng dữ liệu tự tạo ở lần gọi API đầu tiên.
+# Khi chưa bật, website vẫn chạy bình thường; Khu vực khách hàng chỉ mở được tài khoản demo.
 # ---------------------------------------------------------------------------
 # [[d1_databases]]
 # binding = "DB"
 # database_name = "meai"
 # database_id = "DÁN_DATABASE_ID_VÀO_ĐÂY"
+
+# [vars]
+# GOOGLE_CLIENT_ID = "xxxxxxxx.apps.googleusercontent.com"
+# BANK_ID = "MB"
+# BANK_ACCOUNT = "0123456789"
+# BANK_ACCOUNT_NAME = "TEN CHU TAI KHOAN"
+# (ADMIN_TOKEN, PAYMENT_WEBHOOK_KEY là bí mật: khai báo dạng Secret trong Cloudflare Dashboard, không ghi ở đây)

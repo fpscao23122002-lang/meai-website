@@ -12,10 +12,10 @@ const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 const out = resolve(root, "node_modules/.tmp/api-test/router.mjs");
 mkdirSync(dirname(out), { recursive: true });
 execFileSync(resolve(root, "node_modules/.bin/esbuild"), [resolve(root, "server/router.ts"), "--bundle", "--format=esm", "--platform=neutral", `--outfile=${out}`, "--log-level=warning"], { stdio: "inherit" });
-const { handleApi } = await import(out);
+const { handleApi, SCHEMA } = await import(out);
 
 const sqlite = new DatabaseSync(":memory:");
-sqlite.exec(readFileSync(resolve(root, "migrations/0001_accounts.sql"), "utf8"));
+// Không tạo bảng sẵn: API phải tự tạo lược đồ ở lần gọi đầu tiên (ensureSchema)
 const norm = (a) => a.map((v) => (v === undefined ? null : v));
 function stmt(sql, args = []) {
   return {
@@ -57,7 +57,14 @@ async function call(method, path, { body, headers = {}, origin = ORIGIN, useCook
 let fails = 0;
 const check = (name, cond, extra) => { console.log((cond ? "PASS " : "FAIL ") + name + (cond ? "" : " → " + JSON.stringify(extra))); if (!cond) fails++; };
 
+// Lược đồ tự tạo phải khớp file migration dùng cho wrangler d1 migrations
+const migration = readFileSync(resolve(root, "migrations/0001_accounts.sql"), "utf8")
+  .split("\n").filter((l) => !l.trim().startsWith("--")).join("\n")
+  .split(";").map((x) => x.replace(/\s+--.*$/gm, "").split(/\s+/).join(" ").trim()).filter(Boolean);
+check("schema.ts matches migration", JSON.stringify(migration) === JSON.stringify(SCHEMA), { migration, SCHEMA });
+
 let r = await call("GET", "config");
+check("tables auto-created", sqlite.prepare("SELECT COUNT(*) AS n FROM sqlite_master WHERE type='table'").get().n === 6, null);
 check("config configured", r.data.configured === true && r.data.googleClientId === "web-client", r.data);
 r = await call("GET", "me");
 check("me requires login", r.status === 401, r);

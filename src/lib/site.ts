@@ -3,7 +3,7 @@ export const siteConfig = {
   fullName: "MeAI - All-in-One AI Video & Marketing Automation Studio",
   description:
     "Xưởng sản xuất video AI & tự động hóa Reels đa tài khoản. Tích hợp Muse, Google Flow, Seedance — tạo ảnh, tạo video hàng loạt từ danh sách prompt, giữ đồng nhất nhân vật, viết kịch bản từ LadiPage và đăng thẳng lên Facebook Reels.",
-  url: (import.meta.env.VITE_SITE_URL || "https://meai.vn").replace(/\/$/, ""),
+  url: (import.meta.env.VITE_SITE_URL || "https://meai-website.pages.dev").replace(/\/$/, ""),
   downloadUrl: import.meta.env.VITE_DOWNLOAD_URL || "/downloads/MeAI-Studio-Setup-x64.exe",
   latestVersion: "2.6.0",
   releaseDate: "20/10/2026",
@@ -14,7 +14,6 @@ export const siteConfig = {
     telegramHandle: "@meai_support",
     facebook: "https://facebook.com/meai.studio",
     youtube: "https://youtube.com/@meai.studio",
-    email: "support@meai.vn",
   },
   // Thông tin pháp lý: điền khi có pháp nhân — hiện ở chân trang, trang Điều khoản & Chính sách bảo mật (để trống thì ẩn)
   legal: {

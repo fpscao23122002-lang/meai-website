@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { CheckCircle2, LoaderCircle, MonitorSmartphone, ShieldCheck, TriangleAlert } from "lucide-react";
 import { Navbar } from "@/components/layout/Navbar";
@@ -30,6 +30,12 @@ export default function AppConnectPage() {
   const params = useMemo(readParams, []);
   const [status, setStatus] = useState<"idle" | "linking" | "done">("idle");
 
+  // App chỉ kết nối với tài khoản thật: đang xem demo thì thoát demo trước
+  const { ready, mode, exitDemo } = acc;
+  useEffect(() => {
+    if (ready && mode === "demo") void exitDemo();
+  }, [ready, mode, exitDemo]);
+
   const allow = async () => {
     if (!params) return;
     setStatus("linking");
@@ -49,18 +55,18 @@ export default function AppConnectPage() {
         Hãy mở trang này bằng nút <strong className="text-white">Đăng nhập với Google</strong> trong app MeAI Desktop.
       </Notice>
     );
-  } else if (acc.mode === "demo") {
+  } else if (!acc.configured) {
     body = (
       <Notice icon={<TriangleAlert className="h-7 w-7 text-amber-300" />} title="Chưa bật đăng nhập Google">
-        Hệ thống tài khoản đang ở chế độ xem thử nên chưa thể kết nối app. Vui lòng liên hệ{" "}
+        Đăng nhập Google đang được kích hoạt nên chưa thể kết nối app. Vui lòng liên hệ{" "}
         <a href={siteConfig.contact.telegram} target="_blank" rel="noopener noreferrer" className="font-semibold text-cyan-glow hover:underline">
           Telegram {siteConfig.contact.telegramHandle}
         </a>
         .
       </Notice>
     );
-  } else if (!acc.account) {
-    body = <GoogleLoginCard acc={acc} title="Đăng nhập để kết nối app" subtitle="Dùng tài khoản Google đã mua gói MeAI" />;
+  } else if (!acc.account || acc.mode === "demo") {
+    body = <GoogleLoginCard acc={acc} allowDemo={false} title="Đăng nhập để kết nối app" subtitle="Dùng tài khoản Google đã mua gói MeAI" />;
   } else if (status === "done") {
     body = (
       <Notice icon={<CheckCircle2 className="h-7 w-7 text-emerald-400" />} title="Đã kết nối!">

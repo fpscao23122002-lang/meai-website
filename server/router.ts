@@ -3,6 +3,8 @@ import type { Env } from "./env";
 import { safeEqual } from "./crypto";
 import { GoogleTokenError, verifyGoogleIdToken, type JwksFetcher } from "./google";
 import * as store from "./store";
+import { ensureSchema } from "./schema";
+export { SCHEMA } from "./schema";
 
 /**
  * API tài khoản MeAI (Cloudflare Pages Functions, mount tại /api/*).
@@ -323,6 +325,7 @@ export async function handleApi(req: Request, env: Env, opts: { fetcher?: JwksFe
   const url = new URL(req.url);
   const parts = url.pathname.replace(/^\/api\/?/, "").split("/").filter(Boolean);
   try {
+    if (env.DB) await ensureSchema(env.DB);
     return await route({ req, env, parts, fetcher: opts.fetcher });
   } catch (e) {
     if (e instanceof HttpError) return json({ error: e.code, message: e.message, ...e.extra }, e.status);
