@@ -5,15 +5,12 @@ compatibility_date = "2026-10-01"
 
 # ---------------------------------------------------------------------------
 # Đăng nhập Google & gói cước (API /api/*, xem docs/TAI-KHOAN.md)
-# 1) Cloudflare Dashboard → Storage & Databases → D1 → Create → tên "meai" → copy Database ID
-# 2) Bỏ dấu # ở khối [[d1_databases]] bên dưới và dán Database ID (Google Client ID đã khai báo ở [vars])
-# 3) Push lên main → Cloudflare Pages tự deploy. Bảng dữ liệu tự tạo ở lần gọi API đầu tiên.
-# Khi chưa bật, website vẫn chạy bình thường; Khu vực khách hàng chỉ mở được tài khoản demo.
+# D1 "meai" lưu tài khoản; bảng dữ liệu tự tạo ở lần gọi API đầu tiên (server/schema.ts).
 # ---------------------------------------------------------------------------
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "meai"
-# database_id = "DÁN_DATABASE_ID_VÀO_ĐÂY"
+[[d1_databases]]
+binding = "DB"
+database_name = "meai"
+database_id = "774b2e5b-2b00-416b-a259-146cf85df62a"
 
 [vars]
 # OAuth Client ID (Web application) — không phải bí mật, trình duyệt nào cũng thấy
