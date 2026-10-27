@@ -17,13 +17,13 @@ export function Pricing() {
         <SectionHeading
           eyebrow="Bảng giá"
           title={["Đầu tư một lần, ", { text: "x10 sản lượng content", className: "text-gradient" }]}
-          description="Rẻ hơn lương một bạn edit part-time, nhưng chạy 24/7 không nghỉ phép. Tất cả gói đều dùng đủ 3 engine AI và nhận License tự động qua email."
+          description="Rẻ hơn lương một bạn edit part-time, nhưng chạy 24/7 không nghỉ phép. Tất cả gói đều dùng đủ 3 engine AI, gắn thẳng vào tài khoản Google của bạn — đăng nhập app là dùng."
         />
 
         <div className="mt-16 grid items-stretch gap-6 lg:grid-cols-3">
           {plans.map((plan, i) => {
             const Icon = icons[plan.id as keyof typeof icons] ?? Rocket;
-            const href = plan.id === "lifetime" ? siteConfig.contact.zalo : `/dashboard?plan=${plan.id}`;
+            const href = `/dashboard?plan=${plan.id}`;
             return (
               <motion.div
                 key={plan.id}
@@ -99,10 +99,10 @@ export function Pricing() {
         </div>
 
         <p className="mt-12 text-center text-sm text-slate-500">
-          Giá đã bao gồm VAT. Thanh toán chuyển khoản / VietQR / MoMo — License gửi tự động qua email trong 1 phút. Cần mua số
+          Giá đã bao gồm VAT. Thanh toán chuyển khoản / VietQR — gói tự kích hoạt vào tài khoản Google ngay khi xác nhận. Cần mua số
           lượng lớn cho team?{" "}
-          <a href={siteConfig.contact.zalo} target="_blank" rel="noopener noreferrer" className="font-semibold text-cyan-glow hover:underline">
-            Nhắn Zalo để nhận báo giá riêng
+          <a href={siteConfig.contact.telegram} target="_blank" rel="noopener noreferrer" className="font-semibold text-cyan-glow hover:underline">
+            Nhắn Telegram để nhận báo giá riêng
           </a>
           .
         </p>

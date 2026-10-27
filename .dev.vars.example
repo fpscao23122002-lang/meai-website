@@ -1,0 +1,8 @@
+# Copy thành .dev.vars để chạy thử API tại máy: npx wrangler pages dev dist --d1 DB=meai-local
+GOOGLE_CLIENT_ID=xxxxxxxx.apps.googleusercontent.com
+GOOGLE_DESKTOP_CLIENT_IDS=
+ADMIN_TOKEN=doi-thanh-chuoi-bi-mat-dai
+PAYMENT_WEBHOOK_KEY=
+BANK_ID=MB
+BANK_ACCOUNT=0123456789
+BANK_ACCOUNT_NAME=MEAI STUDIO

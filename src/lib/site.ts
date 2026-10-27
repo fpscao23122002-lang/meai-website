@@ -9,11 +9,12 @@ export const siteConfig = {
   releaseDate: "20/10/2026",
   installerSize: "148 MB",
   contact: {
-    zalo: "https://zalo.me/meai",
+    // Kênh hỗ trợ duy nhất: mọi nút "Hỗ trợ / Liên hệ / Thanh toán" đều mở cuộc trò chuyện Telegram này
+    telegram: "https://t.me/meai_support",
+    telegramHandle: "@meai_support",
     facebook: "https://facebook.com/meai.studio",
     youtube: "https://youtube.com/@meai.studio",
     email: "support@meai.vn",
-    hotline: "0900 000 000",
   },
 };
 

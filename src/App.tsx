@@ -16,6 +16,7 @@ import HomePage from "@/pages/HomePage";
 const DocsPage = lazy(() => import("@/pages/DocsPage"));
 const DashboardPage = lazy(() => import("@/pages/DashboardPage"));
 const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
+const AppConnectPage = lazy(() => import("@/pages/AppConnectPage"));
 
 function PageFallback() {
   return (
@@ -28,13 +29,15 @@ function PageFallback() {
 export default function App() {
   const location = useLocation();
   // Trang chính chỉ dựng khi màn mở đầu bắt đầu "mở rèm" → hiệu ứng xuất hiện của trang chạy đúng lúc
-  const [revealed, setRevealed] = useState(false);
+  // Trang /app/* (app desktop mở để đăng nhập) vào thẳng nội dung, không chạy màn mở đầu
+  const [skipIntro] = useState(() => location.pathname.startsWith("/app/"));
+  const [revealed, setRevealed] = useState(skipIntro);
 
   return (
     // reducedMotion="user": tự tắt hiệu ứng chuyển động nếu người dùng bật "Giảm chuyển động" trong hệ điều hành
     <MotionConfig reducedMotion="user">
       <ScrollProvider>
-      <Intro onReveal={() => setRevealed(true)} />
+      {skipIntro ? null : <Intro onReveal={() => setRevealed(true)} />}
       <Aurora />
       <CursorGlow />
       <RippleLayer />
@@ -57,6 +60,7 @@ export default function App() {
                 <Route path="/" element={<HomePage />} />
                 <Route path="/docs" element={<DocsPage />} />
                 <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/app/connect" element={<AppConnectPage />} />
                 <Route path="*" element={<NotFoundPage />} />
               </Routes>
             </Suspense>

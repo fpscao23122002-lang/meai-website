@@ -1,6 +1,6 @@
 export const docSections = [
   { id: "tong-quan", title: "Tổng quan giao diện" },
-  { id: "cai-dat", title: "Cài đặt & kích hoạt" },
+  { id: "cai-dat", title: "Cài đặt & đăng nhập" },
   { id: "thiet-lap", title: "Thiết lập ban đầu" },
   { id: "tai-khoan", title: "Thêm & quản lý tài khoản" },
   { id: "studio", title: "Studio: prompt hàng loạt" },

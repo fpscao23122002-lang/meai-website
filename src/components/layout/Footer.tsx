@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Link } from "@/components/ui/Link";
-import { ArrowUpRight, Facebook, Mail, MessageCircle, Phone, Sparkles, Youtube } from "lucide-react";
+import { ArrowUpRight, Facebook, Sparkles, Youtube } from "lucide-react";
+import { TelegramIcon } from "@/components/ui/TelegramIcon";
 import { Logo } from "@/components/ui/Logo";
 import { siteConfig } from "@/lib/site";
 
@@ -19,7 +20,7 @@ const columns = [
     title: "Tài nguyên",
     links: [
       { href: "/docs", label: "Hướng dẫn sử dụng" },
-      { href: "/docs#cai-dat", label: "Cài đặt & kích hoạt" },
+      { href: "/docs#cai-dat", label: "Cài đặt & đăng nhập" },
       { href: "/docs#studio", label: "Tạo ảnh & video hàng loạt" },
       { href: "/docs#kich-ban", label: "Kịch bản & LadiPage" },
       { href: "/docs#dang-reels", label: "Đăng Facebook Reels" },
@@ -28,10 +29,9 @@ const columns = [
   {
     title: "Hỗ trợ",
     links: [
-      { href: "/dashboard", label: "Quản lý License" },
+      { href: "/dashboard", label: "Khu vực khách hàng" },
       { href: "/#faq", label: "Câu hỏi thường gặp" },
-      { href: siteConfig.contact.zalo, label: "Nhóm Zalo cộng đồng" },
-      { href: `mailto:${siteConfig.contact.email}`, label: "Gửi yêu cầu hỗ trợ" },
+      { href: siteConfig.contact.telegram, label: "Hỗ trợ qua Telegram" },
     ],
   },
 ];
@@ -39,7 +39,7 @@ const columns = [
 const socials = [
   { href: siteConfig.contact.facebook, label: "Facebook", Icon: Facebook },
   { href: siteConfig.contact.youtube, label: "YouTube", Icon: Youtube },
-  { href: siteConfig.contact.zalo, label: "Zalo", Icon: MessageCircle },
+  { href: siteConfig.contact.telegram, label: "Telegram", Icon: TelegramIcon },
 ];
 
 const ease = [0.22, 1, 0.36, 1] as const;
@@ -59,12 +59,9 @@ export function Footer() {
             xưởng content.
           </p>
           <div className="mt-6 space-y-2 text-sm text-slate-400">
-            <a href={`mailto:${siteConfig.contact.email}`} className="flex items-center gap-2 hover:text-white">
-              <Mail className="h-4 w-4 text-cyan-brand" /> {siteConfig.contact.email}
+            <a href={siteConfig.contact.telegram} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-white">
+              <TelegramIcon className="h-4 w-4 text-cyan-brand" /> Hỗ trợ Telegram: {siteConfig.contact.telegramHandle}
             </a>
-            <p className="flex items-center gap-2">
-              <Phone className="h-4 w-4 text-neon-pink" /> Hotline/Zalo: {siteConfig.contact.hotline}
-            </p>
           </div>
           <div className="mt-6 flex gap-2">
             {socials.map(({ href, label, Icon }, i) => (

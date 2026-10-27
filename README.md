@@ -59,12 +59,20 @@ npm run deploy              # build + wrangler pages deploy dist
 | --- | --- |
 | `/` | Landing page: Hero (ảnh Studio thật), Bento tính năng, Giao diện thật (8 màn hình app), Quy trình, Demo Studio tương tác, Bảng giá, FAQ, CTA |
 | `/docs` | Hướng dẫn sử dụng theo đúng menu app |
-| `/dashboard` | Khu vực khách hàng: đăng nhập, hạn dùng gói, License Key & thiết bị, tải bản mới, changelog |
+| `/dashboard` | Khu vực khách hàng — **chỉ đăng nhập bằng Google**: gói & hạn dùng, chọn gói + thanh toán VietQR, máy tính đang dùng, lịch sử đơn, tải bản mới, changelog |
+| `/app/connect` | Trang app desktop mở để đăng nhập Google qua trình duyệt |
+| `/api/*` | API tài khoản (Cloudflare Pages Functions + D1) — xem [docs/TAI-KHOAN.md](docs/TAI-KHOAN.md) |
 
 ```
 index.html             # Khung HTML, meta SEO/Open Graph, font Be Vietnam Pro
 vite.config.ts         # Alias @ → src, chia chunk, sinh robots.txt & sitemap.xml
-wrangler.toml          # Cấu hình Cloudflare Pages cho Wrangler CLI
+wrangler.toml          # Cấu hình Cloudflare Pages cho Wrangler CLI (+ D1 binding)
+functions/api/         # Pages Functions: mount API tài khoản tại /api/*
+server/                # API: xác minh Google, phiên đăng nhập, gói, đơn hàng, thiết bị, webhook thanh toán
+shared/plans.ts        # Giá, số ngày, số máy của từng gói (dùng chung web + API)
+migrations/            # Lược đồ D1
+docs/TAI-KHOAN.md      # Hướng dẫn bật tài khoản Google + tích hợp app desktop
+scripts/test-api.mjs   # Kiểm thử API (npm run test:api)
 public/
   _headers             # Header Cloudflare Pages
   favicon.png, apple-touch-icon.png, og-image.png
@@ -73,11 +81,11 @@ public/
   samples/             # Ảnh thành phẩm mẫu dùng trong demo
 src/
   main.tsx, App.tsx    # Khởi tạo React + định tuyến (trang phụ tải lazy)
-  pages/               # HomePage, DocsPage, DashboardPage, NotFoundPage
+  pages/               # HomePage, DocsPage, DashboardPage, AppConnectPage, NotFoundPage
   components/
     landing/           # Hero, BentoFeatures, AppTour, Workflow, InteractiveDemo, Pricing, FAQ, FinalCTA
     docs/              # Sidebar mục lục + block tài liệu
-    dashboard/         # DashboardApp (đăng nhập, license) + Changelog
+    dashboard/         # DashboardApp (đăng nhập Google, gói, thanh toán, thiết bị), GoogleSignIn, Changelog
     layout/            # Navbar, Footer, ScrollManager (cuộn tới #section)
     ui/                # Button, Link, Image, Logo, Reveal, SectionHeading
   hooks/usePageMeta.ts # Title/description/canonical theo trang
@@ -95,12 +103,18 @@ image/, app-preview.png.png  # Ảnh gốc bạn tải lên (nguồn để tạo
 
 ## Tùy chỉnh nhanh
 
-- **Phiên bản / ngày phát hành / dung lượng / liên hệ:** `src/lib/site.ts`.
-- **Giá, quyền lợi, FAQ, changelog, mô tả màn hình app:** `src/lib/data.ts`.
+- **Phiên bản / ngày phát hành / dung lượng / liên hệ:** `src/lib/site.ts` (kênh hỗ trợ duy nhất: Telegram `https://t.me/meai_support`).
+- **Giá, số ngày, số máy của gói:** `shared/plans.ts` (web và API dùng chung).
+- **Quyền lợi, FAQ, changelog, mô tả màn hình app:** `src/lib/data.ts`.
 - **Ảnh giao diện app:** thay file trong `public/screens/` (giữ nguyên tên).
 - **Logo:** `public/brand/meai-logo.webp`, `public/favicon.png`, `public/apple-touch-icon.png`, `public/og-image.png`.
 - **Màu thương hiệu:** `tailwind.config.ts` (`ink` #0B0B14, `panel` #121224, `bg-brand-gradient` #00F0FF → #FC3199, màu engine Muse/Flow/Seedance/Dola).
 
-## Lưu ý về `/dashboard`
+## Tài khoản Google & gói cước
 
-Khu vực khách hàng hiện chạy ở **chế độ demo**: đăng nhập, License Key và danh sách thiết bị được mô phỏng và lưu trong `localStorage` của trình duyệt. Khi có backend License (VD: Cloudflare Workers + D1), thay đối tượng `api` và hàm `createDemoSession` trong `src/components/dashboard/DashboardApp.tsx` bằng lời gọi API thật.
+Website và app desktop dùng chung **một tài khoản Google**; gói mua ở đâu cũng gắn vào tài khoản đó và app tự nhận đúng gói,
+hạn dùng, số máy qua API. Backend chạy trên Cloudflare Pages Functions + D1 (không cần server riêng).
+
+- Chưa cấu hình: `/dashboard` chạy **chế độ xem thử** (dữ liệu mô phỏng trên trình duyệt), phần còn lại của web không ảnh hưởng.
+- Bật thật: làm theo [docs/TAI-KHOAN.md](docs/TAI-KHOAN.md) — tạo Google Client ID, tạo D1, khai báo `GOOGLE_CLIENT_ID`, `ADMIN_TOKEN`, thông tin ngân hàng (VietQR) và tuỳ chọn webhook tự kích hoạt.
+- App desktop: tài liệu API đăng nhập / kiểm tra gói / mua gói trong app ở mục 4 của tài liệu trên.

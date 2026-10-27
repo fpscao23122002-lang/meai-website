@@ -229,7 +229,7 @@ export function InteractiveDemo() {
     const date = `${String(now.getDate()).padStart(2, "0")}/${String(now.getMonth() + 1).padStart(2, "0")}`;
     const ratio = String(cur.ratio);
     const [rw, rh] = ratio.split(":").map(Number);
-    const created: Task[] = prompts.map((p, i) => {
+    const created: Task[] = prompts.map((p) => {
       const id = nextId.current++;
       return {
         id,
@@ -243,8 +243,8 @@ export function InteractiveDemo() {
         account: null,
         lastAccount: null,
         attempts: 0,
-        // Prompt thứ 2 của mỗi lượt luôn "dính lỗi" 2 lần để demo cơ chế thử lại & Chạy lại lỗi
-        failPlan: i === 1 ? 2 : Math.random() < 0.15 ? 1 : 0,
+        // Mọi task trong bản demo đều chạy thành công
+        failPlan: 0,
         elapsed: 0,
         date,
         // Khung ngang dùng ảnh ngang, khung dọc/vuông dùng ảnh dọc
@@ -341,7 +341,7 @@ export function InteractiveDemo() {
           </h2>
           <p className="mt-5 text-base leading-7 text-slate-400 sm:text-lg">
             Mô phỏng đúng app MeAI: đổi engine, dán prompt (mỗi prompt cách nhau 1 dòng trống), bấm{" "}
-            <strong className="text-white">Tạo &amp; chạy</strong> rồi thử <em>Chọn lỗi → Chạy lại lỗi</em>, <em>Ghép video</em>. Bấm menu{" "}
+            <strong className="text-white">Tạo &amp; chạy</strong> rồi xem các tài khoản chia nhau chạy song song tới khi <em>Xong</em>, thử <em>Ghép video</em>. Bấm menu{" "}
             <strong className="text-white">Tư liệu, Kịch bản, Thư viện, Tài khoản, LadiPage, Đăng Reels, Cài đặt</strong> để thử mọi chức
             năng.
           </p>
