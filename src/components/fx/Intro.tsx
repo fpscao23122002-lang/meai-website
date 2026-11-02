@@ -14,19 +14,21 @@ const OPEN_MS = 900; // thời gian mở rèm
 
 const STEPS = [
   { at: 0, text: "Khởi động lõi AI…" },
-  { at: 16, text: "Kết nối Muse…" },
-  { at: 34, text: "Kết nối Google Flow…" },
-  { at: 52, text: "Đồng bộ Seedance & Dola…" },
+  { at: 14, text: "Kết nối Muse…" },
+  { at: 28, text: "Kết nối Google Flow…" },
+  { at: 42, text: "Kết nối Seedance…" },
+  { at: 56, text: "Đồng bộ Kling & Dola…" },
   { at: 70, text: "Nạp tư liệu & hàng đợi thông minh…" },
   { at: 88, text: "Tối ưu giao diện Studio…" },
   { at: 100, text: "Sẵn sàng!" },
 ];
 
 const ENGINES = [
-  { name: "Muse", color: "#00F0FF", at: 22 },
-  { name: "Google Flow", color: "#A855F7", at: 40 },
-  { name: "Seedance", color: "#EAB308", at: 58 },
-  { name: "Dola", color: "#EC4899", at: 76 },
+  { name: "Muse", color: "#00F0FF", at: 18 },
+  { name: "Google Flow", color: "#A855F7", at: 32 },
+  { name: "Seedance", color: "#EAB308", at: 46 },
+  { name: "Kling", color: "#22C55E", at: 60 },
+  { name: "Dola", color: "#EC4899", at: 74 },
 ];
 
 const BRAND = "MeAI Studio";
@@ -192,11 +194,11 @@ export function Intro({ onReveal }: { onReveal: () => void }) {
             transition={{ duration: 1, delay: 0.25, ease: [0.22, 1, 0.36, 1] }}
             className="absolute inset-5 animate-spin-slower rounded-full border border-dashed border-cyan-glow/30 [animation-direction:reverse]"
           />
-          {/* 4 vệ tinh engine, sáng lên khi kết nối xong */}
+          {/* 5 vệ tinh nền tảng, sáng lên khi kết nối xong */}
           {ENGINES.map((e, i) => {
             const on = pct >= e.at;
             return (
-              <div key={e.name} className="absolute inset-0 animate-spin-slow" style={{ animationDelay: `${-i * 2}s` }}>
+              <div key={e.name} className="absolute inset-0 animate-spin-slow" style={{ animationDelay: `${-i * (8 / ENGINES.length)}s` }}>
                 <motion.span
                   animate={{ scale: on ? 1 : 0.5, opacity: on ? 1 : 0.25 }}
                   className="absolute -top-1.5 left-1/2 h-3 w-3 -translate-x-1/2 rounded-full"
@@ -277,7 +279,7 @@ export function Intro({ onReveal }: { onReveal: () => void }) {
           </div>
 
           {/* Trạng thái từng engine */}
-          <div className="mt-4 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+          <div className="mt-4 flex flex-wrap justify-center gap-1.5">
             {ENGINES.map((e) => {
               const on = pct >= e.at;
               return (

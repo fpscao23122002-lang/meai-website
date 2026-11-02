@@ -91,7 +91,7 @@ export function TaiKhoanMock({ play }: { play: boolean }) {
         </span>
       </div>
 
-      <div ref={tabInd.containerRef} className="relative mt-2.5 grid grid-cols-2 gap-1.5 sm:grid-cols-4">
+      <div ref={tabInd.containerRef} className="relative mt-2.5 grid grid-cols-3 gap-1.5 sm:grid-cols-5">
         <span aria-hidden style={tabInd.style} className="pointer-events-none absolute left-0 top-0 rounded-lg shadow-glow-sm ring-1 ring-cyan-glow/60 will-change-transform" />
         {platforms.map((p) => (
           <button

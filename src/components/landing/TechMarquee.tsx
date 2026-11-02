@@ -5,6 +5,7 @@ const platforms = [
   { name: "Muse", dot: "bg-engine-muse" },
   { name: "Google Flow", dot: "bg-engine-flow" },
   { name: "Seedance", dot: "bg-engine-seedance" },
+  { name: "Kling", dot: "bg-engine-kling" },
   { name: "Dola", dot: "bg-engine-dola" },
   { name: "Nano Banana 2", dot: "bg-engine-flow" },
   { name: "Omni 1.1 Flash", dot: "bg-engine-flow" },

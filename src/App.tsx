@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Route, Routes, useLocation } from "react-router-dom";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import { ScrollManager } from "@/components/layout/ScrollManager";
@@ -35,6 +35,17 @@ export default function App() {
   // Trang /app/* (app desktop mở để đăng nhập) vào thẳng nội dung, không chạy màn mở đầu
   const [skipIntro] = useState(() => location.pathname.startsWith("/app/"));
   const [revealed, setRevealed] = useState(skipIntro);
+
+  // Trang chủ: tải sẵn ảnh bìa + phim mở đầu trong lúc màn chờ đang chạy → vào trang là phim phát ngay
+  useEffect(() => {
+    if (location.pathname !== "/") return;
+    const links = [
+      Object.assign(document.createElement("link"), { rel: "preload", as: "image", href: "/videos/intro-1.webp" }),
+      Object.assign(document.createElement("link"), { rel: "prefetch", href: "/videos/intro-1.mp4" }),
+    ];
+    links.forEach((l) => document.head.appendChild(l));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     // reducedMotion="user": tự tắt hiệu ứng chuyển động nếu người dùng bật "Giảm chuyển động" trong hệ điều hành

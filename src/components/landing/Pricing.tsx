@@ -91,7 +91,7 @@ export function Pricing() {
         <SectionHeading
           eyebrow="Bảng giá"
           title={["Phí cố định cho phần mềm, ", { text: "video làm bao nhiêu tuỳ bạn", className: "text-gradient" }]}
-          description="Rẻ hơn lương một bạn edit part-time, nhưng chạy 24/7 không nghỉ phép. Tất cả gói đều dùng đủ 3 engine AI, gắn thẳng vào tài khoản Google của bạn — đăng nhập app là dùng."
+          description="Rẻ hơn lương một bạn edit part-time, nhưng chạy 24/7 không nghỉ phép. Tất cả gói đều dùng đủ 5 nền tảng AI, gắn thẳng vào tài khoản Google của bạn — đăng nhập app là dùng."
         />
 
         <div className="mx-auto mt-10 grid max-w-4xl gap-3 sm:grid-cols-3">

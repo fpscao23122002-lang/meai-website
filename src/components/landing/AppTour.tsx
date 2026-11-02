@@ -176,7 +176,7 @@ export function AppTour() {
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan-glow" />
                     Dựng lại từ app thật — đang tự chạy thao tác mẫu
                   </span>
-                  <ShotButton src={shot.src} w={2559} label={`Ảnh chụp màn hình ${shot.label} thật`} />
+                  {shot.src ? <ShotButton src={shot.src} w={2559} label={`Ảnh chụp màn hình ${shot.label} thật`} /> : null}
                 </div>
 
                 <div className="mt-6 grid gap-6 md:grid-cols-[1fr_1.1fr]">

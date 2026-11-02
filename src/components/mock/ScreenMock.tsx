@@ -15,6 +15,8 @@ const STUDIO_TABS: { engine: EngineId; kind: Kind }[] = [
   { engine: "flow", kind: "image" },
   { engine: "flow", kind: "video" },
   { engine: "seedance", kind: "video" },
+  { engine: "kling", kind: "video" },
+  { engine: "dola", kind: "image" },
 ];
 
 /** Chọn bản dựng màn hình app theo id menu */

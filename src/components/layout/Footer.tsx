@@ -173,7 +173,7 @@ export function Footer() {
         <div className="container space-y-1.5 pb-8 text-[11px] leading-5 text-slate-600">
           <p>
             MeAI là công cụ tự động hoá thao tác trên tài khoản của chính người dùng tại các nền tảng AI. MeAI không cung cấp, không bán
-            tài khoản hay lượt tạo video; người dùng tự chịu trách nhiệm tuân thủ điều khoản của từng nền tảng. Muse, Google Flow, Seedance,
+            tài khoản hay lượt tạo video; người dùng tự chịu trách nhiệm tuân thủ điều khoản của từng nền tảng. Muse, Google Flow, Seedance, Kling, Dola,
             Facebook và LadiPage là thương hiệu của các chủ sở hữu tương ứng.
           </p>
           {siteConfig.legal.company ? (

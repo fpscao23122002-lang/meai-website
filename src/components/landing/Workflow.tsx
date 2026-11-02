@@ -8,7 +8,7 @@ const steps = [
   {
     Icon: Users,
     title: "Thêm tài khoản",
-    desc: "Tab Tài khoản → thêm Muse, Flow, Seedance hoặc Dola. Đặt số TK chạy đồng thời, tổng luồng, gán proxy nếu cần.",
+    desc: "Tab Tài khoản → thêm Muse, Flow, Seedance, Kling hoặc Dola. Đặt số TK chạy đồng thời, tổng luồng, gán proxy nếu cần.",
   },
   {
     Icon: UserRound,

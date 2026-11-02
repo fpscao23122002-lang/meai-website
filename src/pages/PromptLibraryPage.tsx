@@ -76,7 +76,7 @@ export default function PromptLibraryPage() {
   usePageMeta({
     title: "Prompt mẫu tạo ảnh & video AI",
     description:
-      "Thư viện prompt mẫu cho MeAI Studio: quảng cáo sản phẩm, UGC review, thời trang, phim ngắn, ẩm thực — ghi rõ engine Muse, Google Flow, Seedance và chế độ nên dùng.",
+      "Thư viện prompt mẫu cho MeAI Studio: quảng cáo sản phẩm, UGC review, thời trang, phim ngắn, ẩm thực — ghi rõ nền tảng Muse, Google Flow, Seedance, Kling, Dola và chế độ nên dùng.",
     path: "/prompt-mau",
   });
   const [group, setGroup] = useState(ALL);

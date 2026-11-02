@@ -67,6 +67,29 @@ export const CONFIGS: Record<string, ConfigDef> = {
     ],
     seed: true,
   },
+  "kling-video": {
+    model: "Kling Video",
+    segs: [
+      { key: "mode", label: "Chế độ", options: ["Text → Video", "Ảnh → Video"] },
+      { key: "quality", label: "Chất lượng", options: ["Tiêu chuẩn", "Cao"] },
+      { key: "duration", label: "Thời lượng", options: ["5s", "10s"] },
+      { key: "ratio", label: "Tỷ lệ", options: ["9:16", "16:9", "1:1"] },
+    ],
+    toggles: [{ key: "wm", label: "Xóa watermark" }],
+    refs: "firstLast",
+  },
+  "dola-image": {
+    segs: [{ key: "ratio", label: "Tỉ lệ", options: ["9:16", "16:9", "1:1", "3:4"] }],
+    toggles: [{ key: "wm", label: "Xóa watermark" }],
+    perPrompt: true,
+  },
+  "dola-video": {
+    segs: [
+      { key: "ratio", label: "Tỉ lệ", options: ["9:16", "16:9", "1:1"] },
+      { key: "duration", label: "Thời lượng", options: ["5s", "10s"] },
+    ],
+    toggles: [{ key: "wm", label: "Xóa watermark" }],
+  },
 };
 
 export const DEFAULT_OPTS: Record<string, Record<string, OptValue>> = {
@@ -75,4 +98,7 @@ export const DEFAULT_OPTS: Record<string, Record<string, OptValue>> = {
   "flow-image": { ratio: "16:9", res: "2K", wm: true },
   "flow-video": { ratio: "16:9", quality: "4K", duration: "8s", wm: true },
   "seedance-video": { mode: "Text → Video", res: "720p", duration: "5s", ratio: "16:9", audio: false, camera: false, wm: true },
+  "kling-video": { mode: "Text → Video", quality: "Cao", duration: "5s", ratio: "9:16", wm: true },
+  "dola-image": { ratio: "9:16", wm: true, perPrompt: "1" },
+  "dola-video": { ratio: "9:16", duration: "5s", wm: true },
 };

@@ -117,18 +117,18 @@ export const promptGroups: PromptGroup[] = [
     desc: "Cảnh điện ảnh để dựng phim AI, video kể chuyện xây kênh.",
     items: [
       {
-        title: "Làng tuyết trung cổ",
+        title: "Hải đăng giữa bão đêm",
         engine: "flow",
         mode: "Tạo video",
         ratio: "16:9",
-        text: "Ngôi làng trung cổ phủ tuyết, người cha khoác áo choàng ôm con gái nhỏ bên gốc thông,\nánh sáng lạnh u ám, khói bốc từ ống khói, máy quay lia chậm từ trái sang phải, phong cách phim giả tưởng",
+        text: "Ngọn hải đăng đơn độc trên vách đá giữa cơn bão đêm, sóng lớn đập trắng xoá vào chân đá,\nchùm sáng quét qua màn mưa, máy quay bay chậm từ ngoài khơi tiến vào, tông xanh lạnh điện ảnh",
       },
       {
-        title: "Tỉ thí võ thuật dưới mưa",
+        title: "Cung thủ trên tường thành",
         engine: "seedance",
         mode: "Tạo video",
         ratio: "16:9",
-        text: "Hai võ sĩ cúi chào nhau giữa sân gạch cổ dưới mưa, mái ngói Á Đông phía sau,\nmáy quay chuyển động chậm quanh hai nhân vật, không khí phim võ thuật điện ảnh",
+        text: "Nữ cung thủ mặc giáp da đứng trên tường thành đá lúc hoàng hôn, kéo căng dây cung rồi buông tên,\ngió thổi tung tà áo choàng, máy quay xoay nửa vòng quanh nhân vật, phong cách phim sử thi",
       },
       {
         title: "Ông lão kể chuyện bên bếp lửa",
