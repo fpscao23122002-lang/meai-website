@@ -57,7 +57,7 @@ npm run deploy              # build + wrangler pages deploy dist
 
 | Đường dẫn | Nội dung |
 | --- | --- |
-| `/` | Landing page: Hero (ảnh Studio thật), Bento tính năng, Giao diện thật (8 màn hình app), Ứng dụng thực tế (UGC · phim AI · affiliate), Quy trình, Demo Studio tương tác, Bảng giá + bảng so sánh gói, FAQ theo nhóm, CTA |
+| `/` | Landing page: Phim nền đầu trang (2 đoạn 16:9 nối tiếp, lặp vô hạn), Studio tự chạy demo, Bento tính năng, Giao diện thật (8 màn hình app), Ứng dụng thực tế (6 video thành phẩm 9:16: UGC · phim AI · mùa lễ hội), Quy trình, Demo Studio tương tác, Bảng giá + bảng so sánh gói, FAQ theo nhóm, CTA |
 | `/docs` | Hướng dẫn sử dụng theo đúng menu app |
 | `/dashboard` | Khu vực khách hàng — **chỉ đăng nhập bằng Google**: gói & hạn dùng, chọn gói + thanh toán VietQR, máy tính đang dùng, lịch sử đơn, tải bản mới, changelog |
 | `/tai-ve` | Trang tải bộ cài: phiên bản, yêu cầu máy, 4 bước chạy lô đầu tiên, ghi chú bản mới |
@@ -81,6 +81,7 @@ public/
   favicon.png, apple-touch-icon.png, og-image.png
   brand/               # Logo MeAI
   screens/             # Ảnh chụp màn hình app (WebP)
+  videos/              # Video đã nén cho web: phim nền đầu trang + video thành phẩm 9:16
   samples/             # Ảnh thành phẩm mẫu dùng trong demo
 src/
   main.tsx, App.tsx    # Khởi tạo React + định tuyến (trang phụ tải lazy)
@@ -93,7 +94,9 @@ src/
     ui/                # Button, Link, Image, Logo, Reveal, SectionHeading
   hooks/usePageMeta.ts # Title/description/canonical theo trang
   lib/                 # site.ts (thông tin chung, pháp lý), data.ts (nội dung, FAQ), prompts.ts (prompt mẫu), docs.ts (mục lục)
-image/, app-preview.png.png  # Ảnh gốc bạn tải lên (nguồn để tạo các file trong public/)
+nguon-goc/              # File gốc bạn tải lên, không đưa lên web
+  anh-app/             # 12 ảnh chụp app + app-preview.png (nguồn tạo public/screens)
+  video/               # Tải video mới vào đây — xem HUONG-DAN.md
 ```
 
 ## Giao diện app & hiệu ứng

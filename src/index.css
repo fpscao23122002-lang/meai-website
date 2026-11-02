@@ -407,3 +407,13 @@
     opacity: 1;
   }
 }
+
+/* Phim nền đầu trang: phóng chậm đoạn đang chiếu (xem HeroCinema.tsx) */
+@keyframes hero-zoom {
+  from {
+    transform: scale(1.02);
+  }
+  to {
+    transform: scale(1.1);
+  }
+}

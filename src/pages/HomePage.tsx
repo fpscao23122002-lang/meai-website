@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/layout/Navbar";
 import { Footer } from "@/components/layout/Footer";
-import { Hero } from "@/components/landing/Hero";
+import { HeroCinema } from "@/components/landing/HeroCinema";
+import { StudioShowcase } from "@/components/landing/StudioShowcase";
 import { TechMarquee } from "@/components/landing/TechMarquee";
 import { BentoFeatures } from "@/components/landing/BentoFeatures";
 import { AppTour } from "@/components/landing/AppTour";
@@ -30,8 +31,9 @@ export default function HomePage() {
     <>
       <Navbar />
       <main>
-        <Hero />
+        <HeroCinema />
         <TechMarquee />
+        <StudioShowcase />
         <BentoFeatures />
         <AppTour />
         <UseCases />
