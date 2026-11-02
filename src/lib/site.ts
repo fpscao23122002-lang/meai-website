@@ -2,7 +2,7 @@ export const siteConfig = {
   name: "MeAI Studio",
   fullName: "MeAI - All-in-One AI Video & Marketing Automation Studio",
   description:
-    "Xưởng sản xuất video AI & tự động hóa Reels đa tài khoản. Tích hợp Muse, Google Flow, Seedance — tạo ảnh, tạo video hàng loạt từ danh sách prompt, giữ đồng nhất nhân vật, viết kịch bản từ LadiPage và đăng thẳng lên Facebook Reels.",
+    "Xưởng sản xuất video AI & tự động hóa Reels đa tài khoản. Tích hợp Muse, Google Flow, Seedance, Kling, Dola — tạo ảnh, tạo video hàng loạt từ danh sách prompt, giữ đồng nhất nhân vật, viết kịch bản từ LadiPage và đăng thẳng lên Facebook Reels.",
   url: (import.meta.env.VITE_SITE_URL || "https://meai-website.pages.dev").replace(/\/$/, ""),
   downloadUrl: import.meta.env.VITE_DOWNLOAD_URL || "/downloads/MeAI-Studio-Setup-x64.exe",
   latestVersion: "2.6.0",

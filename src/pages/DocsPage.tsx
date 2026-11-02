@@ -104,11 +104,11 @@ export default function DocsPage() {
               <DocTable
                 head={["Mục", "Dùng để"]}
                 rows={[
-                  ["Studio", "Tạo ảnh & video hàng loạt bằng Muse, Google Flow, Seedance"],
+                  ["Studio", "Tạo ảnh & video hàng loạt bằng Muse, Google Flow, Seedance, Kling, Dola"],
                   ["Tư liệu", "Nhân vật, mẫu prompt, người mẫu cố định, ảnh luân phiên"],
                   ["Kịch bản", "Viết kịch bản phân cảnh → video có giọng đọc, nhạc nền"],
                   ["Thư viện", "Xem, ghép, lưu và đăng mọi ảnh/video đã tạo"],
-                  ["Tài khoản", "Thêm tài khoản Muse, Flow, Seedance, Dola; luồng, proxy, hạn mức"],
+                  ["Tài khoản", "Thêm tài khoản Muse, Flow, Seedance, Kling, Dola; luồng, proxy, hạn mức"],
                   ["LadiPage", "Dán link landing page → sinh 3 kịch bản phân cảnh cho Muse"],
                   ["Đăng FB Reels", "Đăng video lên Fanpage bằng Page Access Token"],
                   ["Cài đặt", "Thư mục lưu, số lần thử khi lỗi, giới hạn thời gian, token Facebook"],

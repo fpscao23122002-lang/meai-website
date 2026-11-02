@@ -1,7 +1,9 @@
 import { useId, useRef, useState } from "react";
 import { AnimatePresence, motion, useInView, useReducedMotion } from "framer-motion";
-import { FolderOpen, LoaderCircle, Play, Plus } from "lucide-react";
-import { engines, type EngineId } from "@/lib/data";
+import { FolderOpen, LoaderCircle, Plus } from "lucide-react";
+import { engines, isVideoOnly, type EngineId } from "@/lib/data";
+import { ALL_MEDIA, ENGINE_MEDIA, pickMedia, type Media } from "@/lib/showcase";
+import { MockVideo } from "./MockVideo";
 import { CONFIGS, DEFAULT_OPTS, type Kind, type OptValue } from "@/lib/studioConfig";
 import { useDemoControl, useScript, useTask } from "@/hooks/useScript";
 import { AppFrame, Btn, Caret, FakeCursor, Field, Interactive, Label, Panel, ProgressBar, Seg, StatusPill, Toast, Toggle } from "./atoms";
@@ -18,49 +20,53 @@ type Task = {
   status: "wait" | "run" | "done" | "error";
   progress: number;
   account: number | null;
-  thumb: string;
+  media: Media;
   time: string;
 };
 
-const PORTRAIT = ["/samples/video-3.webp", "/samples/video-4.webp", "/samples/video-1.webp", "/samples/video-5.webp", "/samples/video-2.webp"];
-
+/** Prompt mẫu khớp với thành phẩm của từng nền tảng (xem lib/showcase.ts) */
 const PROMPTS: Record<EngineId, string> = {
-  muse: "Ông lão tóc bạc mặc áo thun xám,\nmỉm cười trong tủ quần áo gỗ\n\nCô gái Việt cầm lọ serum,\nánh nắng sớm, quảng cáo mỹ phẩm",
-  flow: "Unbox tai nghe trên bàn gỗ,\nslow motion, ánh sáng studio\n\nLy cà phê muối, khói bay nhẹ,\nmacro shot, nắng chiều",
-  seedance: "Cô gái xoay người khoe váy mới,\nphố đêm neon, máy lia theo\n\nShipper giao hàng dưới mưa,\nphong cách điện ảnh",
+  muse: "Cô gái váy đỏ cầm chai nước hoa,\ngiới thiệu trong cửa hàng\n\nCây thông, đèn bông tuyết,\nngười tuyết LED bừng sáng",
+  flow: "Người đàn ông nhìn tấm ảnh cũ\nsau ô kính vỡ, hồi ức cánh đồng hoa\n\nPhi thuyền lao vào hố đen,\nrồng đen, thế giới giả tưởng",
+  seedance: "Hai kiếm sĩ giao đấu\ndưới mưa hoa anh đào, tia lửa toé\n\nCận cảnh lưỡi kiếm chạm nhau,\ncánh hoa bay, quay chậm",
+  kling: "Người mẫu váy satin đen,\ntạo dáng trước quán cà phê phố cổ\n\nChiến đấu cơ giữa mây lửa,\nphượng hoàng bay qua rừng nấm",
+  dola: "Chú Samoyed mặc áo ông già Noel,\ncả nhà bật cười bên lò sưởi\n\nGia đình đón Noel ấm áp,\ncây thông lung linh phía sau",
 };
 
 const SEED_TASKS: Task[] = [
   {
     id: 2,
-    title: "Chân dung bên trái ảnh là một cô gái trẻ Việt Nam (khoảng 32 tuổi)",
-    engine: "muse",
-    kind: "image",
-    ratio: "16:9",
-    status: "done",
-    progress: 100,
-    account: 1,
-    thumb: "/samples/anh-1.webp",
-    time: "00:20",
-  },
-  {
-    id: 1,
-    title: "Ông lão tóc bạc đứng trong tủ quần áo, mỉm cười nhìn camera",
+    title: ENGINE_MEDIA.muse[0].title,
     engine: "muse",
     kind: "video",
     ratio: "9:16",
     status: "done",
     progress: 100,
-    account: 2,
-    thumb: "/samples/video-4.webp",
+    account: 1,
+    media: ENGINE_MEDIA.muse[0],
     time: "00:48",
+  },
+  {
+    id: 1,
+    title: ENGINE_MEDIA.dola[0].title,
+    engine: "dola",
+    kind: "video",
+    ratio: "9:16",
+    status: "done",
+    progress: 100,
+    account: 2,
+    media: ENGINE_MEDIA.dola[0],
+    time: "00:52",
   },
 ];
 
-const ORDER: { engine: EngineId; kind: Kind }[] = [
-  { engine: "muse", kind: "image" },
-  { engine: "flow", kind: "video" },
-  { engine: "seedance", kind: "video" },
+/** Demo tự chạy lần lượt qua 5 nền tảng; mỗi lượt chọn đúng khung hình của thành phẩm */
+const ORDER: { engine: EngineId; kind: Kind; ratio: string }[] = [
+  { engine: "muse", kind: "video", ratio: "9:16" },
+  { engine: "flow", kind: "video", ratio: "16:9" },
+  { engine: "seedance", kind: "video", ratio: "9:16" },
+  { engine: "kling", kind: "video", ratio: "9:16" },
+  { engine: "dola", kind: "video", ratio: "9:16" },
 ];
 
 const engineOf = (id: EngineId) => engines.find((e) => e.id === id)!;
@@ -75,7 +81,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
   const inView = useInView(wrapRef, { margin: "-10% 0px" });
   const reduce = useReducedMotion();
 
-  const [mode, setMode] = useState(fixedEngine ?? ORDER[0]);
+  const [mode, setMode] = useState<{ engine: EngineId; kind: Kind }>(fixedEngine ?? ORDER[0]);
   const cfgKey = `${mode.engine}-${mode.kind}`;
   const cfg = CONFIGS[cfgKey];
   const [opts, setOpts] = useState<Record<string, OptValue>>(DEFAULT_OPTS[cfgKey]);
@@ -100,7 +106,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
 
   // Người dùng tự thao tác
   const pickEngine = (engine: EngineId) => {
-    const kind: Kind = engine === "seedance" ? "video" : mode.kind;
+    const kind: Kind = isVideoOnly(engine) ? "video" : mode.kind;
     setMode({ engine, kind });
     setOpts({ ...DEFAULT_OPTS[`${engine}-${kind}`] });
   };
@@ -143,7 +149,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
       status: "wait",
       progress: 0,
       account: null,
-      thumb: PORTRAIT[(nextId.current + i) % PORTRAIT.length],
+      media: pickMedia(m.engine, ratioOpt, i),
       time: "00:00",
     }));
     const ids = created.map((t) => t.id);
@@ -184,7 +190,8 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
   };
 
   useScript(ctl.active, async ({ wait, type }) => {
-    const m = fixedEngine ?? ORDER[cycle.current % ORDER.length];
+    const step = ORDER[cycle.current % ORDER.length];
+    const m = fixedEngine ?? step;
     const key = `${m.engine}-${m.kind}`;
     cycle.current += 1;
     setMode(m);
@@ -198,7 +205,10 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
     await type(PROMPTS[m.engine], setPrompt, 20);
     await wait(350);
 
-    const ratioOpt = "9:16";
+    // Chọn khung hình có trong tuỳ chọn của engine (Flow video: 16:9 / 9:16…)
+    const ratioOpts = CONFIGS[key].segs.find((sg) => sg.key === "ratio")?.options ?? ["9:16"];
+    const wanted = fixedEngine ? (m.kind === "image" ? "16:9" : "9:16") : step.ratio;
+    const ratioOpt = ratioOpts.includes(wanted) ? wanted : ratioOpts[0];
     moveTo(`[data-opt="${uid}-ratio:${ratioOpt}"]`);
     await wait(750);
     click();
@@ -214,7 +224,6 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
     await wait(600);
   });
 
-  const e = engineOf(mode.engine);
   const modeSeg = cfg.segs.find((s) => s.key === "mode");
   const otherSegs = cfg.segs.filter((s) => s.key !== "mode");
 
@@ -238,17 +247,17 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                   data-ind={en.id}
                   onClick={() => pickEngine(en.id)}
                   className={cn(
-                    "relative flex flex-1 items-center justify-center gap-1 whitespace-nowrap rounded px-1 py-1 text-[10.5px] font-semibold",
+                    "relative flex flex-1 items-center justify-center gap-0.5 whitespace-nowrap rounded px-0.5 py-1 text-[9.5px] font-semibold tracking-tight",
                     en.id === mode.engine ? "text-white" : "text-slate-500 hover:text-white",
                   )}
                 >
                   <span className={cn("relative h-1.5 w-1.5 rounded-full", en.dot)} />
-                  <span className="relative">{en.name}</span>
+                  <span className="relative">{en.short}</span>
                 </button>
               ))}
             </div>
 
-            {mode.engine !== "seedance" ? (
+            {!isVideoOnly(mode.engine) ? (
               <Seg
                 layoutKey={`${uid}-kind`}
                 options={["Tạo ảnh", "Tạo video"]}
@@ -309,8 +318,8 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                     <Toggle on label="Ảnh luân phiên" hint="1 ảnh" />
                     <Label>Ảnh tham chiếu (tối đa 6)</Label>
                     <div className="flex gap-1">
-                      {PORTRAIT.slice(0, 3).map((src) => (
-                        <img key={src} src={src} alt="" className="h-8 w-8 rounded object-cover ring-1 ring-white/15" />
+                      {ALL_MEDIA.slice(0, 3).map((md) => (
+                        <img key={md.poster} src={md.poster} alt="" className="h-8 w-8 rounded object-cover ring-1 ring-white/15" />
                       ))}
                       <span className="flex h-8 w-8 items-center justify-center rounded border border-dashed border-white/15 text-slate-500">
                         <Plus className="h-3 w-3" />
@@ -405,7 +414,7 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                           {t.status === "done" ? (
                             <motion.img
                               key="img"
-                              src={t.thumb}
+                              src={t.media.poster}
                               alt=""
                               initial={{ opacity: 0, scale: 1.4, filter: "blur(6px)" }}
                               animate={{ opacity: 1, scale: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
@@ -449,28 +458,33 @@ export function StudioMock({ fixedEngine, className }: { fixedEngine?: { engine:
                 className="relative w-full overflow-hidden rounded-md bg-white/5"
                 style={{ aspectRatio: preview.ratio.replace(":", " / "), maxHeight: 220, maxWidth: preview.ratio === "9:16" ? 124 : undefined }}
               >
+                {/* Task xong → thành phẩm hiện lên; video tự phát (tắt tiếng, lặp) */}
                 <AnimatePresence mode="popLayout">
-                  <motion.img
+                  <motion.div
                     key={preview.id}
-                    src={preview.thumb}
-                    alt="Thành phẩm"
-                    initial={{ opacity: 0, scale: 1.15, filter: "blur(10px)" }}
-                    animate={{ opacity: 1, scale: 1, filter: "blur(0px)", transitionEnd: { filter: "none" } }}
+                    initial={{ opacity: 0, scale: 1.12 }}
+                    animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.6 }}
-                    className="absolute inset-0 h-full w-full object-cover object-top"
-                  />
+                    className="absolute inset-0"
+                  >
+                    {preview.kind === "video" ? (
+                      <MockVideo media={preview.media} />
+                    ) : (
+                      <img src={preview.media.poster} alt="Thành phẩm" className="absolute inset-0 h-full w-full object-cover object-top" />
+                    )}
+                  </motion.div>
                 </AnimatePresence>
                 {preview.kind === "video" ? (
-                  <span className="absolute inset-0 m-auto flex h-7 w-7 items-center justify-center rounded-full bg-white/90 text-ink">
-                    <Play className="h-3 w-3 fill-current" />
+                  <span className="absolute left-1 top-1 flex items-center gap-1 rounded bg-black/55 px-1 py-0.5 text-[8.5px] font-semibold text-white">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" /> Đang phát
                   </span>
                 ) : null}
               </div>
             </div>
             <div className="mt-2 flex flex-wrap items-center gap-1 text-[9.5px] text-slate-500">
               <StatusPill status="done" />
-              <span className={cn("rounded px-1 font-bold ring-1 ring-current", e.text)}>{engineOf(preview.engine).short}</span>
+              <span className={cn("rounded px-1 font-bold ring-1 ring-current", engineOf(preview.engine).text)}>{engineOf(preview.engine).short}</span>
               {preview.kind === "image" ? "Ảnh" : "Video"} · {preview.ratio}
             </div>
             <Label className="mt-2">Prompt</Label>

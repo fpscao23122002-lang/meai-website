@@ -18,9 +18,9 @@ const CLIPS = [
 const FADE = 1.1;
 
 const stats = [
-  { value: "3", label: "Engine AI tích hợp", sub: "Muse · Flow · Seedance" },
-  { value: "∞", label: "Tài khoản & luồng", sub: "chạy song song" },
-  { value: "6", label: "Ảnh tham chiếu", sub: "giữ đồng nhất nhân vật" },
+  { value: "5", label: "Nền tảng AI tích hợp", sub: "Muse · Flow · Seedance · Kling · Dola" },
+  { value: "Hàng triệu", label: "Video đã được tạo", sub: "bằng MeAI Studio" },
+  { value: "Đa luồng", label: "Chạy nhiều nền tảng", sub: "nâng cao số lượng video" },
   { value: "4K", label: "Độ phân giải tối đa", sub: "ảnh & video" },
 ];
 
@@ -306,7 +306,7 @@ export function HeroCinema() {
             {/* Nền mờ đặc thay cho backdrop-blur: kính mờ trên video đang phát rất tốn GPU */}
             {stats.map((s) => (
               <div key={s.label} className="bg-ink/80 p-4 sm:p-6">
-                <p className="text-gradient text-3xl font-extrabold tabular-nums sm:text-4xl">{s.value}</p>
+                <p className="text-gradient text-2xl font-extrabold leading-tight tabular-nums sm:text-4xl">{s.value}</p>
                 <p className="mt-1 text-sm font-semibold text-white">{s.label}</p>
                 <p className="text-xs text-slate-400">{s.sub}</p>
               </div>

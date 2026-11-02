@@ -16,7 +16,7 @@ const config: Config = {
         line: "rgba(148, 163, 184, 0.12)",
         cyan: { brand: "#0EE6FA", glow: "#00F0FF" },
         neon: { pink: "#FC3199", red: "#FF0844" },
-        engine: { muse: "#00F0FF", flow: "#A855F7", seedance: "#EAB308", dola: "#EC4899" },
+        engine: { muse: "#00F0FF", flow: "#A855F7", seedance: "#EAB308", kling: "#22C55E", dola: "#EC4899" },
       },
       fontFamily: {
         sans: ["\"Be Vietnam Pro\"", "ui-sans-serif", "system-ui", "sans-serif"],

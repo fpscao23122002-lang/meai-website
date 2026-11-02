@@ -105,9 +105,9 @@ export function BentoFeatures() {
               icon={Cpu}
               index="01"
               title="Đa Engine AI Đỉnh Cao"
-              desc="Muse, Google Flow và Seedance tích hợp sẵn trong Studio. Tạo ảnh & tạo video hàng loạt từ danh sách prompt — đổi engine chỉ một click, các tuỳ chọn tự đổi theo đúng engine."
+              desc="Muse, Google Flow, Seedance, Kling và Dola tích hợp sẵn trong Studio. Tạo ảnh & tạo video hàng loạt từ danh sách prompt — đổi engine chỉ một click, các tuỳ chọn tự đổi theo đúng engine."
             />
-            <div className="relative mt-7 grid gap-3 sm:grid-cols-3">
+            <div className="relative mt-7 grid gap-3 sm:grid-cols-6">
               {engines.map((e, i) => (
                 <motion.div
                   key={e.id}
@@ -116,16 +116,20 @@ export function BentoFeatures() {
                   viewport={{ once: true }}
                   transition={{ delay: 0.15 + i * 0.1 }}
                   style={
-                    tick % 3 === i
+                    tick % engines.length === i
                       ? { borderColor: `${e.hex}99`, boxShadow: `0 0 0 1px ${e.hex}55, 0 12px 40px -12px ${e.hex}88` }
                       : undefined
                   }
-                  className="relative flex flex-col rounded-2xl border border-white/[0.07] bg-ink/60 p-4 transition-[border-color,box-shadow] duration-500"
+                  className={cn(
+                    "relative flex flex-col rounded-2xl border border-white/[0.07] bg-ink/60 p-4 transition-[border-color,box-shadow] duration-500",
+                    // 5 nền tảng: hàng trên 3 thẻ, hàng dưới 2 thẻ rộng hơn
+                    i < 3 ? "sm:col-span-2" : "sm:col-span-3",
+                  )}
                 >
                   <p className="flex items-center gap-2 font-semibold text-white">
-                    <span className={cn("h-2.5 w-2.5 rounded-full", e.dot, tick % 3 === i && "animate-pulse")} /> {e.name}
+                    <span className={cn("h-2.5 w-2.5 rounded-full", e.dot, tick % engines.length === i && "animate-pulse")} /> {e.name}
                     <AnimatePresence>
-                      {tick % 3 === i ? (
+                      {tick % engines.length === i ? (
                         <motion.span
                           initial={{ opacity: 0, x: -6 }}
                           animate={{ opacity: 1, x: 0 }}
@@ -162,7 +166,7 @@ export function BentoFeatures() {
                       className={cn(
                         "rounded-md px-2 py-1 transition-all duration-500",
                         i === FLOW_STEPS.length - 1 ? "font-semibold text-white ring-1 ring-cyan-brand/30" : "text-slate-300",
-                        tick % 3 === i ? "bg-brand-gradient-soft text-white shadow-glow-sm ring-1 ring-cyan-glow/50" : "bg-white/[0.05]",
+                        tick % engines.length === i ? "bg-brand-gradient-soft text-white shadow-glow-sm ring-1 ring-cyan-glow/50" : "bg-white/[0.05]",
                         i === 0 && "font-mono",
                       )}
                     >

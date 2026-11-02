@@ -4,12 +4,13 @@ import { AnimatePresence, motion, useInView } from "framer-motion";
 import {
   FolderOpen,
   LoaderCircle,
-  Play,
   Plus,
   TriangleAlert,
   X,
 } from "lucide-react";
-import { engines, type EngineId } from "@/lib/data";
+import { engines, isVideoOnly, type EngineId } from "@/lib/data";
+import { ALL_MEDIA, ENGINE_MEDIA, pickMedia, type Media } from "@/lib/showcase";
+import { MockVideo } from "@/components/mock/MockVideo";
 import { CONFIGS, DEFAULT_OPTS, type Kind, type OptValue, type Seg } from "@/lib/studioConfig";
 import { cn } from "@/lib/cn";
 import { ScreenMock } from "@/components/mock/ScreenMock";
@@ -22,29 +23,25 @@ import { useIndicator } from "@/hooks/useIndicator";
 
 const TEMPLATES: { name: string; text: string }[] = [
   {
-    name: "Chân dung KOC ảo",
-    text: "Chân dung cận cảnh cô gái Việt 25 tuổi, da trắng hồng, tóc layer uốn sóng nhẹ,\nánh nắng sớm xuyên rèm, phong cách quảng cáo mỹ phẩm Hàn Quốc",
+    name: "Review nước hoa UGC",
+    text: "Cô gái váy đỏ cầm chai nước hoa giơ lên camera trong cửa hàng nước hoa,\nnói chuyện tự nhiên như livestream, ánh đèn vàng ấm, trung cảnh",
   },
   {
-    name: "Review sản phẩm UGC",
-    text: "Cô gái cầm lọ serum giơ lên camera, bàn trang điểm gỗ sáng, đèn ring light,\ntrung cảnh, phong cách UGC TikTok, nói chuyện tự nhiên",
+    name: "Lookbook dạo phố",
+    text: "Người mẫu tóc bạch kim, váy satin đen, tất trắng, tạo dáng trước quán cà phê phố cổ,\nxe đạp và chậu hoa phía sau, máy quay đi lùi chậm",
   },
   {
-    name: "Unbox sản phẩm",
-    text: "Đôi tay mở hộp quà lịch Giáng Sinh trên bàn gỗ, đèn Noel lung linh phía sau,\ncận cảnh, máy đẩy chậm, ánh sáng ấm",
+    name: "Phim kiếm hiệp",
+    text: "Hai kiếm sĩ áo giáp đen giao đấu dưới mưa hoa anh đào trước đền đỏ,\ntia lửa toé khi kiếm chạm nhau, góc máy điện ảnh",
   },
 ];
 
-const DEFAULT_PROMPT = `Ông lão tóc bạc mặc áo thun xám, đứng trong tủ quần áo gỗ,
-mỉm cười cầm chiếc áo mới, ánh sáng ấm, cận trung cảnh
+const DEFAULT_PROMPT = `Cô gái váy đỏ cầm chai nước hoa giới thiệu trong cửa hàng,
+nói chuyện với camera, ánh đèn vàng ấm, trung cảnh
 
-Cô gái Việt giơ hộp lịch Giáng Sinh giữa kho hàng đầy ắp,
-cận cảnh lung linh đèn Noel, máy đẩy chậm
+Cây thông Noel, đèn bông tuyết và người tuyết LED
+lần lượt bừng sáng, phòng khách ấm cúng`;
 
-Ly cà phê muối trên bàn gỗ, khói bay nhẹ, macro shot, ánh nắng chiều`;
-
-const THUMBS = ["/samples/anh-1.webp", "/samples/video-3.webp", "/samples/video-1.webp", "/samples/video-4.webp", "/samples/video-2.webp", "/samples/video-5.webp"];
-const PORTRAIT_THUMBS = THUMBS.slice(1);
 const RETRY_LIMIT = 1; // = "Số lần thử khi lỗi" trong Cài đặt
 
 /* ------------------------------------------------------------------ */
@@ -67,45 +64,32 @@ type Task = {
   failPlan: number;
   elapsed: number;
   date: string;
-  thumb: string;
+  /** Thành phẩm thật hiện khi task xong (xem lib/showcase.ts) */
+  media: Media;
 };
 
+const seedTask = (id: number, engine: EngineId, media: Media, elapsed: number, account: number): Task => ({
+  id,
+  prompt: media.title,
+  engine,
+  kind: "video",
+  ratio: media.ratio,
+  extra: "",
+  status: "done",
+  progress: 100,
+  account: null,
+  lastAccount: account,
+  attempts: 0,
+  failPlan: 0,
+  elapsed,
+  date: "02/11",
+  media,
+});
+
 const SEED_TASKS: Task[] = [
-  {
-    id: 2,
-    prompt:
-      "Chân dung bên trái ảnh là một cô gái trẻ Việt Nam (khoảng 32 tuổi) có gương mặt xinh đẹp, nét đẹp tự nhiên của người Việt Nam. Bên phải là bé trai đội mũ, phía sau là xe hơi đen.",
-    engine: "muse",
-    kind: "image",
-    ratio: "16:9",
-    extra: "",
-    status: "done",
-    progress: 100,
-    account: null,
-    lastAccount: 0,
-    attempts: 0,
-    failPlan: 0,
-    elapsed: 20,
-    date: "27/10",
-    thumb: THUMBS[0],
-  },
-  {
-    id: 1,
-    prompt: "Ông lão tóc bạc mặc áo thun xám đứng trong tủ quần áo, mỉm cười nhìn camera, ánh sáng ấm.",
-    engine: "muse",
-    kind: "video",
-    ratio: "9:16",
-    extra: "",
-    status: "done",
-    progress: 100,
-    account: null,
-    lastAccount: 1,
-    attempts: 0,
-    failPlan: 0,
-    elapsed: 48,
-    date: "27/10",
-    thumb: "/samples/video-4.webp",
-  },
+  seedTask(3, "kling", ENGINE_MEDIA.kling[0], 44, 0),
+  seedTask(2, "flow", ENGINE_MEDIA.flow[1], 52, 1),
+  seedTask(1, "dola", ENGINE_MEDIA.dola[0], 38, 0),
 ];
 
 const engineInfo = (id: EngineId) => engines.find((e) => e.id === id)!;
@@ -122,7 +106,7 @@ function splitPrompts(text: string) {
 
 export function InteractiveDemo() {
   const [engine, setEngine] = useState<EngineId>("muse");
-  const [kinds, setKinds] = useState<Record<"muse" | "flow", Kind>>({ muse: "image", flow: "image" });
+  const [kinds, setKinds] = useState<Record<EngineId, Kind>>({ muse: "video", flow: "video", seedance: "video", kling: "video", dola: "video" });
   const [opts, setOpts] = useState(DEFAULT_OPTS);
   const [refCount, setRefCount] = useState(0);
   const [firstLast, setFirstLast] = useState({ first: false, last: false });
@@ -134,13 +118,13 @@ export function InteractiveDemo() {
   const [tasks, setTasks] = useState<Task[]>(SEED_TASKS);
   const [running, setRunning] = useState(false);
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [activeId, setActiveId] = useState<number>(2);
+  const [activeId, setActiveId] = useState<number>(3);
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | Status>("all");
   const [sort, setSort] = useState<"new" | "old">("new");
   const [toast, setToast] = useState<string | null>(null);
 
-  const nextId = useRef(3);
+  const nextId = useRef(4);
   const [screen, setScreen] = useState("studio");
   const sbInd = useIndicator<HTMLElement>(screen);
   const sbIndM = useIndicator(screen);
@@ -149,7 +133,7 @@ export function InteractiveDemo() {
   const screenLabel = SIDEBAR.find((x) => x.id === screen)?.label ?? "Studio";
   const promptRef = useRef<HTMLTextAreaElement>(null);
 
-  const kind: Kind = engine === "seedance" ? "video" : kinds[engine];
+  const kind: Kind = isVideoOnly(engine) ? "video" : kinds[engine];
   const cfgKey = `${engine}-${kind}`;
   const cfg = CONFIGS[cfgKey];
   const cur = opts[cfgKey];
@@ -220,6 +204,8 @@ export function InteractiveDemo() {
     if (cfgKey === "flow-image") return String(cur.res);
     if (cfgKey === "flow-video") return `${cur.quality} · ${cur.duration}`;
     if (cfgKey === "seedance-video") return `${cur.res} · ${cur.duration}`;
+    if (cfgKey === "kling-video") return `${cur.quality} · ${cur.duration}`;
+    if (cfgKey === "dola-video") return String(cur.duration);
     return "";
   };
 
@@ -228,8 +214,7 @@ export function InteractiveDemo() {
     const now = new Date();
     const date = `${String(now.getDate()).padStart(2, "0")}/${String(now.getMonth() + 1).padStart(2, "0")}`;
     const ratio = String(cur.ratio);
-    const [rw, rh] = ratio.split(":").map(Number);
-    const created: Task[] = prompts.map((p) => {
+    const created: Task[] = prompts.map((p, i) => {
       const id = nextId.current++;
       return {
         id,
@@ -247,8 +232,8 @@ export function InteractiveDemo() {
         failPlan: 0,
         elapsed: 0,
         date,
-        // Khung ngang dùng ảnh ngang, khung dọc/vuông dùng ảnh dọc
-        thumb: rw > rh ? THUMBS[0] : PORTRAIT_THUMBS[id % PORTRAIT_THUMBS.length],
+        // Thành phẩm thật của nền tảng đang chọn, đúng khung ngang/dọc
+        media: pickMedia(engine, ratio, i),
       };
     });
     setTasks((t) => [...t, ...created]);
@@ -456,7 +441,7 @@ export function InteractiveDemo() {
             <div className="grid min-w-0 flex-1 gap-3 p-3 lg:grid-cols-[300px_minmax(0,1fr)] xl:grid-cols-[300px_minmax(0,1fr)_280px]">
               {/* ---------------- Panel cấu hình ---------------- */}
               <div className="flex flex-col rounded-xl border border-white/[0.06] bg-panel p-3">
-                <div className="flex gap-1 rounded-lg border border-white/[0.06] bg-ink/50 p-1">
+                <div className="grid grid-cols-5 gap-0.5 rounded-lg border border-white/[0.06] bg-ink/50 p-1">
                   {engines.map((e) => (
                     <button
                       key={e.id}
@@ -464,17 +449,17 @@ export function InteractiveDemo() {
                       onClick={() => setEngine(e.id)}
                       style={engine === e.id ? { boxShadow: `inset 0 0 0 1px ${e.hex}` } : undefined}
                       className={cn(
-                        "flex flex-auto items-center justify-center gap-1.5 whitespace-nowrap rounded-md px-2 py-1.5 text-[11px] font-semibold transition",
+                        "flex items-center justify-center gap-1 whitespace-nowrap rounded-md px-0.5 py-1.5 text-[10.5px] font-semibold tracking-tight transition",
                         engine === e.id ? "bg-white/[0.06] text-white" : "text-slate-400 hover:text-white",
                       )}
                     >
-                      <span className={cn("h-1.5 w-1.5 rounded-full", e.dot)} />
-                      {e.name}
+                      <span className={cn("h-1.5 w-1.5 shrink-0 rounded-full", e.dot)} />
+                      {e.short}
                     </button>
                   ))}
                 </div>
 
-                {engine !== "seedance" ? (
+                {!isVideoOnly(engine) ? (
                   <div className="mt-3 inline-flex w-fit gap-1 rounded-lg border border-white/[0.06] p-1">
                     {(["image", "video"] as const).map((k) => (
                       <button
@@ -569,7 +554,7 @@ export function InteractiveDemo() {
                               onClick={() => setRefCount((c) => c - 1)}
                               className="group relative h-10 w-10 overflow-hidden rounded-md ring-1 ring-white/15"
                             >
-                              <Image src={THUMBS[(i + 1) % THUMBS.length]} alt="" fill sizes="40px" className="object-cover" />
+                              <Image src={ALL_MEDIA[(i + 1) % ALL_MEDIA.length].poster} alt="" fill sizes="40px" className="object-cover object-top" />
                               <span className="absolute inset-0 hidden items-center justify-center bg-black/60 group-hover:flex">
                                 <X className="h-3 w-3 text-white" />
                               </span>
@@ -627,7 +612,7 @@ export function InteractiveDemo() {
                               className="relative flex h-14 w-14 items-center justify-center overflow-hidden rounded-lg border border-dashed border-white/15 text-[11px] text-slate-400 hover:border-cyan-glow/50"
                             >
                               {firstLast[k] ? (
-                                <Image src={k === "first" ? THUMBS[2] : THUMBS[5]} alt="" fill sizes="56px" className="object-cover" />
+                                <Image src={k === "first" ? ALL_MEDIA[2].poster : ALL_MEDIA[5].poster} alt="" fill sizes="56px" className="object-cover object-top" />
                               ) : (
                                 `+ ${k === "first" ? "Đầu" : "Cuối"}`
                               )}
@@ -928,7 +913,7 @@ function TaskRow({
       />
       <span className="relative h-9 w-9 shrink-0 overflow-hidden rounded-md bg-white/5">
         {task.status === "done" ? (
-          <Image src={task.thumb} alt="" fill sizes="36px" className="object-cover" />
+          <Image src={task.media.poster} alt="" fill sizes="36px" className="object-cover object-top" />
         ) : task.status === "error" ? (
           <TriangleAlert className="absolute inset-0 m-auto h-4 w-4 text-neon-pink" />
         ) : task.status === "running" ? (
@@ -962,12 +947,17 @@ function Preview({ task, onOpen, onRecreate, onEdit }: { task: Task; onOpen: () 
         >
           {task.status === "done" ? (
             <>
-              <Image src={task.thumb} alt="Ảnh xem trước thành phẩm" fill sizes="260px" className="object-cover object-top" />
+              {/* Task xong: video tự phát (tắt tiếng, lặp); task ảnh hiện ảnh thành phẩm */}
               {task.kind === "video" ? (
-                <span className="absolute inset-0 m-auto flex h-9 w-9 items-center justify-center rounded-full bg-white/90 text-ink">
-                  <Play className="h-4 w-4 fill-current" />
-                </span>
-              ) : null}
+                <>
+                  <MockVideo key={task.id} media={task.media} className="object-top" />
+                  <span className="absolute left-1.5 top-1.5 flex items-center gap-1 rounded bg-black/55 px-1.5 py-0.5 text-[10px] font-semibold text-white">
+                    <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" /> Đang phát
+                  </span>
+                </>
+              ) : (
+                <Image src={task.media.poster} alt="Ảnh xem trước thành phẩm" fill sizes="260px" className="object-cover object-top" />
+              )}
             </>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 px-3 text-center text-[11px] text-slate-400">

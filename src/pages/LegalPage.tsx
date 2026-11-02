@@ -92,7 +92,7 @@ function Terms() {
         <h2>4. Tài khoản nền tảng bên thứ ba</h2>
         <p>
           MeAI là công cụ tự động hoá thao tác trên <strong>tài khoản của chính bạn</strong> tại các nền tảng AI và mạng xã hội (như
-          Muse, Google Flow, Seedance, Dola, Facebook). MeAI không cung cấp, không bán tài khoản hay lượt tạo video của các nền tảng này.
+          Muse, Google Flow, Seedance, Kling, Dola, Facebook). MeAI không cung cấp, không bán tài khoản hay lượt tạo video của các nền tảng này.
         </p>
         <ul>
           <li>Bạn tự chịu trách nhiệm tuân thủ điều khoản sử dụng và chính sách nội dung của từng nền tảng.</li>

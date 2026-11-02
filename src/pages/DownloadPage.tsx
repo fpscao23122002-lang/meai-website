@@ -97,7 +97,7 @@ export default function DownloadPage() {
               />
               <Callout type="info">
                 Việc tạo ảnh/video chạy trên server của các nền tảng AI, máy bạn chủ yếu điều phối và tải thành phẩm — không cần card đồ
-                hoạ mạnh. Tài khoản Muse, Google Flow, Seedance, Dola do bạn tự chuẩn bị; MeAI không bán tài khoản hay lượt tạo video.
+                hoạ mạnh. Tài khoản Muse, Google Flow, Seedance, Kling, Dola do bạn tự chuẩn bị; MeAI không bán tài khoản hay lượt tạo video.
               </Callout>
             </section>
 
@@ -121,7 +121,7 @@ export default function DownloadPage() {
                   },
                   {
                     title: "Thêm tài khoản AI",
-                    body: <>Tab Tài khoản → thêm Muse, Flow, Seedance hoặc Dola; đặt số luồng và gán proxy nếu cần.</>,
+                    body: <>Tab Tài khoản → thêm Muse, Flow, Seedance, Kling hoặc Dola; đặt số luồng và gán proxy nếu cần.</>,
                   },
                   {
                     title: "Dán prompt & Tạo & chạy",

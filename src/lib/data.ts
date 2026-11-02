@@ -1,7 +1,7 @@
 // Dữ liệu sản phẩm — bám sát giao diện & tính năng thật của app MeAI.
 import { PLAN_RULES, formatVnd } from "../../shared/plans";
 
-export type EngineId = "muse" | "flow" | "seedance";
+export type EngineId = "muse" | "flow" | "seedance" | "kling" | "dola";
 
 export const engines: {
   id: EngineId;
@@ -13,6 +13,8 @@ export const engines: {
   tagline: string;
   modes: string[];
   specs: string[];
+  /** Engine chỉ tạo video (không có lựa chọn Tạo ảnh) */
+  videoOnly?: boolean;
 }[] = [
   {
     id: "muse",
@@ -46,14 +48,41 @@ export const engines: {
     tagline: "Text → Video, Ảnh → Video, Đầu–cuối với Seedance Pro. Có tạo âm thanh & cố định camera.",
     modes: ["Text → Video", "Ảnh → Video", "Đầu–cuối"],
     specs: ["480p · 720p · 1080p · 5s/10s", "6 tỉ lệ, có cả 21:9", "Seed cố định để tái lập"],
+    videoOnly: true,
+  },
+  {
+    id: "kling",
+    name: "Kling",
+    short: "Kling",
+    dot: "bg-engine-kling",
+    text: "text-engine-kling",
+    hex: "#22C55E",
+    tagline: "Video chuyển động mượt, vật lý tự nhiên — Text → Video, Ảnh → Video, hợp thời trang & cảnh điện ảnh.",
+    modes: ["Text → Video", "Ảnh → Video"],
+    specs: ["Clip 5s · 10s", "9:16 · 16:9 · 1:1", "Tiêu chuẩn / Chất lượng cao"],
+    videoOnly: true,
+  },
+  {
+    id: "dola",
+    name: "Dola",
+    short: "Dola",
+    dot: "bg-engine-dola",
+    text: "text-engine-dola",
+    hex: "#EC4899",
+    tagline: "Tạo ảnh & video nhanh, hợp nội dung giải trí, mùa lễ hội — thêm nguồn lượt tạo để hàng đợi chạy liên tục.",
+    modes: ["Tạo ảnh", "Tạo video"],
+    specs: ["Ảnh & video 9:16 · 16:9 · 1:1", "Clip 5s · 10s", "Chạy song song nhiều tài khoản"],
   },
 ];
+
+export const isVideoOnly = (id: EngineId) => Boolean(engines.find((e) => e.id === id)?.videoOnly);
 
 /** Nền tảng có thể thêm tài khoản trong tab Tài khoản */
 export const platforms = [
   { name: "Muse", dot: "bg-engine-muse" },
   { name: "Flow", dot: "bg-engine-flow" },
   { name: "Seedance", dot: "bg-engine-seedance" },
+  { name: "Kling", dot: "bg-engine-kling" },
   { name: "Dola", dot: "bg-engine-dola" },
 ];
 
@@ -69,6 +98,7 @@ export type AppScreen = {
 };
 
 /** Ảnh chụp màn hình thật của app (mở bằng nút "Xem ảnh chụp thật"); giao diện hiển thị trên web được dựng bằng code */
+/** src rỗng = chưa có ảnh chụp thật (chỉ có bản dựng bằng code) */
 export type Shot = { label: string; src: string; full?: string };
 
 const studioShot = (label: string, name: string): Shot => ({ label, src: `/screens/${name}.webp` });
@@ -81,7 +111,7 @@ export const appScreens: AppScreen[] = [
     title: "Studio — tạo ảnh & video hàng loạt",
     desc: "Chọn engine, dán danh sách prompt (mỗi prompt cách nhau 1 dòng trống) rồi bấm Tạo & chạy. Mỗi engine có bộ tuỳ chọn riêng, hiển thị đúng thứ bạn cần.",
     points: [
-      "Muse · Google Flow · Seedance trên cùng một màn hình",
+      "Muse · Google Flow · Seedance · Kling · Dola trên cùng một màn hình",
       "Chèn mẫu prompt / Lưu làm mẫu chỉ với một click",
       "Hàng đợi có lọc trạng thái, Chọn lỗi, Chạy lại lỗi, Ghép video",
       "Xem trước kết quả, Mở file, Tạo lại hoặc Chỉnh sửa prompt",
@@ -92,6 +122,8 @@ export const appScreens: AppScreen[] = [
       studioShot("Flow · Ảnh", "studio-flow-anh"),
       studioShot("Flow · Video", "studio-flow-video"),
       studioShot("Seedance", "studio-seedance"),
+      { label: "Kling · Video", src: "" },
+      { label: "Dola · Ảnh", src: "" },
     ],
   },
   {
@@ -136,7 +168,7 @@ export const appScreens: AppScreen[] = [
     id: "tai-khoan",
     label: "Tài khoản",
     title: "Tài khoản — đa nền tảng, đa luồng",
-    desc: "Quản lý tài khoản Muse, Flow, Seedance, Dola ở một nơi, xem trạng thái rảnh, gói và tín dụng còn lại.",
+    desc: "Quản lý tài khoản Muse, Flow, Seedance, Kling, Dola ở một nơi, xem trạng thái rảnh, gói và tín dụng còn lại.",
     points: [
       "TK chạy đồng thời, Tổng luồng, Chia việc: Luân phiên / Lần lượt",
       "Tự chuyển tài khoản khi chạm hạn mức ngày (Daily Limit)",
@@ -205,7 +237,7 @@ export const plans: Plan[] = [
     cta: "Bắt đầu Gói Tháng",
     features: [
       "Đầy đủ tính năng: Studio, Tư liệu, Kịch bản, Thư viện",
-      "Muse, Google Flow, Seedance — tạo ảnh & video hàng loạt",
+      "Muse, Google Flow, Seedance, Kling, Dola — tạo ảnh & video hàng loạt",
       "Không giới hạn tài khoản & luồng chạy",
       "LadiPage → kịch bản, Đăng FB Reels",
       "Dùng trên 1 máy tính",
@@ -264,7 +296,7 @@ export const faqs: { cat: (typeof faqCategories)[number]["id"]; q: string; a: st
   {
     cat: "mua",
     q: "Tôi có cần tự có tài khoản Muse / Google Flow / Seedance không?",
-    a: "Có. MeAI là “xưởng điều phối”: bạn thêm tài khoản Muse, Flow, Seedance hoặc Dola trong tab Tài khoản, app hiển thị trạng thái rảnh, gói, tín dụng còn lại và tự chia task. Càng nhiều tài khoản, hàng đợi chạy càng nhanh.",
+    a: "Có. MeAI là “xưởng điều phối”: bạn thêm tài khoản Muse, Flow, Seedance, Kling hoặc Dola trong tab Tài khoản, app hiển thị trạng thái rảnh, gói, tín dụng còn lại và tự chia task. Càng nhiều tài khoản, hàng đợi chạy càng nhanh.",
   },
   {
     cat: "dung",
@@ -299,7 +331,7 @@ export const faqs: { cat: (typeof faqCategories)[number]["id"]; q: string; a: st
   {
     cat: "mua",
     q: "MeAI có thu thêm tiền cho mỗi video không?",
-    a: "Không. Phí gói là phí sử dụng phần mềm. Lượt tạo ảnh/video được tính trên tài khoản Muse, Flow, Seedance của chính bạn theo gói của từng nền tảng — MeAI không thu thêm đồng nào trên mỗi video và không bán credit.",
+    a: "Không. Phí gói là phí sử dụng phần mềm. Lượt tạo ảnh/video được tính trên tài khoản Muse, Flow, Seedance, Kling, Dola của chính bạn theo gói của từng nền tảng — MeAI không thu thêm đồng nào trên mỗi video và không bán credit.",
   },
   {
     cat: "mua",
